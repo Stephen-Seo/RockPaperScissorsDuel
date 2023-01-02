@@ -1,6 +1,8 @@
 #ifndef ROCK_PAPER_SCISSORS_DUEL_GAME_H_
 #define ROCK_PAPER_SCISSORS_DUEL_GAME_H_
 
+#include <string>
+
 class Game {
 public:
   Game();
@@ -16,6 +18,11 @@ private:
 
   void update_impl();
   void draw_impl();
+
+  std::string playerOne;
+  std::string playerTwo;
+  std::string status;
+  bool isPlayerOne;
 
 };
 

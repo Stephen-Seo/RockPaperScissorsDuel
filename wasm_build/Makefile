@@ -14,10 +14,12 @@ HEADERS = \
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 
-all: | format rock_paper_scissors_duel.html index.html
+OUTDIR = outdir
 
-rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS}
-	${CXX} -o rock_paper_scissors_duel.html \
+all: | format ${OUTDIR} ${OUTDIR}/rock_paper_scissors_duel.html ${OUTDIR}/index.html ${OUTDIR}/logic.js ${OUTDIR}/client.js
+
+${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} client.js logic.js
+	${CXX} -o ${OUTDIR}/rock_paper_scissors_duel.html \
 		-s USE_GLFW=3 -I../wasm_includes -L../wasm_libs -lraylib \
 		--shell-file custom_shell.html \
 		-sEXPORTED_FUNCTIONS=_main,_game_visual_update \
@@ -25,17 +27,22 @@ rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS}
 		${OTHER_FLAGS} \
 		${SOURCES}
 
+${OUTDIR}:
+	mkdir ${OUTDIR}
+
+${OUTDIR}/logic.js:
+	cp logic.js ${OUTDIR}/
+
+${OUTDIR}/client.js:
+	cp client.js ${OUTDIR}/
+
 .PHONY: clean format index.html
 
-index.html:
-	ln -sf rock_paper_scissors_duel.html index.html
+${OUTDIR}/index.html:
+	ln -sf rock_paper_scissors_duel.html ${OUTDIR}/index.html
 
 clean:
-	rm -f rock_paper_scissors_duel.html
-	rm -f rock_paper_scissors_duel.js
-	rm -f rock_paper_scissors_duel.wasm
-	rm -f rock_paper_scissors_duel.data
-	rm -f index.html
+	rm -rf ${OUTDIR}
 
 format:
 	clang-format -i --style=file ${SOURCES} ${HEADERS}

@@ -1,4 +1,4 @@
-Rune.initlogic({
+Rune.initLogic({
     minPlayers: 2,
     maxPlayers: 2,
     setup: (players) => ({
@@ -96,10 +96,10 @@ Rune.initlogic({
             game.first_ready = false;
             game.second_ready = false;
             if (!has_remaining) {
-                if (pos <= -3) {
+                if (game.pos <= -3) {
                     // second won
                     Rune.gameOver();
-                } else if (pos >= 3) {
+                } else if (game.pos >= 3) {
                     // first won
                     Rune.gameOver();
                 } else {
