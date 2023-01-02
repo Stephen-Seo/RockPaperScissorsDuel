@@ -6,7 +6,7 @@
 // third party includes
 #include <raylib.h>
 
-Game::Game() : status("Unknown status") {}
+Game::Game() : status("Unknown status"), prevPos(0), cachedPos(0) {}
 
 void Game::update_state(const char *playerOne, const char *playerTwo,
                         const char *currentPlayer, char first_first,
@@ -28,6 +28,11 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
     status = "player two";
   } else {
     status = "unknown player";
+  }
+
+  if (cachedPos != pos) {
+    prevPos = cachedPos;
+    cachedPos = pos;
   }
 }
 

@@ -22,6 +22,8 @@ private:
   std::string playerOne;
   std::string playerTwo;
   std::string status;
+  int prevPos;
+  int cachedPos;
   bool isPlayerOne;
 
 };
