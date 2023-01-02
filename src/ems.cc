@@ -4,7 +4,7 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-EM_JS(void, js_set_ready, (), { Rune.actions.set_ready(); });
+EM_JS(void, js_set_ready, (), { Rune.actions.set_ready("unused"); });
 
 EM_JS(void, js_set_choices,
       (const char *first, const char *second, const char *third), {

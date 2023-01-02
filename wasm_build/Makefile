@@ -10,7 +10,9 @@ SOURCES = \
 		../src/game.cc
 
 HEADERS = \
-		../src/constants.h
+		../src/constants.h \
+		../src/ems.h \
+		../src/game.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 
@@ -18,12 +20,13 @@ OUTDIR = outdir
 
 all: | format ${OUTDIR} ${OUTDIR}/rock_paper_scissors_duel.html ${OUTDIR}/index.html ${OUTDIR}/logic.js ${OUTDIR}/client.js
 
-${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} client.js logic.js
+${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} ${OUTDIR}/client.js ${OUTDIR}/logic.js
 	${CXX} -o ${OUTDIR}/rock_paper_scissors_duel.html \
 		-s USE_GLFW=3 -I../wasm_includes -L../wasm_libs -lraylib \
 		--shell-file custom_shell.html \
 		-sEXPORTED_FUNCTIONS=_main,_game_visual_update \
 		-sEXPORTED_RUNTIME_METHODS=ccall \
+		--preload-file ../resources \
 		${OTHER_FLAGS} \
 		${SOURCES}
 

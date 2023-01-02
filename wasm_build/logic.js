@@ -111,7 +111,7 @@ Rune.initLogic({
                 }
             }
         },
-        set_ready: ({ game, playerId }) => {
+        set_ready: (unused, { game, playerId }) => {
             let is_first = game.player1 === playerId;
 
             if (is_first) {
