@@ -16,4 +16,6 @@ constexpr int ICON_MAX_WIDTH = 100;
 
 constexpr float READY_TIMER_MAX = 1.0F;
 
+constexpr float RESULTS_TIMER_MAX = 1.0F;
+
 #endif

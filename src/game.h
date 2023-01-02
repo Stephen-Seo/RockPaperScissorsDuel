@@ -25,22 +25,37 @@ private:
   void update_impl();
   void draw_impl();
 
+  void draw_choice(const unsigned int idx, const char choice,
+                   const bool using_triple, const float y,
+                   const Color color = WHITE);
+  void draw_qm(const unsigned int idx, const bool using_triple, const float y,
+               const Color color = WHITE);
+
+  void draw_helper_coord(float *x, float *width, const unsigned int idx,
+                         const bool using_triple);
+
   std::optional<Texture2D> spriteSheet;
   std::string playerOne;
   std::string playerTwo;
   std::string status;
   /*
-   * 0 - ready flag
+   * 0 - ready flag (ready to submit moves)
    * 1 - readyTimer fade to gray (fade to black otherwise)
    * 2 - is spectator
    * 3 - ready flag dirty
    * 4 - animating results
+   * 5 - animating dirty
+   * 6 - revealed first moves
+   * 7 - revealed second moves
+   * 8 - revealed third moves
    */
   std::bitset<32> flags;
   float readyTimer;
+  float resultsTimer;
   int prevPos;
   int cachedPos;
   char picked[3];
+  char opponentPicked[3];
   bool isPlayerOne;
 };
 
