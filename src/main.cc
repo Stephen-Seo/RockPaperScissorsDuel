@@ -54,9 +54,10 @@ int main() {
 #endif
 
   Game game{};
-  global_game_ptr = &game;
 
 #ifdef __EMSCRIPTEN__
+  global_game_ptr = &game;
+
   SetWindowSize(call_js_get_canvas_width(), call_js_get_canvas_height());
 
   emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, false,

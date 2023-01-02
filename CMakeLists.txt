@@ -16,6 +16,7 @@ endif()
 
 set(RPSDuelNative_SOURCES
     src/main.cc
+    src/game.cc
 )
 
 add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})
