@@ -6,7 +6,8 @@ endif
 
 SOURCES = \
 		../src/main.cc \
-		../src/ems.cc
+		../src/ems.cc \
+		../src/game.cc
 
 HEADERS = \
 		../src/constants.h
