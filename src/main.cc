@@ -2,6 +2,8 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
+
+#include "ems.h"
 #else
 #include <random>
 #endif
@@ -26,14 +28,21 @@ void EMSCRIPTEN_KEEPALIVE game_visual_update(
 
 } // end em exposed functions
 
-EM_JS(void, js_set_ready, (), { Rune.actions.set_ready(); });
-
-EM_JS(void, js_set_choices,
-      (const char *first, const char *second, const char *third), {
-        Rune.actions.set_choices(UTF8ToString(first), UTF8ToString(second),
-                                 UTF8ToString(third));
-      });
+EM_BOOL resize_event_callback(int event_type, const EmscriptenUiEvent *event,
+                              void *ud) {
+  if (event_type == EMSCRIPTEN_EVENT_RESIZE) {
+    SetWindowSize(call_js_get_canvas_width(), call_js_get_canvas_height());
+  }
+  return false;
+}
 #endif
+
+void game_update(void *game_ptr) {
+  BeginDrawing();
+  ClearBackground(BLACK);
+  DrawText("Testing...", 100, 100, 30, RAYWHITE);
+  EndDrawing();
+}
 
 int main() {
 #ifdef __EMSCRIPTEN__
@@ -44,14 +53,18 @@ int main() {
 #endif
 
 #ifdef __EMSCRIPTEN__
+  SetWindowSize(call_js_get_canvas_width(), call_js_get_canvas_height());
+
+  emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, false,
+                                 resize_event_callback);
+
+  // TODO set game ptr
+  emscripten_set_main_loop_arg(game_update, nullptr, 0, 1);
 #else
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
-    BeginDrawing();
-    ClearBackground(BLACK);
-    DrawText("Testing...", 100, 100, 30, RAYWHITE);
-    EndDrawing();
+    game_update(nullptr);
   }
 
   CloseAudioDevice();

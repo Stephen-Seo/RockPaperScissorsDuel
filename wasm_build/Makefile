@@ -5,14 +5,15 @@ else
 endif
 
 SOURCES = \
-		../src/main.cc
+		../src/main.cc \
+		../src/ems.cc
 
 HEADERS = \
 		../src/constants.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 
-all: | format rock_paper_scissors_duel.html
+all: | format rock_paper_scissors_duel.html index.html
 
 rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS}
 	${CXX} -o rock_paper_scissors_duel.html \
@@ -23,13 +24,17 @@ rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS}
 		${OTHER_FLAGS} \
 		${SOURCES}
 
-.PHONY: clean format
+.PHONY: clean format index.html
+
+index.html:
+	ln -sf rock_paper_scissors_duel.html index.html
 
 clean:
 	rm -f rock_paper_scissors_duel.html
 	rm -f rock_paper_scissors_duel.js
 	rm -f rock_paper_scissors_duel.wasm
 	rm -f rock_paper_scissors_duel.data
+	rm -f index.html
 
 format:
 	clang-format -i --style=file ${SOURCES} ${HEADERS}
