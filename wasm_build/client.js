@@ -3,7 +3,7 @@ Rune.initClient({
         const { player1, player2, first_choices, second_choices, ready, pos, matchup_idx } = newGame;
 
         Module.ccall('game_visual_update',
-            undefined,
+            'number',
             ['string', 'string', 'string',
                 'number', 'number', 'number',
                 'number', 'number', 'number',

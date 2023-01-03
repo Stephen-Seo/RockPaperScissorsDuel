@@ -4,8 +4,7 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-EM_JS(void, js_set_ready, (bool is_ready),
-      { Rune.actions.set_ready({is_ready}); });
+EM_JS(void, js_set_ready, (), { Rune.actions.set_ready("unused"); });
 
 EM_JS(void, js_set_choices,
       (const char *first, const char *second, const char *third), {
@@ -23,13 +22,13 @@ EM_JS(int, canvas_get_width, (),
 
 EM_JS(int, canvas_get_height, (),
       { return document.getElementById("canvas").clientHeight; });
-#else
-#include <iostream>
 #endif
 
-void call_js_set_ready(bool ready) {
+#include <iostream>
+
+void call_js_set_ready() {
 #ifdef __EMSCRIPTEN__
-  js_set_ready(ready);
+  js_set_ready();
 #else
   std::clog << "WARNING: emscripten not enabled, cannot call js_set_ready()!"
             << std::endl;

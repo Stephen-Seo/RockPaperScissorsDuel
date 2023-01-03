@@ -43,6 +43,7 @@ private:
   std::string playerOne;
   std::string playerTwo;
   std::string status;
+  double prevTime;
   /*
    * 0 - ready flag (ready to submit moves)
    * 1 - readyTimer fade to gray (fade to black otherwise)

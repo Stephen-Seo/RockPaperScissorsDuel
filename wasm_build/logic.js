@@ -53,13 +53,13 @@ Rune.initLogic({
                 game.second_choices[2] = third;
             }
         },
-        set_ready: ({ is_ready }, { game, playerId }) => {
+        set_ready: (unused, { game, playerId }) => {
             let is_first = game.player1 === playerId;
 
             if (is_first) {
-                game.ready[0] = is_ready;
+                game.ready[0] = true;
             } else {
-                game.ready[1] = is_ready;
+                game.ready[1] = true;
             }
         },
         request_update: (unused, {game, playerId}) => {
@@ -88,8 +88,6 @@ Rune.initLogic({
                         && game.second_choices[game.matchup_idx] === 'r')
                     || (game.first_choices[game.matchup_idx] === 's'
                         && game.second_choices[game.matchup_idx] === 'p')) {
-                //game.first_choices[game.matchup_idx] = 'w';
-                //game.second_choices[game.matchup_idx] = 'l';
                 game.pos = game.pos + 1;
             }
             // check if second won the matchup
@@ -99,15 +97,8 @@ Rune.initLogic({
                         && game.second_choices[game.matchup_idx] === 's')
                     || (game.first_choices[game.matchup_idx] === 's'
                         && game.second_choices[game.matchup_idx] === 'r')) {
-                //game.first_choices[game.matchup_idx] = 'l';
-                //game.second_choices[game.matchup_idx] = 'w';
                 game.pos = game.pos - 1;
             }
-            // matchup was a draw
-            //else {
-                //game.first_choices[game.matchup_idx] = 'd';
-                //game.second_choices[game.matchup_idx] = 'd';
-            //}
             game.matchup_idx = game.matchup_idx + 1;
 
             game.ready[0] = false;

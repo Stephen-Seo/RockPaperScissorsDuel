@@ -13,9 +13,10 @@
 #include "helpers.h"
 
 Game::Game()
-    : spriteSheet(std::nullopt), status("Unknown status"), readyTimer(0.0F),
-      resultsTimer(RESULTS_TIMER_MAX), scoreChangeTimer(SCORE_CHANGE_TIMER_MAX),
-      requestTimer(REQUEST_TIMER_MAX), prevPos(0), cachedPos(0) {
+    : spriteSheet(std::nullopt), status("Unknown status"), prevTime(0.0),
+      readyTimer(0.0F), resultsTimer(RESULTS_TIMER_MAX),
+      scoreChangeTimer(SCORE_CHANGE_TIMER_MAX), requestTimer(REQUEST_TIMER_MAX),
+      prevPos(0), cachedPos(0) {
   spriteSheet = LoadTexture("resources/rockpaperscissorsSpriteSheet.png");
 
   picked[0] = 0;
@@ -41,8 +42,8 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
               << "  p1: " << first_first << ", " << first_second << ", "
               << first_third << "\n  p2: " << second_first << ", "
               << second_second << ", " << second_third << "\nfirst is "
-              << (first_ready ? "ready" : "not ready") << "\nsecond is "
-              << (second_ready ? "ready" : "not ready") << "\npos: " << pos
+              << (first_ready ? "ready" : "NOT ready") << "\nsecond is "
+              << (second_ready ? "ready" : "NOT ready") << "\npos: " << pos
               << " matchup_idx: " << matchup_idx << std::endl;
     std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
   }
@@ -96,41 +97,6 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
     prevPos = cachedPos;
     cachedPos = pos;
   }
-
-  if (flags.test(0) && flags.test(4) && flags.test(6) && flags.test(7) &&
-      flags.test(8) && first_first == '?' && first_second == '?' &&
-      first_third == '?' && second_first == '?' && second_second == '?' &&
-      second_third == '?') {
-    std::cout << "Resetting for next round" << (isPlayerOne ? " (1) " : " (2) ")
-              << "..." << std::endl;
-    flags.reset(0);
-    flags.reset(1);
-    flags.reset(3);
-    flags.reset(4);
-    flags.reset(5);
-    flags.reset(6);
-    flags.reset(7);
-    flags.reset(8);
-    flags.reset(9);
-    flags.reset(10);
-    flags.reset(11);
-    flags.reset(12);
-
-    readyTimer = 0;
-    resultsTimer = RESULTS_TIMER_MAX;
-
-    picked[0] = 0;
-    picked[1] = 0;
-    picked[2] = 0;
-
-    opponentPicked[0] = 0;
-    opponentPicked[1] = 0;
-    opponentPicked[2] = 0;
-
-    call_js_set_ready(false);
-
-    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
-  }
 }
 
 void Game::do_update() {
@@ -143,7 +109,12 @@ void Game::update_impl() {
     return;
   }
 
-  const float dt = GetFrameTime();
+  float dt = 0.0F;
+  {
+    double timeNow = GetTime();
+    dt = timeNow - prevTime;
+    prevTime = timeNow;
+  }
 
   readyTimer -= dt;
   if (readyTimer <= 0.0F) {
@@ -241,7 +212,7 @@ void Game::update_impl() {
              GetTouchY() <= GetScreenHeight() - triple_single_width * 2) {
       if (picked[0] != 0 && picked[1] != 0 && picked[2] != 0 &&
           !flags.test(0)) {
-        call_js_set_ready(true);
+        call_js_set_ready();
         flags.set(0);
         flags.set(3);
       }
@@ -276,9 +247,10 @@ void Game::update_impl() {
       resultsTimer = RESULTS_TIMER_MAX;
     } else if (flags.test(9)) {
       if (!flags.test(8)) {
-        call_js_set_ready(true);
+        call_js_set_ready();
         flags.reset(9);
         flags.set(5);
+      } else {
       }
     } else {
       resultsTimer -= dt;
@@ -287,15 +259,12 @@ void Game::update_impl() {
         if (!flags.test(6)) {
           flags.set(6);
           flags.set(9);
-          call_js_set_ready(true);
         } else if (!flags.test(7)) {
           flags.set(7);
           flags.set(9);
-          call_js_set_ready(true);
         } else if (!flags.test(8)) {
           flags.set(8);
           flags.set(9);
-          call_js_set_ready(true);
         }
       }
     }
@@ -305,15 +274,46 @@ void Game::update_impl() {
       prevPos == cachedPos && is_choices_set() && is_opponent_choices_set()) {
     flags.reset(12);
     call_js_request_update();
-    std::cout << "Requesting update..." << std::endl;
+    // std::cout << "Requesting update..." << std::endl; // TODO DEBUG
   }
 
   requestTimer -= dt;
   if (requestTimer <= 0.0F) {
+    requestTimer = REQUEST_TIMER_MAX;
     if (flags.test(10) && flags.test(11)) {
       call_js_request_update();
-      std::cout << "Requesting update (timer)..." << std::endl;
+      // std::cout << "Requesting update (timer)..." << std::endl; // TODO DEBUG
     }
+  }
+
+  if (flags.test(0) && flags.test(6) && flags.test(7) && flags.test(8)) {
+    // std::cout << "Resetting for next round" << (isPlayerOne ? " (1) " : " (2)
+    // ") << "..." << std::endl; // TODO DEBUG
+    flags.reset(0);
+    flags.reset(1);
+    flags.reset(3);
+    flags.reset(4);
+    flags.reset(5);
+    flags.reset(6);
+    flags.reset(7);
+    flags.reset(8);
+    flags.reset(9);
+    flags.reset(10);
+    flags.reset(11);
+    flags.reset(12);
+
+    readyTimer = 0;
+    resultsTimer = RESULTS_TIMER_MAX;
+
+    picked[0] = 0;
+    picked[1] = 0;
+    picked[2] = 0;
+
+    opponentPicked[0] = 0;
+    opponentPicked[1] = 0;
+    opponentPicked[2] = 0;
+
+    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
   }
 }
 
