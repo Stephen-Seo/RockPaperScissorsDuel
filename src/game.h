@@ -17,7 +17,7 @@ public:
                     const char *currentPlayer, char first_first,
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
-                    bool second_ready, int pos);
+                    bool second_ready, int pos, int matchup_idx);
 
   void do_update();
 
@@ -34,6 +34,11 @@ private:
   void draw_helper_coord(float *x, float *width, const unsigned int idx,
                          const bool using_triple);
 
+  bool is_choices_set() const;
+  bool is_opponent_choices_set() const;
+
+  void draw_score() const;
+
   std::optional<Texture2D> spriteSheet;
   std::string playerOne;
   std::string playerTwo;
@@ -48,10 +53,16 @@ private:
    * 6 - revealed first moves
    * 7 - revealed second moves
    * 8 - revealed third moves
+   * 9 - finished revealing a move
+   * 10 - first ready
+   * 11 - second ready
+   * 12 - ready state dirty
    */
   std::bitset<32> flags;
   float readyTimer;
   float resultsTimer;
+  float scoreChangeTimer;
+  float requestTimer;
   int prevPos;
   int cachedPos;
   char picked[3];

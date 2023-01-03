@@ -10,10 +10,12 @@
 // local includes
 #include "constants.h"
 #include "ems.h"
+#include "helpers.h"
 
 Game::Game()
     : spriteSheet(std::nullopt), status("Unknown status"), readyTimer(0.0F),
-      prevPos(0), cachedPos(0) {
+      resultsTimer(RESULTS_TIMER_MAX), scoreChangeTimer(SCORE_CHANGE_TIMER_MAX),
+      requestTimer(REQUEST_TIMER_MAX), prevPos(0), cachedPos(0) {
   spriteSheet = LoadTexture("resources/rockpaperscissorsSpriteSheet.png");
 
   picked[0] = 0;
@@ -29,20 +31,56 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
                         const char *currentPlayer, char first_first,
                         char first_second, char first_third, char second_first,
                         char second_second, char second_third, bool first_ready,
-                        bool second_ready, int pos) {
+                        bool second_ready, int pos, int matchup_idx) {
+  // TODO DEBUG
+  if (std::strcmp(playerOne, currentPlayer) == 0) {
+    std::clog << "update_state:\n"
+              << "  is p1: "
+              << (std::strcmp(playerOne, currentPlayer) == 0 ? "true" : "false")
+              << std::endl
+              << "  p1: " << first_first << ", " << first_second << ", "
+              << first_third << "\n  p2: " << second_first << ", "
+              << second_second << ", " << second_third << "\nfirst is "
+              << (first_ready ? "ready" : "not ready") << "\nsecond is "
+              << (second_ready ? "ready" : "not ready") << "\npos: " << pos
+              << " matchup_idx: " << matchup_idx << std::endl;
+    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
+  }
   // TODO handle changing choices from r/p/s to w/l and etc.
   if (playerOne) {
     this->playerOne = playerOne;
-    opponentPicked[0] = second_first;
-    opponentPicked[1] = second_second;
-    opponentPicked[2] = second_third;
   }
   if (playerTwo) {
     this->playerTwo = playerTwo;
-    opponentPicked[0] = first_first;
-    opponentPicked[1] = first_second;
-    opponentPicked[2] = first_third;
   }
+
+  if (std::strcmp(playerOne, currentPlayer) == 0) {
+    isPlayerOne = true;
+    if (Helpers::isValidChoice(second_first) &&
+        Helpers::isValidChoice(second_second) &&
+        Helpers::isValidChoice(second_third)) {
+      opponentPicked[0] = second_first;
+      opponentPicked[1] = second_second;
+      opponentPicked[2] = second_third;
+    }
+  } else if (std::strcmp(playerTwo, currentPlayer) == 0) {
+    isPlayerOne = false;
+    if (Helpers::isValidChoice(first_first) &&
+        Helpers::isValidChoice(first_second) &&
+        Helpers::isValidChoice(first_third)) {
+      opponentPicked[0] = first_first;
+      opponentPicked[1] = first_second;
+      opponentPicked[2] = first_third;
+    }
+  } else {
+    isPlayerOne = false;
+  }
+
+  if ((!flags.test(10) && first_ready) || (!flags.test(11) && second_ready)) {
+    flags.set(12);
+  }
+  flags.set(10, first_ready);
+  flags.set(11, second_ready);
 
   if (std::strcmp(currentPlayer, "undefined") == 0) {
     status = "Watching a Game...";
@@ -59,12 +97,12 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
     cachedPos = pos;
   }
 
-  if (flags.test(0) && flags.test(3) && first_ready && second_ready) {
-    flags.reset(3);
-    flags.set(4);
-  } else if (flags.test(0) && flags.test(4) && first_first == 0 &&
-             first_second == 0 && first_third == 0 && second_first == 0 &&
-             second_second == 0 && second_third == 0) {
+  if (flags.test(0) && flags.test(4) && flags.test(6) && flags.test(7) &&
+      flags.test(8) && first_first == '?' && first_second == '?' &&
+      first_third == '?' && second_first == '?' && second_second == '?' &&
+      second_third == '?') {
+    std::cout << "Resetting for next round" << (isPlayerOne ? " (1) " : " (2) ")
+              << "..." << std::endl;
     flags.reset(0);
     flags.reset(1);
     flags.reset(3);
@@ -73,13 +111,25 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
     flags.reset(6);
     flags.reset(7);
     flags.reset(8);
+    flags.reset(9);
+    flags.reset(10);
+    flags.reset(11);
+    flags.reset(12);
 
     readyTimer = 0;
-    resultsTimer = 0;
+    resultsTimer = RESULTS_TIMER_MAX;
 
     picked[0] = 0;
     picked[1] = 0;
     picked[2] = 0;
+
+    opponentPicked[0] = 0;
+    opponentPicked[1] = 0;
+    opponentPicked[2] = 0;
+
+    call_js_set_ready(false);
+
+    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
   }
 }
 
@@ -93,10 +143,20 @@ void Game::update_impl() {
     return;
   }
 
-  readyTimer -= GetFrameTime();
+  const float dt = GetFrameTime();
+
+  readyTimer -= dt;
   if (readyTimer <= 0.0F) {
     readyTimer = READY_TIMER_MAX;
     flags.flip(1);
+  }
+
+  if (prevPos != cachedPos) {
+    scoreChangeTimer -= dt;
+    if (scoreChangeTimer <= 0) {
+      scoreChangeTimer = SCORE_CHANGE_TIMER_MAX;
+      prevPos = cachedPos;
+    }
   }
 
   if (IsMouseButtonPressed(0) && !flags.test(0)) {
@@ -181,7 +241,7 @@ void Game::update_impl() {
              GetTouchY() <= GetScreenHeight() - triple_single_width * 2) {
       if (picked[0] != 0 && picked[1] != 0 && picked[2] != 0 &&
           !flags.test(0)) {
-        call_js_set_ready();
+        call_js_set_ready(true);
         flags.set(0);
         flags.set(3);
       }
@@ -202,24 +262,57 @@ void Game::update_impl() {
     status = "Pick Moves!";
   }
 
-  if (flags.test(0) && !flags.test(3) && flags.test(4)) {
+  if (flags.test(0) && flags.test(3) && flags.test(10) && flags.test(11)) {
+    char buf[6] = {picked[0], 0, picked[1], 0, picked[2], 0};
+    call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    flags.reset(3);
+    flags.set(4);
+  } else if (flags.test(0) && !flags.test(3) && flags.test(4)) {
     // updates for result animations
 
     if (flags.test(5)) {
       flags.reset(5);
+      flags.reset(9);
       resultsTimer = RESULTS_TIMER_MAX;
-    }
-
-    resultsTimer -= GetFrameTime();
-    if (resultsTimer <= 0) {
-      resultsTimer = RESULTS_TIMER_MAX;
-      if (!flags.test(6)) {
-        flags.set(6);
-      } else if (!flags.test(7)) {
-        flags.set(7);
-      } else if (!flags.test(8)) {
-        flags.set(8);
+    } else if (flags.test(9)) {
+      if (!flags.test(8)) {
+        call_js_set_ready(true);
+        flags.reset(9);
+        flags.set(5);
       }
+    } else {
+      resultsTimer -= dt;
+      if (resultsTimer <= 0) {
+        resultsTimer = RESULTS_TIMER_MAX;
+        if (!flags.test(6)) {
+          flags.set(6);
+          flags.set(9);
+          call_js_set_ready(true);
+        } else if (!flags.test(7)) {
+          flags.set(7);
+          flags.set(9);
+          call_js_set_ready(true);
+        } else if (!flags.test(8)) {
+          flags.set(8);
+          flags.set(9);
+          call_js_set_ready(true);
+        }
+      }
+    }
+  }
+
+  if (flags.test(12) && flags.test(10) && flags.test(11) &&
+      prevPos == cachedPos && is_choices_set() && is_opponent_choices_set()) {
+    flags.reset(12);
+    call_js_request_update();
+    std::cout << "Requesting update..." << std::endl;
+  }
+
+  requestTimer -= dt;
+  if (requestTimer <= 0.0F) {
+    if (flags.test(10) && flags.test(11)) {
+      call_js_request_update();
+      std::cout << "Requesting update (timer)..." << std::endl;
     }
   }
 }
@@ -228,7 +321,8 @@ void Game::draw_impl() {
   if (flags.test(2)) {
     BeginDrawing();
     ClearBackground(BLACK);
-    DrawText(status.c_str(), 0, 0, 30, RAYWHITE);
+    draw_score();
+    DrawText(status.c_str(), 0, 20, 30, RAYWHITE);
     EndDrawing();
     return;
   }
@@ -243,46 +337,59 @@ void Game::draw_impl() {
     }
 
     if (flags.test(0)) {
+      draw_choice(0, picked[0], false, triple_single_width * 2.0F, WHITE);
+      draw_choice(1, picked[1], false, triple_single_width * 2.0F, WHITE);
+      draw_choice(2, picked[2], false, triple_single_width * 2.0F, WHITE);
       float ratio = 1.0F - resultsTimer / RESULTS_TIMER_MAX;
+      char otherPicked =
+          Helpers::isValidChoice(opponentPicked[0]) ? opponentPicked[0] : '?';
       if (!flags.test(6)) {
         if (ratio < 1.0F) {
-          draw_choice(0, opponentPicked[0], false, triple_single_width,
+          draw_choice(0, otherPicked, false, triple_single_width,
                       {255, 255, 255, (unsigned char)(ratio * 255.0F)});
           draw_qm(0, false, triple_single_width,
                   {255, 255, 255, (unsigned char)((1.0F - ratio) * 255.0f)});
         } else {
-          draw_choice(0, opponentPicked[0], false, triple_single_width);
+          draw_choice(0, otherPicked, false, triple_single_width);
         }
       } else {
-        draw_choice(0, opponentPicked[0], false, triple_single_width);
+        draw_choice(0, otherPicked, false, triple_single_width);
       }
 
+      otherPicked =
+          Helpers::isValidChoice(opponentPicked[1]) ? opponentPicked[1] : '?';
       if (!flags.test(7)) {
-        if (ratio < 1.0F) {
-          draw_choice(0, opponentPicked[1], false, triple_single_width,
+        if (!flags.test(6)) {
+          draw_qm(1, false, triple_single_width, WHITE);
+        } else if (ratio < 1.0F) {
+          draw_choice(1, otherPicked, false, triple_single_width,
                       {255, 255, 255, (unsigned char)(ratio * 255.0F)});
-          draw_qm(0, false, triple_single_width,
+          draw_qm(1, false, triple_single_width,
                   {255, 255, 255, (unsigned char)((1.0F - ratio) * 255.0f)});
         } else {
-          draw_choice(0, opponentPicked[1], false, triple_single_width);
+          draw_choice(1, otherPicked, false, triple_single_width);
         }
       } else {
-        draw_choice(0, opponentPicked[1], false, triple_single_width);
+        draw_choice(1, otherPicked, false, triple_single_width);
       }
 
+      otherPicked =
+          Helpers::isValidChoice(opponentPicked[2]) ? opponentPicked[2] : '?';
       if (!flags.test(8)) {
-        if (ratio < 1.0F) {
-          draw_choice(0, opponentPicked[2], false, triple_single_width,
+        if (!flags.test(7)) {
+          draw_qm(2, false, triple_single_width, WHITE);
+        } else if (ratio < 1.0F) {
+          draw_choice(2, otherPicked, false, triple_single_width,
                       {255, 255, 255, (unsigned char)(ratio * 255.0F)});
-          draw_qm(0, false, triple_single_width,
+          draw_qm(2, false, triple_single_width,
                   {255, 255, 255, (unsigned char)((1.0F - ratio) * 255.0f)});
         } else {
-          draw_choice(0, opponentPicked[2], false, triple_single_width);
+          draw_choice(2, otherPicked, false, triple_single_width);
         }
       } else {
-        draw_choice(0, opponentPicked[2], false, triple_single_width);
+        draw_choice(2, otherPicked, false, triple_single_width);
       }
-    } else {
+    } else { // flags.test(0)
       unsigned char value = 0;
       if (flags.test(1)) {
         // fade ready bg to gray
@@ -327,8 +434,10 @@ void Game::draw_impl() {
                     {200, 200, 200, 255});
 
       for (unsigned int i = 0; i < 3; ++i) {
-        draw_choice(i, picked[i], true,
-                    (float)GetScreenHeight() - triple_single_width * 2.0F);
+        if (picked[i] != 0) {
+          draw_choice(i, picked[i], true,
+                      (float)GetScreenHeight() - triple_single_width * 2.0F);
+        }
       }
 
       DrawRectangle(0, GetScreenHeight() - triple_single_width,
@@ -339,7 +448,8 @@ void Game::draw_impl() {
       draw_choice(2, 's', true, (float)GetScreenHeight() - triple_single_width);
     }
   }
-  DrawText(status.c_str(), 0, 0, 20, RAYWHITE);
+  draw_score();
+  DrawText(status.c_str(), 0, 20, 20, RAYWHITE);
   EndDrawing();
 }
 
@@ -379,7 +489,8 @@ void Game::draw_choice(const unsigned int idx, const char choice,
   default:
     // Should never happen.
     std::cerr << "WARNING: Invalid choice passed to draw_choice()!"
-              << std::endl;
+                 " (value is \""
+              << choice << "\" or \"" << (int)choice << "\")" << std::endl;
     break;
   }
 }
@@ -434,13 +545,13 @@ void Game::draw_helper_coord(float *x, float *width, const unsigned int idx,
 
       switch (idx) {
       case 0:
-        *x = (GetScreenWidth() - *width * 4.0F) / 2.0F;
+        *x = GetScreenWidth() - *width * 4.0F;
         break;
       case 1:
-        *x = (GetScreenWidth() - *width * 3.0F) / 2.0F;
+        *x = GetScreenWidth() - *width * 3.0F;
         break;
       case 2:
-        *x = (GetScreenWidth() - *width * 2.0F) / 2.0F;
+        *x = GetScreenWidth() - *width * 2.0F;
         break;
       default:
         // Should never happen.
@@ -449,5 +560,34 @@ void Game::draw_helper_coord(float *x, float *width, const unsigned int idx,
         return;
       }
     }
+  }
+}
+
+bool Game::is_choices_set() const {
+  return picked[0] != 0 && picked[1] != 0 && picked[2] != 0;
+}
+
+bool Game::is_opponent_choices_set() const {
+  return opponentPicked[0] != 0 && opponentPicked[1] != 0 &&
+         opponentPicked[2] != 0 && opponentPicked[0] != '?' &&
+         opponentPicked[1] != '?' && opponentPicked[2] != '?';
+}
+
+void Game::draw_score() const {
+  char buf[6] = {prevPos < 0 ? '-' : ' ',
+                 prevPos < 0 ? (char)('0' - prevPos) : (char)('0' + prevPos),
+                 0,
+                 cachedPos < 0 ? '-' : ' ',
+                 cachedPos < 0 ? (char)('0' - cachedPos)
+                               : (char)('0' + cachedPos),
+                 0};
+  if (prevPos != cachedPos) {
+    float ratio = 1.0F - scoreChangeTimer / SCORE_CHANGE_TIMER_MAX;
+    DrawText(&buf[3], 0, 0, 20,
+             {255, 255, 255, (unsigned char)(ratio * 255.0F)});
+    DrawText(buf, 0, 0, 20,
+             {255, 255, 255, (unsigned char)((1.0F - ratio) * 255.0F)});
+  } else {
+    DrawText(&buf[3], 0, 0, 20, WHITE);
   }
 }

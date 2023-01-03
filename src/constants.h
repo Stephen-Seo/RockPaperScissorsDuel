@@ -18,4 +18,8 @@ constexpr float READY_TIMER_MAX = 1.0F;
 
 constexpr float RESULTS_TIMER_MAX = 1.0F;
 
+constexpr float SCORE_CHANGE_TIMER_MAX = 1.0F;
+
+constexpr float REQUEST_TIMER_MAX = 2.0F;
+
 #endif

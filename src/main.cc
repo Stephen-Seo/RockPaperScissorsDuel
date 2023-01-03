@@ -25,11 +25,11 @@ void EMSCRIPTEN_KEEPALIVE game_visual_update(
     const char *playerOne, const char *playerTwo, const char *currentPlayer,
     char first_first, char first_second, char first_third, char second_first,
     char second_second, char second_third, bool first_ready, bool second_ready,
-    int pos) {
+    int pos, int matchup_idx) {
   ((Game *)global_game_ptr)
       ->update_state(playerOne, playerTwo, currentPlayer, first_first,
                      first_second, first_third, second_first, second_second,
-                     second_third, first_ready, second_ready, pos);
+                     second_third, first_ready, second_ready, pos, matchup_idx);
 }
 
 } // end em exposed functions

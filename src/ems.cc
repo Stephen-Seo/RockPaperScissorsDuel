@@ -4,13 +4,19 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-EM_JS(void, js_set_ready, (), { Rune.actions.set_ready("unused"); });
+EM_JS(void, js_set_ready, (bool is_ready),
+      { Rune.actions.set_ready({is_ready}); });
 
 EM_JS(void, js_set_choices,
       (const char *first, const char *second, const char *third), {
-        Rune.actions.set_choices(UTF8ToString(first), UTF8ToString(second),
-                                 UTF8ToString(third));
+        Rune.actions.set_choices({
+          first : UTF8ToString(first),
+          second : UTF8ToString(second),
+          third : UTF8ToString(third)
+        });
       });
+
+EM_JS(void, js_request_update, (), { Rune.actions.request_update("unused"); });
 
 EM_JS(int, canvas_get_width, (),
       { return document.getElementById("canvas").clientWidth; });
@@ -21,9 +27,9 @@ EM_JS(int, canvas_get_height, (),
 #include <iostream>
 #endif
 
-void call_js_set_ready() {
+void call_js_set_ready(bool ready) {
 #ifdef __EMSCRIPTEN__
-  js_set_ready();
+  js_set_ready(ready);
 #else
   std::clog << "WARNING: emscripten not enabled, cannot call js_set_ready()!"
             << std::endl;
@@ -37,6 +43,16 @@ void call_js_set_choices(const char *first, const char *second,
 #else
   std::clog << "WARNING: emscripten not enabled, cannot call js_set_choices()!"
             << std::endl;
+#endif
+}
+
+void call_js_request_update() {
+#ifdef __EMSCRIPTEN__
+  js_request_update();
+#else
+  std::clog
+      << "WARNING: emscripten not enabled, cannot call js_request_update()!"
+      << std::endl;
 #endif
 }
 

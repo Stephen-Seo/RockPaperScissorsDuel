@@ -7,12 +7,14 @@ endif
 SOURCES = \
 		../src/main.cc \
 		../src/ems.cc \
-		../src/game.cc
+		../src/game.cc \
+		../src/helpers.cc
 
 HEADERS = \
 		../src/constants.h \
 		../src/ems.h \
-		../src/game.h
+		../src/game.h \
+		../src/helpers.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 
@@ -33,10 +35,10 @@ ${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} ${OUTDIR}/client.
 ${OUTDIR}:
 	mkdir ${OUTDIR}
 
-${OUTDIR}/logic.js:
+${OUTDIR}/logic.js: logic.js
 	cp logic.js ${OUTDIR}/
 
-${OUTDIR}/client.js:
+${OUTDIR}/client.js: client.js
 	cp client.js ${OUTDIR}/
 
 .PHONY: clean format index.html
