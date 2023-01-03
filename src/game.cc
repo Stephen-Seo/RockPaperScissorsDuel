@@ -34,19 +34,20 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
                         char second_second, char second_third, bool first_ready,
                         bool second_ready, int pos, int matchup_idx) {
   // TODO DEBUG
-  if (std::strcmp(playerOne, currentPlayer) == 0) {
-    std::clog << "update_state:\n"
-              << "  is p1: "
-              << (std::strcmp(playerOne, currentPlayer) == 0 ? "true" : "false")
-              << std::endl
-              << "  p1: " << first_first << ", " << first_second << ", "
-              << first_third << "\n  p2: " << second_first << ", "
-              << second_second << ", " << second_third << "\nfirst is "
-              << (first_ready ? "ready" : "NOT ready") << "\nsecond is "
-              << (second_ready ? "ready" : "NOT ready") << "\npos: " << pos
-              << " matchup_idx: " << matchup_idx << std::endl;
-    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
-  }
+  // if (std::strcmp(playerOne, currentPlayer) == 0) {
+  //  std::clog << "update_state:\n"
+  //            << "  is p1: "
+  //            << (std::strcmp(playerOne, currentPlayer) == 0 ? "true" :
+  //            "false")
+  //            << std::endl
+  //            << "  p1: " << first_first << ", " << first_second << ", "
+  //            << first_third << "\n  p2: " << second_first << ", "
+  //            << second_second << ", " << second_third << "\nfirst is "
+  //            << (first_ready ? "ready" : "NOT ready") << "\nsecond is "
+  //            << (second_ready ? "ready" : "NOT ready") << "\npos: " << pos
+  //            << " matchup_idx: " << matchup_idx << std::endl;
+  //  std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
+  //}
   // TODO handle changing choices from r/p/s to w/l and etc.
   if (playerOne) {
     this->playerOne = playerOne;
@@ -313,7 +314,8 @@ void Game::update_impl() {
     opponentPicked[1] = 0;
     opponentPicked[2] = 0;
 
-    std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
+    // TODO DEBUG
+    // std::clog << "flags: " << flags.to_string().substr(32 - 13) << std::endl;
   }
 }
 
