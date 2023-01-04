@@ -619,13 +619,24 @@ bool Game::is_opponent_choices_set() const {
 }
 
 void Game::draw_score() const {
-  char buf[6] = {prevPos < 0 ? '-' : ' ',
-                 prevPos < 0 ? (char)('0' - prevPos) : (char)('0' + prevPos),
-                 0,
-                 cachedPos < 0 ? '-' : ' ',
-                 cachedPos < 0 ? (char)('0' - cachedPos)
-                               : (char)('0' + cachedPos),
-                 0};
+  char buf[6];
+
+  if (isPlayerOne || flags.test(2)) {
+    buf[0] = prevPos < 0 ? '-' : ' ';
+    buf[1] = prevPos < 0 ? (char)('0' - prevPos) : (char)('0' + prevPos);
+    buf[2] = 0;
+    buf[3] = cachedPos < 0 ? '-' : ' ';
+    buf[4] = cachedPos < 0 ? (char)('0' - cachedPos) : (char)('0' + cachedPos);
+    buf[5] = 0;
+  } else {
+    buf[0] = -prevPos < 0 ? '-' : ' ';
+    buf[1] = -prevPos < 0 ? (char)('0' - -prevPos) : (char)('0' + -prevPos);
+    buf[2] = 0;
+    buf[3] = -cachedPos < 0 ? '-' : ' ';
+    buf[4] =
+        -cachedPos < 0 ? (char)('0' - -cachedPos) : (char)('0' + -cachedPos);
+    buf[5] = 0;
+  }
   if (prevPos != cachedPos) {
     float ratio = 1.0F - scoreChangeTimer / SCORE_CHANGE_TIMER_MAX;
     DrawText(&buf[3], 0, 0, 20,
