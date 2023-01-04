@@ -16,7 +16,7 @@ endif()
 
 set(RPSDuelNative_SOURCES
     src/main.cc
-    src/game.cc
+    src/basic_renderer.cc
     src/ems.cc
     src/helpers.cc
 )

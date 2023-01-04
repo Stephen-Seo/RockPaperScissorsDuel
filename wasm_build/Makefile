@@ -7,13 +7,13 @@ endif
 SOURCES = \
 		../src/main.cc \
 		../src/ems.cc \
-		../src/game.cc \
+		../src/basic_renderer.cc \
 		../src/helpers.cc
 
 HEADERS = \
 		../src/constants.h \
 		../src/ems.h \
-		../src/game.h \
+		../src/basic_renderer.h \
 		../src/helpers.h \
 		../src/game_renderer.h
 

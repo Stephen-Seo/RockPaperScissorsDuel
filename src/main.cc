@@ -15,8 +15,8 @@
 #include <raylib.h>
 
 // local includes
+#include "basic_renderer.h"
 #include "constants.h"
-#include "game.h"
 #include "game_renderer.h"
 
 #ifdef __EMSCRIPTEN__
@@ -59,7 +59,7 @@ int main() {
   InitWindow(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, "RPSDuel_Native");
 #endif
 
-  std::unique_ptr<GameRenderer> renderer = std::make_unique<Game>();
+  std::unique_ptr<GameRenderer> renderer = std::make_unique<BasicRenderer>();
 
 #ifdef __EMSCRIPTEN__
   global_game_ptr = renderer.get();

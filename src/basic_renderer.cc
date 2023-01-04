@@ -1,4 +1,4 @@
-#include "game.h"
+#include "basic_renderer.h"
 
 // standard library includes
 #include <cstring>
@@ -12,7 +12,7 @@
 #include "ems.h"
 #include "helpers.h"
 
-Game::Game()
+BasicRenderer::BasicRenderer()
     : spriteSheet(std::nullopt), status("Unknown status"), readyTimer(0.0F),
       resultsTimer(RESULTS_TIMER_MAX), scoreChangeTimer(SCORE_CHANGE_TIMER_MAX),
       requestTimer(REQUEST_TIMER_MAX), prevPos(0), cachedPos(0),
@@ -28,11 +28,12 @@ Game::Game()
   opponentPicked[2] = 0;
 }
 
-void Game::update_state(const char *playerOne, const char *playerTwo,
-                        const char *currentPlayer, char first_first,
-                        char first_second, char first_third, char second_first,
-                        char second_second, char second_third, bool first_ready,
-                        bool second_ready, int pos, int matchup_idx) {
+void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
+                                 const char *currentPlayer, char first_first,
+                                 char first_second, char first_third,
+                                 char second_first, char second_second,
+                                 char second_third, bool first_ready,
+                                 bool second_ready, int pos, int matchup_idx) {
   // TODO DEBUG
   // if (std::strcmp(playerOne, currentPlayer) == 0) {
   //  std::clog << "update_state:\n"
@@ -118,14 +119,14 @@ void Game::update_state(const char *playerOne, const char *playerTwo,
   }
 }
 
-void Game::do_update() {
+void BasicRenderer::do_update() {
   update_impl();
   draw_impl();
 }
 
-void Game::screen_size_changed() { flags.set(13); }
+void BasicRenderer::screen_size_changed() { flags.set(13); }
 
-void Game::update_impl() {
+void BasicRenderer::update_impl() {
   const float dt = GetFrameTime();
 
   if (flags.test(13)) {
@@ -399,7 +400,7 @@ void Game::update_impl() {
   }
 }
 
-void Game::draw_impl() {
+void BasicRenderer::draw_impl() {
   if (flags.test(2)) {
     BeginDrawing();
     ClearBackground(BLACK);
@@ -498,9 +499,9 @@ void Game::draw_impl() {
   EndDrawing();
 }
 
-void Game::draw_choice(const unsigned int idx, const char choice,
-                       const bool using_triple, const float y,
-                       const Color color) {
+void BasicRenderer::draw_choice(const unsigned int idx, const char choice,
+                                const bool using_triple, const float y,
+                                const Color color) {
   if (!spriteSheet.has_value()) {
     return;
   }
@@ -540,8 +541,8 @@ void Game::draw_choice(const unsigned int idx, const char choice,
   }
 }
 
-void Game::draw_qm(const unsigned int idx, const bool using_triple,
-                   const float y, const Color color) {
+void BasicRenderer::draw_qm(const unsigned int idx, const bool using_triple,
+                            const float y, const Color color) {
   if (!spriteSheet.has_value()) {
     return;
   }
@@ -555,8 +556,9 @@ void Game::draw_qm(const unsigned int idx, const bool using_triple,
                  {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
 }
 
-void Game::draw_helper_coord(float *x, float *width, const unsigned int idx,
-                             const bool using_triple) {
+void BasicRenderer::draw_helper_coord(float *x, float *width,
+                                      const unsigned int idx,
+                                      const bool using_triple) {
   if (x) {
     *x = 0.0F;
     *width = ICON_MAX_WIDTH;
@@ -608,17 +610,17 @@ void Game::draw_helper_coord(float *x, float *width, const unsigned int idx,
   }
 }
 
-bool Game::is_choices_set() const {
+bool BasicRenderer::is_choices_set() const {
   return picked[0] != 0 && picked[1] != 0 && picked[2] != 0;
 }
 
-bool Game::is_opponent_choices_set() const {
+bool BasicRenderer::is_opponent_choices_set() const {
   return opponentPicked[0] != 0 && opponentPicked[1] != 0 &&
          opponentPicked[2] != 0 && opponentPicked[0] != '?' &&
          opponentPicked[1] != '?' && opponentPicked[2] != '?';
 }
 
-void Game::draw_score() const {
+void BasicRenderer::draw_score() const {
   char buf[6];
 
   if (isPlayerOne || flags.test(2)) {
@@ -648,7 +650,7 @@ void Game::draw_score() const {
   }
 }
 
-void Game::draw_reveal_choices(const char p[3], const float y) {
+void BasicRenderer::draw_reveal_choices(const char p[3], const float y) {
   float ratio = 1.0F - resultsTimer / RESULTS_TIMER_MAX;
   char otherPicked = Helpers::isValidChoice(p[0]) ? p[0] : '?';
   if (!flags.test(6)) {

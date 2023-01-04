@@ -1,5 +1,5 @@
-#ifndef ROCK_PAPER_SCISSORS_DUEL_GAME_H_
-#define ROCK_PAPER_SCISSORS_DUEL_GAME_H_
+#ifndef ROCK_PAPER_SCISSORS_DUEL_BASIC_RENDERER_H_
+#define ROCK_PAPER_SCISSORS_DUEL_BASIC_RENDERER_H_
 
 // standard library includes
 #include <bitset>
@@ -12,9 +12,9 @@
 // local includes
 #include "game_renderer.h"
 
-class Game : public GameRenderer {
+class BasicRenderer : public GameRenderer {
 public:
-  Game();
+  BasicRenderer();
 
   void update_state(const char *playerOne, const char *playerTwo,
                     const char *currentPlayer, char first_first,
