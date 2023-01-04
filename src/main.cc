@@ -39,6 +39,7 @@ EM_BOOL resize_event_callback(int event_type, const EmscriptenUiEvent *event,
                               void *ud) {
   if (event_type == EMSCRIPTEN_EVENT_RESIZE) {
     SetWindowSize(call_js_get_canvas_width(), call_js_get_canvas_height());
+    ((Game *)ud)->screen_size_changed();
   }
   return false;
 }
@@ -61,7 +62,7 @@ int main() {
 
   SetWindowSize(call_js_get_canvas_width(), call_js_get_canvas_height());
 
-  emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, false,
+  emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, &game, false,
                                  resize_event_callback);
 
   emscripten_set_main_loop_arg(game_update, &game, 0, 1);

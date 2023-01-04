@@ -22,4 +22,6 @@ constexpr float SCORE_CHANGE_TIMER_MAX = 1.0F;
 
 constexpr float REQUEST_TIMER_MAX = 3.0F;
 
+constexpr int DEFAULT_STATUS_TEXT_SIZE = 30;
+
 #endif

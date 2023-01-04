@@ -4,7 +4,9 @@
 namespace Helpers {
 
 extern bool isValidChoice(char choice);
+extern int getFitableSize(const char *text, const int default_size,
+                          const int width);
 
-}
+} // namespace Helpers
 
 #endif

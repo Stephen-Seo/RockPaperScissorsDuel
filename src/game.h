@@ -21,6 +21,8 @@ public:
 
   void do_update();
 
+  void screen_size_changed();
+
 private:
   void update_impl();
   void draw_impl();
@@ -38,12 +40,12 @@ private:
   bool is_opponent_choices_set() const;
 
   void draw_score() const;
+  void draw_reveal_choices(const char p[3], const float y);
 
   std::optional<Texture2D> spriteSheet;
   std::string playerOne;
   std::string playerTwo;
   std::string status;
-  double prevTime;
   /*
    * 0 - ready flag (ready to submit moves)
    * 1 - readyTimer fade to gray (fade to black otherwise)
@@ -58,6 +60,7 @@ private:
    * 10 - first ready
    * 11 - second ready
    * 12 - ready state dirty
+   * 13 - screen size changed
    */
   std::bitset<32> flags;
   float readyTimer;
@@ -66,6 +69,7 @@ private:
   float requestTimer;
   int prevPos;
   int cachedPos;
+  int statusSize;
   char picked[3];
   char opponentPicked[3];
   bool isPlayerOne;
