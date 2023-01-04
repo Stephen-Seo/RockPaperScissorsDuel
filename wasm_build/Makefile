@@ -14,7 +14,8 @@ HEADERS = \
 		../src/constants.h \
 		../src/ems.h \
 		../src/game.h \
-		../src/helpers.h
+		../src/helpers.h \
+		../src/game_renderer.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 

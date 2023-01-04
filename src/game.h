@@ -9,7 +9,10 @@
 // third party includes
 #include <raylib.h>
 
-class Game {
+// local includes
+#include "game_renderer.h"
+
+class Game : public GameRenderer {
 public:
   Game();
 
@@ -17,11 +20,11 @@ public:
                     const char *currentPlayer, char first_first,
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
-                    bool second_ready, int pos, int matchup_idx);
+                    bool second_ready, int pos, int matchup_idx) override;
 
-  void do_update();
+  void do_update() override;
 
-  void screen_size_changed();
+  void screen_size_changed() override;
 
 private:
   void update_impl();
