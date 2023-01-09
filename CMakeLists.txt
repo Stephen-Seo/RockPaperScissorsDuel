@@ -15,10 +15,18 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(RPSDuelNative_SOURCES
-    src/main.cc
-    src/basic_renderer.cc
-    src/ems.cc
-    src/helpers.cc
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/basic_renderer.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ems.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.cc"
+)
+
+set(RPSDuelNative_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ems.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/constants.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_renderer.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/basic_renderer.h"
 )
 
 add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})
@@ -26,3 +34,12 @@ add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})
 target_link_libraries(RPSDuelNative PUBLIC
     raylib
 )
+
+if(EXISTS /usr/bin/clang-format)
+    add_custom_target(
+        ClangFormatTarget
+        COMMAND clang-format -i --style=google ${RPSDuelNative_SOURCES} ${RPSDuelNative_HEADERS}
+    )
+    add_dependencies(RPSDuelNative ClangFormatTarget)
+    message(STATUS "Enabled clang-format formatting.")
+endif()

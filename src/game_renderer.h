@@ -2,7 +2,7 @@
 #define ROCK_PAPER_SCISSORS_DUEL_GAME_RENDERER_H_
 
 class GameRenderer {
-public:
+ public:
   GameRenderer() {}
   virtual ~GameRenderer() {}
 

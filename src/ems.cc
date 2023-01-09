@@ -56,7 +56,6 @@ void call_js_request_update() {
 }
 
 int call_js_get_canvas_width() {
-
 #ifdef __EMSCRIPTEN__
   return canvas_get_width();
 #else

@@ -13,9 +13,9 @@
 #include "game_renderer.h"
 
 class BasicRenderer : public GameRenderer {
-public:
+ public:
   BasicRenderer();
-  ~BasicRenderer() override {};
+  ~BasicRenderer() override{};
 
   void update_state(const char *playerOne, const char *playerTwo,
                     const char *currentPlayer, char first_first,
@@ -27,7 +27,7 @@ public:
 
   void screen_size_changed() override;
 
-private:
+ private:
   void update_impl();
   void draw_impl();
 

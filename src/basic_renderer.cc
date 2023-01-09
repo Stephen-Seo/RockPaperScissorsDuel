@@ -13,9 +13,14 @@
 #include "helpers.h"
 
 BasicRenderer::BasicRenderer()
-    : spriteSheet(std::nullopt), status("Unknown status"), readyTimer(0.0F),
-      resultsTimer(RESULTS_TIMER_MAX), scoreChangeTimer(SCORE_CHANGE_TIMER_MAX),
-      requestTimer(REQUEST_TIMER_MAX), prevPos(0), cachedPos(0),
+    : spriteSheet(std::nullopt),
+      status("Unknown status"),
+      readyTimer(0.0F),
+      resultsTimer(RESULTS_TIMER_MAX),
+      scoreChangeTimer(SCORE_CHANGE_TIMER_MAX),
+      requestTimer(REQUEST_TIMER_MAX),
+      prevPos(0),
+      cachedPos(0),
       statusSize(DEFAULT_STATUS_TEXT_SIZE) {
   spriteSheet = LoadTexture("resources/rockpaperscissorsSpriteSheet.png");
 
@@ -131,11 +136,10 @@ void BasicRenderer::update_impl() {
 
   if (flags.test(13)) {
     flags.reset(13);
-    statusSize =
-        !status.empty()
-            ? Helpers::getFitableSize(status.c_str(), DEFAULT_STATUS_TEXT_SIZE,
-                                      GetScreenWidth())
-            : DEFAULT_STATUS_TEXT_SIZE;
+    statusSize = !status.empty() ? Helpers::getFitableSize(
+                                       status.c_str(), DEFAULT_STATUS_TEXT_SIZE,
+                                       GetScreenWidth())
+                                 : DEFAULT_STATUS_TEXT_SIZE;
   }
 
   if (prevPos != cachedPos) {
@@ -435,7 +439,7 @@ void BasicRenderer::draw_impl() {
       draw_choice(1, picked[1], false, triple_single_width * 2.0F, WHITE);
       draw_choice(2, picked[2], false, triple_single_width * 2.0F, WHITE);
       draw_reveal_choices(opponentPicked, triple_single_width);
-    } else { // flags.test(0)
+    } else {  // flags.test(0)
       unsigned char value = 0;
       if (flags.test(1)) {
         // fade ready bg to gray
@@ -510,34 +514,35 @@ void BasicRenderer::draw_choice(const unsigned int idx, const char choice,
   draw_helper_coord(&x, &width, idx, using_triple);
 
   switch (choice) {
-  case 'r':
-    DrawTexturePro(spriteSheet.value(),
-                   {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
-                   {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
-    break;
-  case 'p':
-    DrawTexturePro(spriteSheet.value(),
-                   {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
-                   {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
-    break;
-  case 's':
-    DrawTexturePro(spriteSheet.value(),
-                   {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
-                    SCISSORS_DIMS[3]},
-                   {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
-    break;
-  case '?':
-    DrawTexturePro(spriteSheet.value(),
-                   {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
-                    QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
-                   {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
-    break;
-  default:
-    // Should never happen.
-    std::cerr << "WARNING: Invalid choice passed to draw_choice()!"
-                 " (value is \""
-              << choice << "\" or \"" << (int)choice << "\")" << std::endl;
-    break;
+    case 'r':
+      DrawTexturePro(spriteSheet.value(),
+                     {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
+                     {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
+      break;
+    case 'p':
+      DrawTexturePro(
+          spriteSheet.value(),
+          {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
+          {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
+      break;
+    case 's':
+      DrawTexturePro(spriteSheet.value(),
+                     {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+                      SCISSORS_DIMS[3]},
+                     {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
+      break;
+    case '?':
+      DrawTexturePro(spriteSheet.value(),
+                     {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
+                      QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
+                     {x, y, width, width}, {0.0F, 0.0F}, 0.0F, color);
+      break;
+    default:
+      // Should never happen.
+      std::cerr << "WARNING: Invalid choice passed to draw_choice()!"
+                   " (value is \""
+                << choice << "\" or \"" << (int)choice << "\")" << std::endl;
+      break;
   }
 }
 
@@ -569,20 +574,20 @@ void BasicRenderer::draw_helper_coord(float *x, float *width,
       }
 
       switch (idx) {
-      case 0:
-        *x = 0.0F;
-        break;
-      case 1:
-        *x = (GetScreenWidth() - *width) / 2.0F;
-        break;
-      case 2:
-        *x = GetScreenWidth() - *width;
-        break;
-      default:
-        // Should never happen
-        std::cerr << "WARNING: Invalid idx passed to draw_helper_coord()!"
-                  << std::endl;
-        return;
+        case 0:
+          *x = 0.0F;
+          break;
+        case 1:
+          *x = (GetScreenWidth() - *width) / 2.0F;
+          break;
+        case 2:
+          *x = GetScreenWidth() - *width;
+          break;
+        default:
+          // Should never happen
+          std::cerr << "WARNING: Invalid idx passed to draw_helper_coord()!"
+                    << std::endl;
+          return;
       }
     } else {
       *width = GetScreenWidth() / 5.0F;
@@ -591,20 +596,20 @@ void BasicRenderer::draw_helper_coord(float *x, float *width,
       }
 
       switch (idx) {
-      case 0:
-        *x = GetScreenWidth() - *width * 4.0F;
-        break;
-      case 1:
-        *x = GetScreenWidth() - *width * 3.0F;
-        break;
-      case 2:
-        *x = GetScreenWidth() - *width * 2.0F;
-        break;
-      default:
-        // Should never happen.
-        std::cerr << "WARNING: Invalid idx passed to draw_helper_coord()!"
-                  << std::endl;
-        return;
+        case 0:
+          *x = GetScreenWidth() - *width * 4.0F;
+          break;
+        case 1:
+          *x = GetScreenWidth() - *width * 3.0F;
+          break;
+        case 2:
+          *x = GetScreenWidth() - *width * 2.0F;
+          break;
+        default:
+          // Should never happen.
+          std::cerr << "WARNING: Invalid idx passed to draw_helper_coord()!"
+                    << std::endl;
+          return;
       }
     }
   }

@@ -37,7 +37,7 @@ int EMSCRIPTEN_KEEPALIVE game_visual_update(
   return 0;
 }
 
-} // end em exposed functions
+}  // end em exposed functions
 
 EM_BOOL resize_event_callback(int event_type, const EmscriptenUiEvent *event,
                               void *ud) {
