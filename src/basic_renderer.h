@@ -15,6 +15,7 @@
 class BasicRenderer : public GameRenderer {
 public:
   BasicRenderer();
+  ~BasicRenderer() override {};
 
   void update_state(const char *playerOne, const char *playerTwo,
                     const char *currentPlayer, char first_first,
