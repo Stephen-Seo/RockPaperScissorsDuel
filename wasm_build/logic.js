@@ -9,6 +9,7 @@ Rune.initLogic({
         ready: new Array(2).fill(false),
         pos: 0,
         matchup_idx: 0,
+        gameover: false,
     }),
     actions: {
         set_choices: ({first, second, third}, { game, playerId }) => {
@@ -107,9 +108,11 @@ Rune.initLogic({
                 if (game.pos <= -3) {
                     // second won
                     Rune.gameOver();
+                    game.gameover = true;
                 } else if (game.pos >= 3) {
                     // first won
                     Rune.gameOver();
+                    game.gameover = true;
                 } else {
                     // game is still going
                     for (let i = 0; i < 3; ++i) {

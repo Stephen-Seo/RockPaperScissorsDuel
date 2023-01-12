@@ -1,6 +1,6 @@
 Rune.initClient({
     visualUpdate: ({ newGame, yourPlayerId}) => {
-        const { player1, player2, first_choices, second_choices, ready, pos, matchup_idx } = newGame;
+        const { player1, player2, first_choices, second_choices, ready, pos, matchup_idx, gameover } = newGame;
 
         function is_choices_filled(choices) {
             for (let i = 0; i < 3; ++i) {
@@ -18,7 +18,7 @@ Rune.initClient({
                     'number', 'number', 'number',
                     'number', 'number', 'number',
                     'boolean', 'boolean',
-                    'number', 'number'],
+                    'number', 'number', 'boolean'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     first_choices[0].charCodeAt(0),
@@ -28,7 +28,7 @@ Rune.initClient({
                     second_choices[1].charCodeAt(0),
                     second_choices[2].charCodeAt(0),
                     ready[0], ready[1],
-                    pos, matchup_idx]);
+                    pos, matchup_idx, gameover]);
         } else {
             Module.ccall('game_visual_update',
                 'number',
@@ -36,7 +36,7 @@ Rune.initClient({
                     'number', 'number', 'number',
                     'number', 'number', 'number',
                     'boolean', 'boolean',
-                    'number', 'number'],
+                    'number', 'number', 'boolean'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     '?'.charCodeAt(0),
@@ -46,7 +46,7 @@ Rune.initClient({
                     '?'.charCodeAt(0),
                     '?'.charCodeAt(0),
                     ready[0], ready[1],
-                    pos, matchup_idx]);
+                    pos, matchup_idx, gameover]);
         }
     },
 });

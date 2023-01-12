@@ -38,7 +38,8 @@ void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
                                  char first_second, char first_third,
                                  char second_first, char second_second,
                                  char second_third, bool first_ready,
-                                 bool second_ready, int pos, int matchup_idx) {
+                                 bool second_ready, int pos, int matchup_idx,
+                                 bool gameover) {
   // TODO DEBUG
   // if (std::strcmp(playerOne, currentPlayer) == 0) {
   //  std::clog << "update_state:\n"
@@ -121,6 +122,10 @@ void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
   if (cachedPos != pos) {
     prevPos = cachedPos;
     cachedPos = pos;
+  }
+
+  if (gameover) {
+    flags.set(14);
   }
 }
 
@@ -291,7 +296,9 @@ void BasicRenderer::update_impl() {
              GetTouchY() <= GetScreenHeight() - triple_single_width * 2) {
       if (picked[0] != 0 && picked[1] != 0 && picked[2] != 0 &&
           !flags.test(0)) {
-        call_js_set_ready();
+        if (!flags.test(14)) {
+          call_js_set_ready();
+        }
         flags.set(0);
         flags.set(3);
       }
@@ -321,7 +328,9 @@ void BasicRenderer::update_impl() {
 
   if (flags.test(0) && flags.test(3) && flags.test(10) && flags.test(11)) {
     char buf[6] = {picked[0], 0, picked[1], 0, picked[2], 0};
-    call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    if (!flags.test(14)) {
+      call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    }
     flags.reset(3);
     flags.set(4);
   } else if (flags.test(0) && !flags.test(3) && flags.test(4)) {
@@ -333,7 +342,9 @@ void BasicRenderer::update_impl() {
       resultsTimer = RESULTS_TIMER_MAX;
     } else if (flags.test(9)) {
       if (!flags.test(8)) {
-        call_js_set_ready();
+        if (!flags.test(14)) {
+          call_js_set_ready();
+        }
         flags.reset(9);
         flags.set(5);
       } else {
@@ -359,7 +370,9 @@ void BasicRenderer::update_impl() {
   if (flags.test(12) && flags.test(10) && flags.test(11) &&
       prevPos == cachedPos && is_choices_set() && is_opponent_choices_set()) {
     flags.reset(12);
-    call_js_request_update();
+    if (!flags.test(14)) {
+      call_js_request_update();
+    }
     // std::cout << "Requesting update..." << std::endl; // TODO DEBUG
   }
 
@@ -367,7 +380,9 @@ void BasicRenderer::update_impl() {
   if (requestTimer <= 0.0F) {
     requestTimer = REQUEST_TIMER_MAX;
     if (flags.test(10) && flags.test(11)) {
-      call_js_request_update();
+      if (!flags.test(14)) {
+        call_js_request_update();
+      }
       // std::cout << "Requesting update (timer)..." << std::endl; // TODO DEBUG
     }
   }

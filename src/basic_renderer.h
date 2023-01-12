@@ -21,7 +21,8 @@ class BasicRenderer : public GameRenderer {
                     const char *currentPlayer, char first_first,
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
-                    bool second_ready, int pos, int matchup_idx) override;
+                    bool second_ready, int pos, int matchup_idx,
+                    bool gameover) override;
 
   void do_update() override;
 
@@ -65,6 +66,7 @@ class BasicRenderer : public GameRenderer {
    * 11 - second ready
    * 12 - ready state dirty
    * 13 - screen size changed
+   * 14 - is gameover
    */
   std::bitset<32> flags;
   float readyTimer;
