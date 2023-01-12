@@ -49,6 +49,8 @@ class Renderer3D : public GameRenderer {
   const Vector3 overview_start;
   const Vector3 overview_end;
   Vector3 root_pos;
+  Vector3 p1_pos;
+  Vector3 p2_pos;
 
   /*
    * 0 - focus view if true, overview view if false

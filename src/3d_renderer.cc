@@ -12,6 +12,8 @@
 Renderer3D::Renderer3D()
     : overview_start{OVERVIEW_LEFT_X, OVERVIEW_LEFT_Y, OVERVIEW_LEFT_Z},
       overview_end{OVERVIEW_RIGHT_X, OVERVIEW_RIGHT_Y, OVERVIEW_RIGHT_Z},
+      p1_pos{-1.0F, 0.0F, 0.0F},
+      p2_pos{1.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX) {
   camera.position.x = 0.0F;
   camera.position.y = 5.0F;
@@ -124,7 +126,10 @@ void Renderer3D::draw_impl() {
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
-  DrawModel(qm_model, {0.0F, 1.0F, 0.0F}, 1.0F, WHITE);
+  DrawModel(rock_model, p1_pos, 1.0F, WHITE);
+  DrawModel(paper_model, p2_pos, 1.0F, WHITE);
+  DrawModel(scissors_model, {-3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
+  DrawModel(scissors_model, {3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   EndMode3D();
   EndDrawing();
 }
