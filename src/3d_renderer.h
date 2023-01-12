@@ -46,17 +46,26 @@ class Renderer3D : public GameRenderer {
   Model paper_model;
   Model scissors_model;
 
-  const Vector3 overview_start;
-  const Vector3 overview_end;
   Vector3 root_pos;
   Vector3 p1_pos;
   Vector3 p2_pos;
 
   /*
    * 0 - focus view if true, overview view if false
-   * 1 - overview view movement direction (right if true)
+   * 1 - overview view direction (opposite is true)
    * 2 - is player one
    * 3 - is spectator
+   * 4
+   * 5
+   * 6 - overview type "654"
+   *    000 - pan left to right (opposite is right to left)
+   *    001 - from up left zoom out from target (opposite is zoom in)
+   *    010 - from up right zoom out from target (opposite is zoom out)
+   *    011 - from center zoom out (opposite is zoom in)
+   *    100 - UNUSED
+   *    101 - UNUSED
+   *    110 - UNUSED
+   *    111 - UNUSED
    */
   std::bitset<64> flags;
 

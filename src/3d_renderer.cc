@@ -1,18 +1,19 @@
 #include "3d_renderer.h"
 
 // standard library includes
+#include <raylib.h>
+
 #include <cmath>
 #include <cstring>
 #include <iostream>
 
 // local includes
 #include "constants.h"
+#include "ems.h"
 #include "helpers.h"
 
 Renderer3D::Renderer3D()
-    : overview_start{OVERVIEW_LEFT_X, OVERVIEW_LEFT_Y, OVERVIEW_LEFT_Z},
-      overview_end{OVERVIEW_RIGHT_X, OVERVIEW_RIGHT_Y, OVERVIEW_RIGHT_Z},
-      p1_pos{-1.0F, 0.0F, 0.0F},
+    : p1_pos{-1.0F, 0.0F, 0.0F},
       p2_pos{1.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX) {
   camera.position.x = 0.0F;
@@ -57,6 +58,8 @@ Renderer3D::Renderer3D()
       scissors_texture;
 
   flags.set(1);
+  flags.set(4);
+  flags.set(5);
 }
 
 Renderer3D::~Renderer3D() {
@@ -109,13 +112,41 @@ void Renderer3D::update_impl() {
     overview_timer -= dt;
     if (overview_timer <= 0.0F) {
       overview_timer += OVERVIEW_TIMER_MAX;
-      flags.flip(1);
+      const std::bitset<64> prevFlags = flags;
+      const auto is_same = [](const std::bitset<64> &l,
+                              const std::bitset<64> &r) {
+        return l.test(1) == r.test(1) && l.test(4) == r.test(4) &&
+               l.test(5) == r.test(5);
+      };
+      while (is_same(prevFlags, flags)) {
+#ifdef __EMSCRIPTEN__
+        flags.set(1, call_js_get_random() > 0.5F);
+        flags.set(4, call_js_get_random() > 0.5F);
+        flags.set(5, call_js_get_random() > 0.5F);
+#else
+        flags.set(1, GetRandomValue(0, 1) == 0);
+        flags.set(4, GetRandomValue(0, 1) == 0);
+        flags.set(5, GetRandomValue(0, 1) == 0);
+#endif
+      }
     }
 
-    float value = flags.test(1) ? (1.0F - overview_timer / OVERVIEW_TIMER_MAX)
-                                : (overview_timer / OVERVIEW_TIMER_MAX);
-    value = (std::cos(PI_F * value) + 1.0F) / 2.0F;
-    Helpers::lerp_v3(&overview_start, &overview_end, &camera.position, value);
+    float value =
+        (std::cos(PI_F * (1.0F - overview_timer / OVERVIEW_TIMER_MAX)) + 1.0F) /
+        2.0F;
+    if (!flags.test(4) && !flags.test(5) && !flags.test(6)) {
+      Helpers::overview_pan_lr(&camera.position, value, flags.test(1),
+                               camera.target.x);
+    } else if (flags.test(4) && !flags.test(5) && !flags.test(6)) {
+      Helpers::overview_zoom_out_l(&camera.position, value, flags.test(1),
+                                   camera.target.x);
+    } else if (!flags.test(4) && flags.test(5) && !flags.test(6)) {
+      Helpers::overview_zoom_out_r(&camera.position, value, flags.test(1),
+                                   camera.target.x);
+    } else if (flags.test(4) && flags.test(5) && !flags.test(6)) {
+      Helpers::overview_zoom_out_c(&camera.position, value, flags.test(1),
+                                   camera.target.x);
+    }
   }
 
   UpdateCamera(&camera);
@@ -126,6 +157,8 @@ void Renderer3D::draw_impl() {
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
+  DrawModel(qm_model, {-5.0F, 0.0F, 0.0F}, 1.0F, RED);
+  DrawModel(qm_model, {5.0F, 0.0F, 0.0F}, 1.0F, BLUE);
   DrawModel(rock_model, p1_pos, 1.0F, WHITE);
   DrawModel(paper_model, p2_pos, 1.0F, WHITE);
   DrawModel(scissors_model, {-3.0F, 0.0F, 0.0F}, 1.0F, WHITE);

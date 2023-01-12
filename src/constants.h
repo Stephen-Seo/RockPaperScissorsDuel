@@ -38,4 +38,25 @@ constexpr float OVERVIEW_RIGHT_X = 20.0F;
 constexpr float OVERVIEW_RIGHT_Y = 5.0F;
 constexpr float OVERVIEW_RIGHT_Z = 20.0F;
 
+constexpr float OVERVIEW_UP_L_B_X = -4.0F;
+constexpr float OVERVIEW_UP_L_B_Y = 10.0F;
+constexpr float OVERVIEW_UP_L_B_Z = 10.0F;
+constexpr float OVERVIEW_UP_L_E_X = -20.0F;
+constexpr float OVERVIEW_UP_L_E_Y = 20.0F;
+constexpr float OVERVIEW_UP_L_E_Z = 5.0F;
+
+constexpr float OVERVIEW_UP_R_B_X = -OVERVIEW_UP_L_B_X;
+constexpr float OVERVIEW_UP_R_B_Y = OVERVIEW_UP_L_B_Y;
+constexpr float OVERVIEW_UP_R_B_Z = OVERVIEW_UP_L_B_Z;
+constexpr float OVERVIEW_UP_R_E_X = -OVERVIEW_UP_L_E_X;
+constexpr float OVERVIEW_UP_R_E_Y = OVERVIEW_UP_L_E_Y;
+constexpr float OVERVIEW_UP_R_E_Z = OVERVIEW_UP_L_E_Z;
+
+constexpr float OVERVIEW_C_B_X = 0.0F;
+constexpr float OVERVIEW_C_B_Y = 5.0F;
+constexpr float OVERVIEW_C_B_Z = 9.0F;
+constexpr float OVERVIEW_C_E_X = 0.0F;
+constexpr float OVERVIEW_C_E_Y = 7.0F;
+constexpr float OVERVIEW_C_E_Z = 22.0F;
+
 #endif

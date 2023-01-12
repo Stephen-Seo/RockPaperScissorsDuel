@@ -22,6 +22,8 @@ EM_JS(int, canvas_get_width, (),
 
 EM_JS(int, canvas_get_height, (),
       { return document.getElementById("canvas").clientHeight; });
+
+EM_JS(float, get_random, (), { return Math.random(); });
 #endif
 
 #include <iostream>
@@ -68,5 +70,13 @@ int call_js_get_canvas_height() {
   return canvas_get_height();
 #else
   return 500;
+#endif
+}
+
+float call_js_get_random() {
+#ifdef __EMSCRIPTEN__
+  return get_random();
+#else
+  return -1.0F;
 #endif
 }
