@@ -1,8 +1,18 @@
 #include "3d_renderer.h"
 
-#include <raylib.h>
+// standard library includes
+#include <cmath>
+#include <cstring>
+#include <iostream>
 
-Renderer3D::Renderer3D() {
+// local includes
+#include "constants.h"
+#include "helpers.h"
+
+Renderer3D::Renderer3D()
+    : overview_start{OVERVIEW_LEFT_X, OVERVIEW_LEFT_Y, OVERVIEW_LEFT_Z},
+      overview_end{OVERVIEW_RIGHT_X, OVERVIEW_RIGHT_Y, OVERVIEW_RIGHT_Z},
+      overview_timer(OVERVIEW_TIMER_MAX) {
   camera.position.x = 0.0F;
   camera.position.y = 5.0F;
   camera.position.z = 10.0F;
@@ -18,6 +28,8 @@ Renderer3D::Renderer3D() {
   camera.fovy = 45.0F;
 
   camera.projection = CAMERA_PERSPECTIVE;
+
+  SetCameraMode(camera, CAMERA_CUSTOM);
 
   skybox_texture = LoadTexture("resources/skybox.gif");
   platform_texture = LoadTexture("resources/platform_texture.png");
@@ -41,6 +53,8 @@ Renderer3D::Renderer3D() {
   paper_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = paper_texture;
   scissors_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
       scissors_texture;
+
+  flags.set(1);
 }
 
 Renderer3D::~Renderer3D() {
@@ -65,7 +79,18 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
                               char second_first, char second_second,
                               char second_third, bool first_ready,
                               bool second_ready, int pos, int matchup_idx,
-                              bool gameover) {}
+                              bool gameover) {
+  if (std::strcmp(playerOne, currentPlayer) == 0) {
+    flags.set(2);
+    flags.reset(3);
+  } else if (std::strcmp(playerTwo, currentPlayer) == 0) {
+    flags.reset(2);
+    flags.reset(3);
+  } else {
+    flags.reset(2);
+    flags.set(3);
+  }
+}
 
 void Renderer3D::do_update() {
   update_impl();
@@ -74,7 +99,25 @@ void Renderer3D::do_update() {
 
 void Renderer3D::screen_size_changed() {}
 
-void Renderer3D::update_impl() { UpdateCamera(&camera); }
+void Renderer3D::update_impl() {
+  const float dt = GetFrameTime();
+
+  if (flags.test(0)) {
+  } else {
+    overview_timer -= dt;
+    if (overview_timer <= 0.0F) {
+      overview_timer += OVERVIEW_TIMER_MAX;
+      flags.flip(1);
+    }
+
+    float value = flags.test(1) ? (1.0F - overview_timer / OVERVIEW_TIMER_MAX)
+                                : (overview_timer / OVERVIEW_TIMER_MAX);
+    value = (std::cos(PI_F * value) + 1.0F) / 2.0F;
+    Helpers::lerp_v3(&overview_start, &overview_end, &camera.position, value);
+  }
+
+  UpdateCamera(&camera);
+}
 
 void Renderer3D::draw_impl() {
   BeginDrawing();

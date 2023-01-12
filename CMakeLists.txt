@@ -20,6 +20,7 @@ set(RPSDuelNative_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ems.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d_renderer.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/constants.cc"
 )
 
 set(RPSDuelNative_HEADERS

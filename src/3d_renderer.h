@@ -4,6 +4,9 @@
 // required dependency include
 #include "game_renderer.h"
 
+// standard library includes
+#include <bitset>
+
 // third party includes
 #include <raylib.h>
 
@@ -43,7 +46,19 @@ class Renderer3D : public GameRenderer {
   Model paper_model;
   Model scissors_model;
 
+  const Vector3 overview_start;
+  const Vector3 overview_end;
   Vector3 root_pos;
+
+  /*
+   * 0 - focus view if true, overview view if false
+   * 1 - overview view movement direction (right if true)
+   * 2 - is player one
+   * 3 - is spectator
+   */
+  std::bitset<64> flags;
+
+  float overview_timer;
 };
 
 #endif

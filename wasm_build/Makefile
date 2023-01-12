@@ -9,7 +9,8 @@ SOURCES = \
 		../src/ems.cc \
 		../src/basic_renderer.cc \
 		../src/helpers.cc \
-		../src/3d_renderer.cc
+		../src/3d_renderer.cc \
+		../src/constants.cc
 
 HEADERS = \
 		../src/constants.h \

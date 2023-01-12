@@ -1,6 +1,8 @@
 #ifndef ROCK_PAPER_SCISSORS_DUEL_CONSTANTS_H_
 #define ROCK_PAPER_SCISSORS_DUEL_CONSTANTS_H_
 
+extern const float PI_F;
+
 constexpr int DEFAULT_SCREEN_WIDTH = 500;
 constexpr int DEFAULT_SCREEN_HEIGHT = 800;
 
@@ -23,5 +25,17 @@ constexpr float SCORE_CHANGE_TIMER_MAX = 1.0F;
 constexpr float REQUEST_TIMER_MAX = 3.0F;
 
 constexpr int DEFAULT_STATUS_TEXT_SIZE = 30;
+
+// Renderer3D
+
+constexpr float OVERVIEW_TIMER_MAX = 14.0F;
+
+constexpr float OVERVIEW_LEFT_X = -20.0F;
+constexpr float OVERVIEW_LEFT_Y = 5.0F;
+constexpr float OVERVIEW_LEFT_Z = 20.0F;
+
+constexpr float OVERVIEW_RIGHT_X = 20.0F;
+constexpr float OVERVIEW_RIGHT_Y = 5.0F;
+constexpr float OVERVIEW_RIGHT_Z = 20.0F;
 
 #endif
