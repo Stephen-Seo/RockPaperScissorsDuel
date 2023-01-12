@@ -79,6 +79,8 @@ int main() {
     game_update(renderer.get());
   }
 
+  renderer.reset();
+
   CloseAudioDevice();
   CloseWindow();
 #endif

@@ -153,6 +153,7 @@ void Renderer3D::update_impl() {
 }
 
 void Renderer3D::draw_impl() {
+  ClearBackground(BLACK);
   BeginDrawing();
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
