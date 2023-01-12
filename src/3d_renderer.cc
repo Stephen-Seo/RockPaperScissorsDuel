@@ -165,5 +165,6 @@ void Renderer3D::draw_impl() {
   DrawModel(scissors_model, {-3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   DrawModel(scissors_model, {3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   EndMode3D();
+  DrawText("Testing...", 0, 0, 20, RAYWHITE);
   EndDrawing();
 }
