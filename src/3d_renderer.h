@@ -1,7 +1,11 @@
 #ifndef ROCK_PAPER_SCISSORS_3D_RENDERER_H_
 #define ROCK_PAPER_SCISSORS_3D_RENDERER_H_
 
+// required dependency include
 #include "game_renderer.h"
+
+// third party includes
+#include <raylib.h>
 
 class Renderer3D : public GameRenderer {
  public:
@@ -22,6 +26,24 @@ class Renderer3D : public GameRenderer {
  private:
   void update_impl();
   void draw_impl();
+
+  Camera camera;
+
+  Texture2D skybox_texture;
+  Texture2D platform_texture;
+  Texture2D qm_texture;
+  Texture2D rock_texture;
+  Texture2D paper_texture;
+  Texture2D scissors_texture;
+
+  Model skybox_model;
+  Model platform_model;
+  Model qm_model;
+  Model rock_model;
+  Model paper_model;
+  Model scissors_model;
+
+  Vector3 root_pos;
 };
 
 #endif
