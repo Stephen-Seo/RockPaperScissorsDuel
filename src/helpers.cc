@@ -85,3 +85,16 @@ void Helpers::overview_zoom_out_c(Vector3 *out, float value, bool is_opposite,
     out->z = lerp(OVERVIEW_C_B_Z, OVERVIEW_C_E_Z, value);
   }
 }
+
+void Helpers::overview_orbit(Vector3 *out, float value, bool is_opposite,
+                             float offset_x) {
+  value = (value * 2.0F - 1.0F) * OVERVIEW_ORBIT_MODIFIER;
+
+  if (is_opposite) {
+    out->x = -value * OVERVIEW_ORBIT_RADIUS + offset_x;
+  } else {
+    out->x = value * OVERVIEW_ORBIT_RADIUS + offset_x;
+  }
+  out->y = OVERVIEW_ORBIT_Y;
+  out->z = -(value * value - 1.0F) * OVERVIEW_ORBIT_RADIUS;
+}

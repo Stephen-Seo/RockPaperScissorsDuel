@@ -112,21 +112,26 @@ void Renderer3D::update_impl() {
     overview_timer -= dt;
     if (overview_timer <= 0.0F) {
       overview_timer += OVERVIEW_TIMER_MAX;
-      const std::bitset<64> prevFlags = flags;
-      const auto is_same = [](const std::bitset<64> &l,
-                              const std::bitset<64> &r) {
-        return l.test(1) == r.test(1) && l.test(4) == r.test(4) &&
-               l.test(5) == r.test(5);
+      const decltype(flags) prevFlags = flags;
+      const auto is_same = [](const decltype(flags) &l,
+                              const decltype(flags) &r) {
+        return l.test(4) == r.test(4) && l.test(5) == r.test(5) &&
+               l.test(6) == r.test(6);
       };
-      while (is_same(prevFlags, flags)) {
+      while (is_same(prevFlags, flags) ||
+             (flags.test(6) && (flags.test(4) || flags.test(5)))) {
 #ifdef __EMSCRIPTEN__
         flags.set(1, call_js_get_random() > 0.5F);
-        flags.set(4, call_js_get_random() > 0.5F);
-        flags.set(5, call_js_get_random() > 0.5F);
+        int value = call_js_get_random() * 4.99F;
+        flags.set(4, (value & 1) != 0);
+        flags.set(5, (value & 2) != 0);
+        flags.set(6, (value & 4) != 0);
 #else
         flags.set(1, GetRandomValue(0, 1) == 0);
-        flags.set(4, GetRandomValue(0, 1) == 0);
-        flags.set(5, GetRandomValue(0, 1) == 0);
+        int value = GetRandomValue(0, 4);
+        flags.set(4, (value & 1) != 0);
+        flags.set(5, (value & 2) != 0);
+        flags.set(6, (value & 4) != 0);
 #endif
       }
     }
@@ -146,6 +151,9 @@ void Renderer3D::update_impl() {
     } else if (flags.test(4) && flags.test(5) && !flags.test(6)) {
       Helpers::overview_zoom_out_c(&camera.position, value, flags.test(1),
                                    camera.target.x);
+    } else if (!flags.test(4) && !flags.test(5) && flags.test(6)) {
+      Helpers::overview_orbit(&camera.position, value, flags.test(1),
+                              camera.target.x);
     }
   }
 

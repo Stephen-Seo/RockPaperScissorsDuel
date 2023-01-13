@@ -62,7 +62,7 @@ class Renderer3D : public GameRenderer {
    *    001 - from up left zoom out from target (opposite is zoom in)
    *    010 - from up right zoom out from target (opposite is zoom out)
    *    011 - from center zoom out (opposite is zoom in)
-   *    100 - UNUSED
+   *    100 - orbit from left to right (opposite is right to left)
    *    101 - UNUSED
    *    110 - UNUSED
    *    111 - UNUSED

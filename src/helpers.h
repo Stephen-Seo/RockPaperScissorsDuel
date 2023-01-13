@@ -23,6 +23,8 @@ extern void overview_zoom_out_r(Vector3 *out, float value, bool is_opposite,
                                 float offset_x);
 extern void overview_zoom_out_c(Vector3 *out, float value, bool is_opposite,
                                 float offset_x);
+extern void overview_orbit(Vector3 *out, float value, bool is_opposite,
+                           float offset_x);
 
 }  // namespace Helpers
 

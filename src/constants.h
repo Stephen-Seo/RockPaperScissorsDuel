@@ -59,4 +59,8 @@ constexpr float OVERVIEW_C_E_X = 0.0F;
 constexpr float OVERVIEW_C_E_Y = 7.0F;
 constexpr float OVERVIEW_C_E_Z = 22.0F;
 
+constexpr float OVERVIEW_ORBIT_RADIUS = 12.0F;
+constexpr float OVERVIEW_ORBIT_Y = 7.0F;
+constexpr float OVERVIEW_ORBIT_MODIFIER = 0.9F;
+
 #endif
