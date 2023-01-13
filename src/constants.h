@@ -63,4 +63,13 @@ constexpr float OVERVIEW_ORBIT_RADIUS = 12.0F;
 constexpr float OVERVIEW_ORBIT_Y = 7.0F;
 constexpr float OVERVIEW_ORBIT_MODIFIER = 0.9F;
 
+// src/3D/
+
+constexpr float QM_ANGLE_TIMER_VARIANCE = 2.0F;
+constexpr float QM_Y_TIMER_VARIANCE = 2.0F;
+constexpr float QM_MAX_ANGLE_OFFSET = 30.0F;
+constexpr float QM_MAX_Y_OFFSET = 0.3F;
+constexpr float QM_ANGLE_TIMER_MAX = 5.0F;
+constexpr float QM_Y_TIMER_MAX = 3.5F;
+
 #endif

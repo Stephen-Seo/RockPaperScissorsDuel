@@ -21,6 +21,10 @@ set(RPSDuelNative_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d_renderer.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/constants.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/obj.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/v3.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/v3_conv.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.cc"
 )
 
 set(RPSDuelNative_HEADERS
@@ -30,6 +34,10 @@ set(RPSDuelNative_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_renderer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/basic_renderer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d_renderer.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/obj.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/v3.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/v3_conv.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.h"
 )
 
 add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})

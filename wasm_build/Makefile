@@ -10,7 +10,11 @@ SOURCES = \
 		../src/basic_renderer.cc \
 		../src/helpers.cc \
 		../src/3d_renderer.cc \
-		../src/constants.cc
+		../src/constants.cc \
+		../src/3d/obj.cc \
+		../src/3d/v3.cc \
+		../src/3d/v3_conv.cc \
+		../src/3d/qm.cc
 
 HEADERS = \
 		../src/constants.h \
@@ -18,7 +22,11 @@ HEADERS = \
 		../src/basic_renderer.h \
 		../src/helpers.h \
 		../src/game_renderer.h \
-		../src/3d_renderer.h
+		../src/3d_renderer.h \
+		../src/3d/obj.h \
+		../src/3d/v3.h \
+		../src/3d/v3_conv.h \
+		../src/3d/qm.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 

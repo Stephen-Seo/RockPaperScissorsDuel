@@ -10,6 +10,9 @@
 // third party includes
 #include <raylib.h>
 
+// local includes
+#include "3d/qm.h"
+
 class Renderer3D : public GameRenderer {
  public:
   Renderer3D();
@@ -29,6 +32,8 @@ class Renderer3D : public GameRenderer {
  private:
   void update_impl();
   void draw_impl();
+
+  std::array<QuestionMark, 2> qms;
 
   Camera camera;
 
