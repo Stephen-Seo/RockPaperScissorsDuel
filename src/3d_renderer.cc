@@ -14,6 +14,7 @@
 
 Renderer3D::Renderer3D()
     : qms{},
+      root_pos{0.0F, 0.0F, 0.0F},
       p1_pos{-1.0F, 0.0F, 0.0F},
       p2_pos{1.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX) {
