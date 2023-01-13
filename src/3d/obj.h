@@ -5,7 +5,7 @@
 #include <optional>
 
 // local includes
-#include "v3.h"
+#include "a3f.h"
 
 // forward declarations
 struct Model;
@@ -21,24 +21,24 @@ class Object3D {
 
   void set_model(Model *model);
 
-  const V3 &get_pos() const;
-  void set_pos(const V3 &pos);
-  void set_pos(V3 &&pos);
+  const A3F &get_pos() const;
+  void set_pos(const A3F &pos);
+  void set_pos(A3F &&pos);
   void set_pos_x(float x);
   void set_pos_y(float y);
   void set_pos_z(float z);
 
-  const VC4 &get_color() const;
-  void set_color(const VC4 &color);
-  void set_color(VC4 &&color);
+  const A4C &get_color() const;
+  void set_color(const A4C &color);
+  void set_color(A4C &&color);
   void set_color_r(unsigned char r);
   void set_color_g(unsigned char g);
   void set_color_b(unsigned char b);
   void set_color_a(unsigned char a);
 
  protected:
-  V3 pos;
-  VC4 color;
+  A3F pos;
+  A4C color;
   std::optional<Model *> model;
 };
 

@@ -19,11 +19,11 @@ void Object3D::set_model(Model *model) {
   }
 }
 
-const V3 &Object3D::get_pos() const { return pos; }
+const A3F &Object3D::get_pos() const { return pos; }
 
-void Object3D::set_pos(const V3 &pos) { this->pos = pos; }
+void Object3D::set_pos(const A3F &pos) { this->pos = pos; }
 
-void Object3D::set_pos(V3 &&pos) { this->pos = std::forward<V3>(pos); }
+void Object3D::set_pos(A3F &&pos) { this->pos = std::forward<A3F>(pos); }
 
 void Object3D::set_pos_x(float x) { pos[0] = x; }
 
@@ -31,12 +31,12 @@ void Object3D::set_pos_y(float y) { pos[1] = y; }
 
 void Object3D::set_pos_z(float z) { pos[2] = z; }
 
-const VC4 &Object3D::get_color() const { return color; }
+const A4C &Object3D::get_color() const { return color; }
 
-void Object3D::set_color(const VC4 &color) { this->color = color; }
+void Object3D::set_color(const A4C &color) { this->color = color; }
 
-void Object3D::set_color(VC4 &&color) {
-  this->color = std::forward<VC4>(color);
+void Object3D::set_color(A4C &&color) {
+  this->color = std::forward<A4C>(color);
 }
 
 void Object3D::set_color_r(unsigned char r) { color[0] = r; }

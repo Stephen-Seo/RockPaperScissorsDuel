@@ -11,7 +11,7 @@
 
 // local includes
 #include "../constants.h"
-#include "v3_conv.h"
+#include "a3f_conv.h"
 
 QuestionMark::QuestionMark()
     : Object3D()
@@ -68,7 +68,7 @@ void QuestionMark::draw() {
   }
 
   Vector3 unit{1.0F, 1.0F, 1.0F};
-  Vector3 vec3pos = V3ToRV3(pos);
+  Vector3 vec3pos = A3FToRV3(pos);
   float angle = angle_timer / angle_timer_max * 2.0F - 1.0F;
   angle = angle >= 0.0F ? (std::cos(PI_F * angle) * QM_MAX_ANGLE_OFFSET)
                         : (std::cos(PI_F * (-angle)) * QM_MAX_ANGLE_OFFSET);
@@ -78,7 +78,7 @@ void QuestionMark::draw() {
                : ((std::cos(PI_F * (-offset)) + 1.0F) / 2.0F * QM_MAX_Y_OFFSET);
   vec3pos.y += offset;
   DrawModelEx(*model.value(), vec3pos, {0.0F, 1.0F, 0.0F}, angle, unit,
-              VC4ToC(color));
+              A4CToC(color));
 }
 
 void QuestionMark::randomize_timer_values() {
