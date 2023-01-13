@@ -13,6 +13,16 @@
 #include "../constants.h"
 #include "v3_conv.h"
 
+QuestionMark::QuestionMark()
+    : Object3D()
+#ifndef __EMSCRIPTEN__
+      ,
+      re(std::random_device{}())
+#endif
+{
+  randomize_timer_values();
+}
+
 QuestionMark::QuestionMark(Model *m)
     : Object3D(m)
 #ifndef __EMSCRIPTEN__
@@ -53,6 +63,10 @@ void QuestionMark::update(float dt) {
 }
 
 void QuestionMark::draw() {
+  if (!model.has_value()) {
+    return;
+  }
+
   Vector3 unit{1.0F, 1.0F, 1.0F};
   Vector3 vec3pos = V3ToRV3(pos);
   float angle = angle_timer / angle_timer_max * 2.0F - 1.0F;
@@ -63,7 +77,8 @@ void QuestionMark::draw() {
                ? ((std::cos(PI_F * offset) + 1.0F) / 2.0F * QM_MAX_Y_OFFSET)
                : ((std::cos(PI_F * (-offset)) + 1.0F) / 2.0F * QM_MAX_Y_OFFSET);
   vec3pos.y += offset;
-  DrawModelEx(*model, vec3pos, {0.0F, 1.0F, 0.0F}, angle, unit, VC4ToC(color));
+  DrawModelEx(*model.value(), vec3pos, {0.0F, 1.0F, 0.0F}, angle, unit,
+              VC4ToC(color));
 }
 
 void QuestionMark::randomize_timer_values() {

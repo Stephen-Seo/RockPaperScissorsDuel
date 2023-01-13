@@ -1,9 +1,23 @@
 #include "obj.h"
 
+Object3D::Object3D() : pos{0.0F, 0.0F, 0.0F}, color{255, 255, 255, 255} {}
+
 Object3D::Object3D(Model *model)
-    : pos{0.0F, 0.0F, 0.0F}, color{255, 255, 255, 255}, model(model) {}
+    : pos{0.0F, 0.0F, 0.0F}, color{255, 255, 255, 255} {
+  if (model) {
+    this->model = model;
+  }
+}
 
 Object3D::~Object3D() {}
+
+void Object3D::set_model(Model *model) {
+  if (model) {
+    this->model = model;
+  } else {
+    this->model = std::nullopt;
+  }
+}
 
 const V3 &Object3D::get_pos() const { return pos; }
 

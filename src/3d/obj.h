@@ -1,6 +1,9 @@
 #ifndef ROCK_PAPER_SCISSORS_3D_OBJECT_BASE_H_
 #define ROCK_PAPER_SCISSORS_3D_OBJECT_BASE_H_
 
+// standard library includes
+#include <optional>
+
 // local includes
 #include "v3.h"
 
@@ -9,11 +12,14 @@ struct Model;
 
 class Object3D {
  public:
+  Object3D();
   Object3D(Model *model);
   virtual ~Object3D();
 
   virtual void update(float dt) = 0;
   virtual void draw() = 0;
+
+  void set_model(Model *model);
 
   const V3 &get_pos() const;
   void set_pos(const V3 &pos);
@@ -33,7 +39,7 @@ class Object3D {
  protected:
   V3 pos;
   VC4 color;
-  Model *model;
+  std::optional<Model *> model;
 };
 
 #endif

@@ -13,8 +13,7 @@
 #include "helpers.h"
 
 Renderer3D::Renderer3D()
-    : qms{QuestionMark(&qm_model), QuestionMark(&qm_model)},
-      qm_model(LoadModel("resources/question_mark.obj")),
+    : qms{},
       p1_pos{-1.0F, 0.0F, 0.0F},
       p2_pos{1.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX) {
@@ -45,7 +44,7 @@ Renderer3D::Renderer3D()
 
   skybox_model = LoadModel("resources/skybox.obj");
   platform_model = LoadModel("resources/platform.obj");
-  // qm_model = LoadModel("resources/question_mark.obj");
+  qm_model = LoadModel("resources/question_mark.obj");
   rock_model = LoadModel("resources/rock.obj");
   paper_model = LoadModel("resources/paper.obj");
   scissors_model = LoadModel("resources/scissors.obj");
@@ -63,9 +62,11 @@ Renderer3D::Renderer3D()
   flags.set(4);
   flags.set(5);
 
+  qms.at(0).set_model(&qm_model);
   qms.at(0).set_pos({-1.0F, 0.0F, 0.0F});
   qms.at(0).set_color_g(0);
   qms.at(0).set_color_b(0);
+  qms.at(1).set_model(&qm_model);
   qms.at(1).set_pos({1.0F, 0.0F, 0.0F});
   qms.at(1).set_color_r(0);
   qms.at(1).set_color_g(0);
@@ -174,15 +175,15 @@ void Renderer3D::update_impl() {
 }
 
 void Renderer3D::draw_impl() {
-  ClearBackground(BLACK);
   BeginDrawing();
+  ClearBackground(BLACK);
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
-  // DrawModel(qm_model, {-5.0F, 0.0F, 0.0F}, 1.0F, RED);
-  // DrawModel(qm_model, {5.0F, 0.0F, 0.0F}, 1.0F, BLUE);
-  // DrawModel(rock_model, p1_pos, 1.0F, WHITE);
-  // DrawModel(paper_model, p2_pos, 1.0F, WHITE);
+  //  DrawModel(qm_model, {-5.0F, 0.0F, 0.0F}, 1.0F, RED);
+  //  DrawModel(qm_model, {5.0F, 0.0F, 0.0F}, 1.0F, BLUE);
+  //  DrawModel(rock_model, p1_pos, 1.0F, WHITE);
+  //  DrawModel(paper_model, p2_pos, 1.0F, WHITE);
   // DrawModel(scissors_model, {-3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   // DrawModel(scissors_model, {3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   for (auto &obj : qms) {

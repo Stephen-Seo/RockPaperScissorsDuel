@@ -9,6 +9,7 @@
 
 class QuestionMark : public Object3D {
  public:
+  QuestionMark();
   QuestionMark(Model *m);
   ~QuestionMark() override;
 
