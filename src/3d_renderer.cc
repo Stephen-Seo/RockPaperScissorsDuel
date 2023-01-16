@@ -18,7 +18,10 @@ Renderer3D::Renderer3D()
       root_pos{0.0F, 0.0F, 0.0F},
       p1_pos{-1.0F, 0.0F, 0.0F},
       p2_pos{1.0F, 0.0F, 0.0F},
-      overview_timer(OVERVIEW_TIMER_MAX) {
+      overview_timer(OVERVIEW_TIMER_MAX),
+      button_color_timer(BUTTON_COLOR_TIME),
+      choices{'?', '?', '?'},
+      opponent_choices{'?', '?', '?'} {
   camera.position.x = 0.0F;
   camera.position.y = 5.0F;
   camera.position.z = 10.0F;
@@ -121,6 +124,15 @@ void Renderer3D::screen_size_changed() {}
 
 void Renderer3D::update_impl() {
   const float dt = GetFrameTime();
+  const float triple_single_width = GetScreenWidth() / 3.0F;
+  float actual_width = triple_single_width;
+  if (actual_width > (float)ICON_MAX_WIDTH) {
+    actual_width = ICON_MAX_WIDTH;
+  }
+  float actual_width2 = triple_single_width;
+  if (actual_width2 > (float)ICON_MAX_WIDTH_2) {
+    actual_width2 = ICON_MAX_WIDTH_2;
+  }
 
   if (flags.test(0)) {
   } else {
@@ -182,6 +194,96 @@ void Renderer3D::update_impl() {
   for (auto &obj : qms) {
     obj.update(dt);
   }
+
+  if (IsMouseButtonPressed(0)) {
+    if (GetTouchX() >= (triple_single_width - actual_width) / 2.0F &&
+        GetTouchX() <=
+            triple_single_width - (triple_single_width - actual_width) / 2.0F &&
+        GetTouchY() >= GetScreenHeight() - triple_single_width +
+                           (triple_single_width - actual_width) / 2.0F &&
+        GetTouchY() <=
+            GetScreenHeight() - (triple_single_width - actual_width) / 2.0F) {
+      if (choices.at(0) == '?') {
+        choices.at(0) = 'r';
+      } else if (choices.at(1) == '?') {
+        choices.at(1) = 'r';
+      } else {
+        choices.at(2) = 'r';
+      }
+    } else if (GetTouchX() >= triple_single_width +
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchX() <= triple_single_width * 2.0F -
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchY() >= GetScreenHeight() - triple_single_width +
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchY() <= GetScreenHeight() -
+                                  (triple_single_width - actual_width) / 2.0F) {
+      if (choices.at(0) == '?') {
+        choices.at(0) = 'p';
+      } else if (choices.at(1) == '?') {
+        choices.at(1) = 'p';
+      } else {
+        choices.at(2) = 'p';
+      }
+    } else if (GetTouchX() >= GetScreenWidth() - triple_single_width +
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchX() <= GetScreenWidth() -
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchY() >= GetScreenHeight() - triple_single_width +
+                                  (triple_single_width - actual_width) / 2.0F &&
+               GetTouchY() <= GetScreenHeight() -
+                                  (triple_single_width - actual_width) / 2.0F) {
+      if (choices.at(0) == '?') {
+        choices.at(0) = 's';
+      } else if (choices.at(1) == '?') {
+        choices.at(1) = 's';
+      } else {
+        choices.at(2) = 's';
+      }
+    } else if (GetTouchX() >= (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchX() <=
+                   triple_single_width -
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() >=
+                   GetScreenHeight() - triple_single_width * 2.0F +
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() <=
+                   GetScreenHeight() - triple_single_width -
+                       (triple_single_width - actual_width2) / 2.0F) {
+      choices.at(0) = '?';
+    } else if (GetTouchX() >=
+                   triple_single_width +
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchX() <=
+                   triple_single_width * 2.0F -
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() >=
+                   GetScreenHeight() - triple_single_width * 2.0F +
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() <=
+                   GetScreenHeight() - triple_single_width -
+                       (triple_single_width - actual_width2) / 2.0F) {
+      choices.at(1) = '?';
+    } else if (GetTouchX() >=
+                   GetScreenWidth() - triple_single_width +
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchX() <=
+                   GetScreenWidth() -
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() >=
+                   GetScreenHeight() - triple_single_width * 2.0F +
+                       (triple_single_width - actual_width2) / 2.0F &&
+               GetTouchY() <=
+                   GetScreenHeight() - triple_single_width -
+                       (triple_single_width - actual_width2) / 2.0F) {
+      choices.at(2) = '?';
+    }
+  }
+
+  button_color_timer -= dt;
+  if (button_color_timer <= 0.0F) {
+    button_color_timer += BUTTON_COLOR_TIME;
+  }
 }
 
 void Renderer3D::draw_impl() {
@@ -190,35 +292,48 @@ void Renderer3D::draw_impl() {
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
-  //  DrawModel(qm_model, {-5.0F, 0.0F, 0.0F}, 1.0F, RED);
-  //  DrawModel(qm_model, {5.0F, 0.0F, 0.0F}, 1.0F, BLUE);
-  //  DrawModel(rock_model, p1_pos, 1.0F, WHITE);
-  //  DrawModel(paper_model, p2_pos, 1.0F, WHITE);
-  // DrawModel(scissors_model, {-3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
-  // DrawModel(scissors_model, {3.0F, 0.0F, 0.0F}, 1.0F, WHITE);
   for (auto &obj : qms) {
     obj.draw();
   }
   EndMode3D();
-  // DrawText("Testing...", 0, 0, 20, RAYWHITE);
 
   if (!flags.test(3)) {
     const float triple_single_width = GetScreenWidth() / 3.0F;
     float actual_width = triple_single_width;
-    if (triple_single_width > (float)ICON_MAX_WIDTH) {
+    if (actual_width > (float)ICON_MAX_WIDTH) {
       actual_width = ICON_MAX_WIDTH;
     }
+    float actual_width2 = triple_single_width;
+    if (actual_width2 > (float)ICON_MAX_WIDTH_2) {
+      actual_width2 = ICON_MAX_WIDTH_2;
+    }
 
+    unsigned char color_value;
+    const float button_color_value =
+        button_color_timer * 2.0F / BUTTON_COLOR_TIME;
+    if (button_color_value > 1.0F) {
+      color_value = (1.0F - (button_color_value - 1.0F)) * BUTTON_COLOR_MIN +
+                    (button_color_value - 1.0F) * BUTTON_COLOR_MAX;
+    } else {
+      color_value = button_color_value * BUTTON_COLOR_MIN +
+                    (1.0F - button_color_value) * BUTTON_COLOR_MAX;
+    }
     if (flags.test(2)) {
       DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                    {255, 80, 80, 255});
-      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    {255, color_value, color_value, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
                     GetScreenWidth(), triple_single_width, {255, 80, 80, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    GetScreenWidth(), triple_single_width,
+                    {255, color_value, color_value, 255});
     } else {
       DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                    {80, 80, 255, 255});
-      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    {color_value, color_value, 255, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
                     GetScreenWidth(), triple_single_width, {80, 80, 255, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    GetScreenWidth(), triple_single_width,
+                    {color_value, color_value, 255, 255});
     }
     DrawTexturePro(spriteSheet,
                    {READY_DIMS[0], READY_DIMS[1], READY_DIMS[2], READY_DIMS[3]},
@@ -245,6 +360,22 @@ void Renderer3D::draw_impl() {
                        GetScreenHeight() - triple_single_width +
                            (triple_single_width - actual_width) / 2.0F,
                        actual_width, actual_width, BLACK);
+
+    DrawRectangleLines((triple_single_width - actual_width2) / 2.0F,
+                       GetScreenHeight() - triple_single_width * 2.0F +
+                           (triple_single_width - actual_width2) / 2.0F,
+                       actual_width2, actual_width2, BLACK);
+    DrawRectangleLines(
+        triple_single_width + (triple_single_width - actual_width2) / 2.0F,
+        GetScreenHeight() - triple_single_width * 2.0F +
+            (triple_single_width - actual_width2) / 2.0F,
+        actual_width2, actual_width2, BLACK);
+    DrawRectangleLines(GetScreenWidth() - triple_single_width +
+                           (triple_single_width - actual_width2) / 2.0F,
+                       GetScreenHeight() - triple_single_width * 2.0F +
+                           (triple_single_width - actual_width2) / 2.0F,
+                       actual_width2, actual_width2, BLACK);
+
     DrawTexturePro(spriteSheet,
                    {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
                    {(triple_single_width - actual_width) / 2.0F,
@@ -269,6 +400,49 @@ void Renderer3D::draw_impl() {
                         (triple_single_width - actual_width) / 2.0F,
                     actual_width, actual_width},
                    {0.0F, 0.0F}, 0.0F, WHITE);
+
+    for (unsigned int i = 0; i < choices.size(); ++i) {
+      switch (choices[i]) {
+        case 'r':
+          DrawTexturePro(
+              spriteSheet,
+              {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - triple_single_width * 2.0F +
+                   (triple_single_width - actual_width2) / 2.0F,
+               actual_width2, actual_width2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case 'p':
+          DrawTexturePro(
+              spriteSheet,
+              {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - triple_single_width * 2.0F +
+                   (triple_single_width - actual_width2) / 2.0F,
+               actual_width2, actual_width2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case 's':
+          DrawTexturePro(spriteSheet,
+                         {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+                          SCISSORS_DIMS[3]},
+                         {triple_single_width * (float)i +
+                              (triple_single_width - actual_width2) / 2.0F,
+                          GetScreenHeight() - triple_single_width * 2.0F +
+                              (triple_single_width - actual_width2) / 2.0F,
+                          actual_width2, actual_width2},
+                         {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case '?':
+        default:
+          break;
+      }
+    }
+  } else {
+    DrawText("Spectating...", 0, 0, 20, RAYWHITE);
   }
 
   EndDrawing();

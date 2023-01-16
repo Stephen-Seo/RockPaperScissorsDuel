@@ -15,6 +15,7 @@ constexpr int EXCLAMATIONMARKS_DIMS[4] = {40, 88, 32, 56};
 constexpr int OK_DIMS[4] = {72, 88, 80, 56};
 
 constexpr int ICON_MAX_WIDTH = 100;
+constexpr int ICON_MAX_WIDTH_2 = 70;
 
 constexpr float READY_TIMER_MAX = 1.0F;
 
@@ -62,6 +63,10 @@ constexpr float OVERVIEW_C_E_Z = 22.0F;
 constexpr float OVERVIEW_ORBIT_RADIUS = 12.0F;
 constexpr float OVERVIEW_ORBIT_Y = 7.0F;
 constexpr float OVERVIEW_ORBIT_MODIFIER = 0.9F;
+
+constexpr float BUTTON_COLOR_TIME = 9.0F;
+constexpr float BUTTON_COLOR_MIN = 40.0F;
+constexpr float BUTTON_COLOR_MAX = 180.0F;
 
 // src/3D/
 

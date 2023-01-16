@@ -5,6 +5,7 @@
 #include "game_renderer.h"
 
 // standard library includes
+#include <array>
 #include <bitset>
 
 // third party includes
@@ -77,6 +78,10 @@ class Renderer3D : public GameRenderer {
   std::bitset<64> flags;
 
   float overview_timer;
+  float button_color_timer;
+
+  std::array<unsigned char, 3> choices;
+  std::array<unsigned char, 3> opponent_choices;
 };
 
 #endif
