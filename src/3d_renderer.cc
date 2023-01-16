@@ -319,32 +319,41 @@ void Renderer3D::draw_impl() {
                     (1.0F - button_color_value) * BUTTON_COLOR_MAX;
     }
     if (flags.test(2)) {
-      DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                    {255, color_value, color_value, 255});
+      if (choices.at(0) != '?' && choices.at(1) != '?' &&
+          choices.at(2) != '?') {
+        DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
+                      {255, color_value, color_value, 255});
+      }
       DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
                     GetScreenWidth(), triple_single_width, {255, 80, 80, 255});
       DrawRectangle(0, GetScreenHeight() - triple_single_width,
                     GetScreenWidth(), triple_single_width,
                     {255, color_value, color_value, 255});
     } else {
-      DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                    {color_value, color_value, 255, 255});
+      if (choices.at(0) != '?' && choices.at(1) != '?' &&
+          choices.at(2) != '?') {
+        DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
+                      {color_value, color_value, 255, 255});
+      }
       DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
                     GetScreenWidth(), triple_single_width, {80, 80, 255, 255});
       DrawRectangle(0, GetScreenHeight() - triple_single_width,
                     GetScreenWidth(), triple_single_width,
                     {color_value, color_value, 255, 255});
     }
-    DrawTexturePro(spriteSheet,
-                   {READY_DIMS[0], READY_DIMS[1], READY_DIMS[2], READY_DIMS[3]},
-                   {0, 0, GetScreenWidth() * 4.0F / 5.0F, triple_single_width},
-                   {0.0F, 0.0F}, 0.0F, WHITE);
-    DrawTexturePro(spriteSheet,
-                   {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
-                    QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
-                   {GetScreenWidth() * 4.0F / 5.0F, 0, GetScreenWidth() / 5.0F,
-                    triple_single_width},
-                   {0.0F, 0.0F}, 0.0F, WHITE);
+    if (choices.at(0) != '?' && choices.at(1) != '?' && choices.at(2) != '?') {
+      DrawTexturePro(
+          spriteSheet,
+          {READY_DIMS[0], READY_DIMS[1], READY_DIMS[2], READY_DIMS[3]},
+          {0, 0, GetScreenWidth() * 4.0F / 5.0F, triple_single_width},
+          {0.0F, 0.0F}, 0.0F, WHITE);
+      DrawTexturePro(spriteSheet,
+                     {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
+                      QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
+                     {GetScreenWidth() * 4.0F / 5.0F, 0,
+                      GetScreenWidth() / 5.0F, triple_single_width},
+                     {0.0F, 0.0F}, 0.0F, WHITE);
+    }
 
     DrawRectangleLines((triple_single_width - actual_width) / 2.0F,
                        GetScreenHeight() - triple_single_width +
