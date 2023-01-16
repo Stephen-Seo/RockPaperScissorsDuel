@@ -133,6 +133,8 @@ void Renderer3D::update_impl() {
   if (actual_width2 > (float)ICON_MAX_WIDTH_2) {
     actual_width2 = ICON_MAX_WIDTH_2;
   }
+  const float height = actual_width;
+  const float height2 = actual_width2;
 
   if (flags.test(0)) {
   } else {
@@ -199,10 +201,8 @@ void Renderer3D::update_impl() {
     if (GetTouchX() >= (triple_single_width - actual_width) / 2.0F &&
         GetTouchX() <=
             triple_single_width - (triple_single_width - actual_width) / 2.0F &&
-        GetTouchY() >= GetScreenHeight() - triple_single_width +
-                           (triple_single_width - actual_width) / 2.0F &&
-        GetTouchY() <=
-            GetScreenHeight() - (triple_single_width - actual_width) / 2.0F) {
+        GetTouchY() >= GetScreenHeight() - height &&
+        GetTouchY() <= GetScreenHeight()) {
       if (choices.at(0) == '?') {
         choices.at(0) = 'r';
       } else if (choices.at(1) == '?') {
@@ -214,10 +214,8 @@ void Renderer3D::update_impl() {
                                   (triple_single_width - actual_width) / 2.0F &&
                GetTouchX() <= triple_single_width * 2.0F -
                                   (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - triple_single_width +
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() <= GetScreenHeight() -
-                                  (triple_single_width - actual_width) / 2.0F) {
+               GetTouchY() >= GetScreenHeight() - height &&
+               GetTouchY() <= GetScreenHeight()) {
       if (choices.at(0) == '?') {
         choices.at(0) = 'p';
       } else if (choices.at(1) == '?') {
@@ -229,10 +227,8 @@ void Renderer3D::update_impl() {
                                   (triple_single_width - actual_width) / 2.0F &&
                GetTouchX() <= GetScreenWidth() -
                                   (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - triple_single_width +
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() <= GetScreenHeight() -
-                                  (triple_single_width - actual_width) / 2.0F) {
+               GetTouchY() >= GetScreenHeight() - height &&
+               GetTouchY() <= GetScreenHeight()) {
       if (choices.at(0) == '?') {
         choices.at(0) = 's';
       } else if (choices.at(1) == '?') {
@@ -244,12 +240,8 @@ void Renderer3D::update_impl() {
                GetTouchX() <=
                    triple_single_width -
                        (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >=
-                   GetScreenHeight() - triple_single_width * 2.0F +
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() <=
-                   GetScreenHeight() - triple_single_width -
-                       (triple_single_width - actual_width2) / 2.0F) {
+               GetTouchY() >= GetScreenHeight() - height - height2 &&
+               GetTouchY() <= GetScreenHeight() - height) {
       choices.at(0) = '?';
     } else if (GetTouchX() >=
                    triple_single_width +
@@ -257,12 +249,8 @@ void Renderer3D::update_impl() {
                GetTouchX() <=
                    triple_single_width * 2.0F -
                        (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >=
-                   GetScreenHeight() - triple_single_width * 2.0F +
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() <=
-                   GetScreenHeight() - triple_single_width -
-                       (triple_single_width - actual_width2) / 2.0F) {
+               GetTouchY() >= GetScreenHeight() - height - height2 &&
+               GetTouchY() <= GetScreenHeight() - height) {
       choices.at(1) = '?';
     } else if (GetTouchX() >=
                    GetScreenWidth() - triple_single_width +
@@ -270,12 +258,8 @@ void Renderer3D::update_impl() {
                GetTouchX() <=
                    GetScreenWidth() -
                        (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >=
-                   GetScreenHeight() - triple_single_width * 2.0F +
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() <=
-                   GetScreenHeight() - triple_single_width -
-                       (triple_single_width - actual_width2) / 2.0F) {
+               GetTouchY() >= GetScreenHeight() - height - height2 &&
+               GetTouchY() <= GetScreenHeight() - height) {
       choices.at(2) = '?';
     }
   }
@@ -307,6 +291,8 @@ void Renderer3D::draw_impl() {
     if (actual_width2 > (float)ICON_MAX_WIDTH_2) {
       actual_width2 = ICON_MAX_WIDTH_2;
     }
+    const float height = actual_width;
+    const float height2 = actual_width2;
 
     unsigned char color_value;
     const float button_color_value =
@@ -324,10 +310,9 @@ void Renderer3D::draw_impl() {
         DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
                       {255, color_value, color_value, 255});
       }
-      DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
-                    GetScreenWidth(), triple_single_width, {255, 80, 80, 255});
-      DrawRectangle(0, GetScreenHeight() - triple_single_width,
-                    GetScreenWidth(), triple_single_width,
+      DrawRectangle(0, GetScreenHeight() - height - height2, GetScreenWidth(),
+                    height + height2, {255, 80, 80, 255});
+      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height,
                     {255, color_value, color_value, 255});
     } else {
       if (choices.at(0) != '?' && choices.at(1) != '?' &&
@@ -335,10 +320,9 @@ void Renderer3D::draw_impl() {
         DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
                       {color_value, color_value, 255, 255});
       }
-      DrawRectangle(0, GetScreenHeight() - triple_single_width * 2.0F,
-                    GetScreenWidth(), triple_single_width, {80, 80, 255, 255});
-      DrawRectangle(0, GetScreenHeight() - triple_single_width,
-                    GetScreenWidth(), triple_single_width,
+      DrawRectangle(0, GetScreenHeight() - height - height2, GetScreenWidth(),
+                    height + height2, {80, 80, 255, 255});
+      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height,
                     {color_value, color_value, 255, 255});
     }
     if (choices.at(0) != '?' && choices.at(1) != '?' && choices.at(2) != '?') {
@@ -356,58 +340,42 @@ void Renderer3D::draw_impl() {
     }
 
     DrawRectangleLines((triple_single_width - actual_width) / 2.0F,
-                       GetScreenHeight() - triple_single_width +
-                           (triple_single_width - actual_width) / 2.0F,
-                       actual_width, actual_width, BLACK);
+                       GetScreenHeight() - height, actual_width, height, BLACK);
     DrawRectangleLines(
         triple_single_width + (triple_single_width - actual_width) / 2.0F,
-        GetScreenHeight() - triple_single_width +
-            (triple_single_width - actual_width) / 2.0F,
-        actual_width, actual_width, BLACK);
+        GetScreenHeight() - height, actual_width, height, BLACK);
     DrawRectangleLines(GetScreenWidth() - triple_single_width +
                            (triple_single_width - actual_width) / 2.0F,
-                       GetScreenHeight() - triple_single_width +
-                           (triple_single_width - actual_width) / 2.0F,
-                       actual_width, actual_width, BLACK);
+                       GetScreenHeight() - height, actual_width, height, BLACK);
 
     DrawRectangleLines((triple_single_width - actual_width2) / 2.0F,
-                       GetScreenHeight() - triple_single_width * 2.0F +
-                           (triple_single_width - actual_width2) / 2.0F,
-                       actual_width2, actual_width2, BLACK);
+                       GetScreenHeight() - height - height2, actual_width2,
+                       height2, BLACK);
     DrawRectangleLines(
         triple_single_width + (triple_single_width - actual_width2) / 2.0F,
-        GetScreenHeight() - triple_single_width * 2.0F +
-            (triple_single_width - actual_width2) / 2.0F,
-        actual_width2, actual_width2, BLACK);
+        GetScreenHeight() - height - height2, actual_width2, height2, BLACK);
     DrawRectangleLines(GetScreenWidth() - triple_single_width +
                            (triple_single_width - actual_width2) / 2.0F,
-                       GetScreenHeight() - triple_single_width * 2.0F +
-                           (triple_single_width - actual_width2) / 2.0F,
-                       actual_width2, actual_width2, BLACK);
+                       GetScreenHeight() - height - height2, actual_width2,
+                       height2, BLACK);
 
     DrawTexturePro(spriteSheet,
                    {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
                    {(triple_single_width - actual_width) / 2.0F,
-                    GetScreenHeight() - triple_single_width +
-                        (triple_single_width - actual_width) / 2.0F,
-                    actual_width, actual_width},
+                    GetScreenHeight() - height, actual_width, height},
                    {0.0F, 0.0F}, 0.0F, WHITE);
     DrawTexturePro(
         spriteSheet,
         {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
         {triple_single_width + (triple_single_width - actual_width) / 2.0F,
-         GetScreenHeight() - triple_single_width +
-             (triple_single_width - actual_width) / 2.0F,
-         actual_width, actual_width},
+         GetScreenHeight() - height, actual_width, height},
         {0.0F, 0.0F}, 0.0F, WHITE);
     DrawTexturePro(spriteSheet,
                    {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
                     SCISSORS_DIMS[3]},
                    {GetScreenWidth() - triple_single_width +
                         (triple_single_width - actual_width) / 2.0F,
-                    GetScreenHeight() - triple_single_width +
-                        (triple_single_width - actual_width) / 2.0F,
-                    actual_width, actual_width},
+                    GetScreenHeight() - height, actual_width, height},
                    {0.0F, 0.0F}, 0.0F, WHITE);
 
     for (unsigned int i = 0; i < choices.size(); ++i) {
@@ -418,9 +386,7 @@ void Renderer3D::draw_impl() {
               {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
               {triple_single_width * (float)i +
                    (triple_single_width - actual_width2) / 2.0F,
-               GetScreenHeight() - triple_single_width * 2.0F +
-                   (triple_single_width - actual_width2) / 2.0F,
-               actual_width2, actual_width2},
+               GetScreenHeight() - height - height2, actual_width2, height2},
               {0.0F, 0.0F}, 0.0F, WHITE);
           break;
         case 'p':
@@ -429,21 +395,18 @@ void Renderer3D::draw_impl() {
               {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
               {triple_single_width * (float)i +
                    (triple_single_width - actual_width2) / 2.0F,
-               GetScreenHeight() - triple_single_width * 2.0F +
-                   (triple_single_width - actual_width2) / 2.0F,
-               actual_width2, actual_width2},
+               GetScreenHeight() - height - height2, actual_width2, height2},
               {0.0F, 0.0F}, 0.0F, WHITE);
           break;
         case 's':
-          DrawTexturePro(spriteSheet,
-                         {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
-                          SCISSORS_DIMS[3]},
-                         {triple_single_width * (float)i +
-                              (triple_single_width - actual_width2) / 2.0F,
-                          GetScreenHeight() - triple_single_width * 2.0F +
-                              (triple_single_width - actual_width2) / 2.0F,
-                          actual_width2, actual_width2},
-                         {0.0F, 0.0F}, 0.0F, WHITE);
+          DrawTexturePro(
+              spriteSheet,
+              {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+               SCISSORS_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - height - height2, actual_width2, height2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
           break;
         case '?':
         default:
