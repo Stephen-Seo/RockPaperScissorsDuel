@@ -22,6 +22,7 @@ class Object3D {
   void set_model(Model *model);
 
   const A3F &get_pos() const;
+  A3F &get_pos();
   void set_pos(const A3F &pos);
   void set_pos(A3F &&pos);
   void set_pos_x(float x);
@@ -29,6 +30,7 @@ class Object3D {
   void set_pos_z(float z);
 
   const A4C &get_color() const;
+  A4C &get_color();
   void set_color(const A4C &color);
   void set_color(A4C &&color);
   void set_color_r(unsigned char r);

@@ -54,8 +54,6 @@ class Renderer3D : public GameRenderer {
   Model scissors_model;
 
   Vector3 root_pos;
-  Vector3 p1_pos;
-  Vector3 p2_pos;
 
   /*
    * 0 - focus view if true, overview view if false
@@ -73,12 +71,20 @@ class Renderer3D : public GameRenderer {
    *    101 - UNUSED
    *    110 - UNUSED
    *    111 - UNUSED
-   * 7 - p1_pos/p2_pos dirty
+   * 7 - UNUSED
+   * 8 - choices locked
+   * 9 - p1 ready
+   * 10 - p2 ready
+   * 11 - choices submitted
+   * 12 - update received
    */
   std::bitset<64> flags;
 
   float overview_timer;
   float button_color_timer;
+
+  int received_pos;
+  int received_matchup_idx;
 
   std::array<unsigned char, 3> choices;
   std::array<unsigned char, 3> opponent_choices;

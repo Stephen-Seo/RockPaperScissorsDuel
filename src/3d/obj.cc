@@ -21,6 +21,8 @@ void Object3D::set_model(Model *model) {
 
 const A3F &Object3D::get_pos() const { return pos; }
 
+A3F &Object3D::get_pos() { return pos; }
+
 void Object3D::set_pos(const A3F &pos) { this->pos = pos; }
 
 void Object3D::set_pos(A3F &&pos) { this->pos = std::forward<A3F>(pos); }
@@ -32,6 +34,8 @@ void Object3D::set_pos_y(float y) { pos[1] = y; }
 void Object3D::set_pos_z(float z) { pos[2] = z; }
 
 const A4C &Object3D::get_color() const { return color; }
+
+A4C &Object3D::get_color() { return color; }
 
 void Object3D::set_color(const A4C &color) { this->color = color; }
 

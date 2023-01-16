@@ -1,11 +1,12 @@
 #include "3d_renderer.h"
 
 // standard library includes
-#include <raylib.h>
-
 #include <cmath>
 #include <cstring>
 #include <iostream>
+
+// third party includes
+#include <raylib.h>
 
 // local includes
 #include "3d/a3f_conv.h"
@@ -16,12 +17,14 @@
 Renderer3D::Renderer3D()
     : qms{},
       root_pos{0.0F, 0.0F, 0.0F},
-      p1_pos{-1.0F, 0.0F, 0.0F},
-      p2_pos{1.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX),
       button_color_timer(BUTTON_COLOR_TIME),
+      received_pos(0),
       choices{'?', '?', '?'},
       opponent_choices{'?', '?', '?'} {
+  qms.at(0).set_pos_x(-1.0F);
+  qms.at(1).set_pos_x(1.0F);
+
   camera.position.x = 0.0F;
   camera.position.y = 5.0F;
   camera.position.z = 10.0F;
@@ -68,7 +71,6 @@ Renderer3D::Renderer3D()
   flags.set(1);
   flags.set(4);
   flags.set(5);
-  flags.set(7);
 
   qms.at(0).set_model(&qm_model);
   qms.at(0).set_pos({-1.0F, 0.0F, 0.0F});
@@ -81,6 +83,8 @@ Renderer3D::Renderer3D()
 }
 
 Renderer3D::~Renderer3D() {
+  UnloadTexture(spriteSheet);
+
   UnloadTexture(skybox_texture);
   UnloadTexture(platform_texture);
   UnloadTexture(qm_texture);
@@ -112,6 +116,37 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
   } else {
     flags.reset(2);
     flags.set(3);
+  }
+
+  flags.set(9, first_ready);
+  flags.set(10, second_ready);
+
+  flags.set(12);
+
+  if (flags.test(2)) {
+    std::cout << "got pos: " << pos << std::endl;
+    std::cout << "got matchup_idx: " << matchup_idx << std::endl;
+    std::cout << "camera.target.x: " << camera.target.x << std::endl;
+  }
+
+  received_pos = pos;
+  received_matchup_idx = matchup_idx;
+
+  if (second_first != '?') {
+    opponent_choices.at(0) = second_first;
+    opponent_choices.at(1) = second_second;
+    opponent_choices.at(2) = second_third;
+  }
+
+  if (flags.test(11) && first_first == '?' && second_first == '?') {
+    choices.at(0) = '?';
+    choices.at(1) = '?';
+    choices.at(2) = '?';
+    opponent_choices.at(0) = '?';
+    opponent_choices.at(1) = '?';
+    opponent_choices.at(2) = '?';
+    flags.reset(11);
+    flags.reset(8);
   }
 }
 
@@ -188,79 +223,86 @@ void Renderer3D::update_impl() {
 
   UpdateCamera(&camera);
 
-  if (flags.test(7)) {
-    qms.at(0).set_pos(RV3ToA3F(p1_pos));
-    qms.at(1).set_pos(RV3ToA3F(p2_pos));
-    flags.reset(7);
-  }
   for (auto &obj : qms) {
     obj.update(dt);
   }
 
   if (IsMouseButtonPressed(0)) {
-    if (GetTouchX() >= (triple_single_width - actual_width) / 2.0F &&
-        GetTouchX() <=
-            triple_single_width - (triple_single_width - actual_width) / 2.0F &&
-        GetTouchY() >= GetScreenHeight() - height &&
-        GetTouchY() <= GetScreenHeight()) {
-      if (choices.at(0) == '?') {
-        choices.at(0) = 'r';
-      } else if (choices.at(1) == '?') {
-        choices.at(1) = 'r';
-      } else {
-        choices.at(2) = 'r';
+    if (!flags.test(8)) {
+      if (GetTouchX() >= (triple_single_width - actual_width) / 2.0F &&
+          GetTouchX() <= triple_single_width -
+                             (triple_single_width - actual_width) / 2.0F &&
+          GetTouchY() >= GetScreenHeight() - height &&
+          GetTouchY() <= GetScreenHeight()) {
+        if (choices.at(0) == '?') {
+          choices.at(0) = 'r';
+        } else if (choices.at(1) == '?') {
+          choices.at(1) = 'r';
+        } else {
+          choices.at(2) = 'r';
+        }
+      } else if (GetTouchX() >=
+                     triple_single_width +
+                         (triple_single_width - actual_width) / 2.0F &&
+                 GetTouchX() <=
+                     triple_single_width * 2.0F -
+                         (triple_single_width - actual_width) / 2.0F &&
+                 GetTouchY() >= GetScreenHeight() - height &&
+                 GetTouchY() <= GetScreenHeight()) {
+        if (choices.at(0) == '?') {
+          choices.at(0) = 'p';
+        } else if (choices.at(1) == '?') {
+          choices.at(1) = 'p';
+        } else {
+          choices.at(2) = 'p';
+        }
+      } else if (GetTouchX() >=
+                     GetScreenWidth() - triple_single_width +
+                         (triple_single_width - actual_width) / 2.0F &&
+                 GetTouchX() <=
+                     GetScreenWidth() -
+                         (triple_single_width - actual_width) / 2.0F &&
+                 GetTouchY() >= GetScreenHeight() - height &&
+                 GetTouchY() <= GetScreenHeight()) {
+        if (choices.at(0) == '?') {
+          choices.at(0) = 's';
+        } else if (choices.at(1) == '?') {
+          choices.at(1) = 's';
+        } else {
+          choices.at(2) = 's';
+        }
+      } else if (GetTouchX() >= (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchX() <=
+                     triple_single_width -
+                         (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchY() >= GetScreenHeight() - height - height2 &&
+                 GetTouchY() <= GetScreenHeight() - height) {
+        choices.at(0) = '?';
+      } else if (GetTouchX() >=
+                     triple_single_width +
+                         (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchX() <=
+                     triple_single_width * 2.0F -
+                         (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchY() >= GetScreenHeight() - height - height2 &&
+                 GetTouchY() <= GetScreenHeight() - height) {
+        choices.at(1) = '?';
+      } else if (GetTouchX() >=
+                     GetScreenWidth() - triple_single_width +
+                         (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchX() <=
+                     GetScreenWidth() -
+                         (triple_single_width - actual_width2) / 2.0F &&
+                 GetTouchY() >= GetScreenHeight() - height - height2 &&
+                 GetTouchY() <= GetScreenHeight() - height) {
+        choices.at(2) = '?';
+      } else if (choices.at(0) != '?' && choices.at(1) != '?' &&
+                 choices.at(2) != '?' && GetTouchX() >= 0 &&
+                 GetTouchX() <= GetScreenWidth() && GetTouchY() >= 0 &&
+                 GetTouchY() <= triple_single_width) {
+        flags.set(8);
+        call_js_set_ready();
       }
-    } else if (GetTouchX() >= triple_single_width +
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchX() <= triple_single_width * 2.0F -
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - height &&
-               GetTouchY() <= GetScreenHeight()) {
-      if (choices.at(0) == '?') {
-        choices.at(0) = 'p';
-      } else if (choices.at(1) == '?') {
-        choices.at(1) = 'p';
-      } else {
-        choices.at(2) = 'p';
-      }
-    } else if (GetTouchX() >= GetScreenWidth() - triple_single_width +
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchX() <= GetScreenWidth() -
-                                  (triple_single_width - actual_width) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - height &&
-               GetTouchY() <= GetScreenHeight()) {
-      if (choices.at(0) == '?') {
-        choices.at(0) = 's';
-      } else if (choices.at(1) == '?') {
-        choices.at(1) = 's';
-      } else {
-        choices.at(2) = 's';
-      }
-    } else if (GetTouchX() >= (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchX() <=
-                   triple_single_width -
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - height - height2 &&
-               GetTouchY() <= GetScreenHeight() - height) {
-      choices.at(0) = '?';
-    } else if (GetTouchX() >=
-                   triple_single_width +
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchX() <=
-                   triple_single_width * 2.0F -
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - height - height2 &&
-               GetTouchY() <= GetScreenHeight() - height) {
-      choices.at(1) = '?';
-    } else if (GetTouchX() >=
-                   GetScreenWidth() - triple_single_width +
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchX() <=
-                   GetScreenWidth() -
-                       (triple_single_width - actual_width2) / 2.0F &&
-               GetTouchY() >= GetScreenHeight() - height - height2 &&
-               GetTouchY() <= GetScreenHeight() - height) {
-      choices.at(2) = '?';
     }
   }
 
@@ -268,6 +310,27 @@ void Renderer3D::update_impl() {
   if (button_color_timer <= 0.0F) {
     button_color_timer += BUTTON_COLOR_TIME;
   }
+
+  if (flags.test(12)) {
+    if (flags.test(8) && flags.test(11)) {
+      call_js_set_ready();
+      call_js_request_update();
+    } else if (flags.test(8) && flags.test(9) && flags.test(10) &&
+               !flags.test(11)) {
+      char buf[6] = {(char)choices.at(0), 0, (char)choices.at(1), 0,
+                     (char)choices.at(2), 0};
+      call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+      flags.set(11);
+    }
+  }
+
+  flags.reset(12);
+
+  qms.at(0).get_pos().at(0) +=
+      ((received_pos * 2.0F - 1.0F) - qms.at(0).get_pos().at(0)) / 50.0F;
+  qms.at(1).get_pos().at(0) +=
+      ((received_pos * 2.0F + 1.0F) - qms.at(1).get_pos().at(0)) / 50.0F;
+  camera.target.x += (received_pos * 2.0F - camera.target.x) / 50.0F;
 }
 
 void Renderer3D::draw_impl() {
@@ -281,7 +344,7 @@ void Renderer3D::draw_impl() {
   }
   EndMode3D();
 
-  if (!flags.test(3)) {
+  if (!flags.test(3) && !flags.test(8)) {
     const float triple_single_width = GetScreenWidth() / 3.0F;
     float actual_width = triple_single_width;
     if (actual_width > (float)ICON_MAX_WIDTH) {
@@ -414,7 +477,7 @@ void Renderer3D::draw_impl() {
       }
     }
   } else {
-    DrawText("Spectating...", 0, 0, 20, RAYWHITE);
+    DrawText("Waiting...", 0, 0, 20, RAYWHITE);
   }
 
   EndDrawing();
