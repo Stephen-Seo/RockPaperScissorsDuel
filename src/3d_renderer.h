@@ -37,6 +37,7 @@ class Renderer3D : public GameRenderer {
 
   Camera camera;
 
+  Texture2D spriteSheet;
   Texture2D skybox_texture;
   Texture2D platform_texture;
   Texture2D qm_texture;
@@ -71,6 +72,7 @@ class Renderer3D : public GameRenderer {
    *    101 - UNUSED
    *    110 - UNUSED
    *    111 - UNUSED
+   * 7 - p1_pos/p2_pos dirty
    */
   std::bitset<64> flags;
 

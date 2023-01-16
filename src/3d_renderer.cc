@@ -8,6 +8,7 @@
 #include <iostream>
 
 // local includes
+#include "3d/a3f_conv.h"
 #include "constants.h"
 #include "ems.h"
 #include "helpers.h"
@@ -36,6 +37,8 @@ Renderer3D::Renderer3D()
 
   SetCameraMode(camera, CAMERA_CUSTOM);
 
+  spriteSheet = LoadTexture("resources/rockpaperscissorsSpriteSheet.png");
+
   skybox_texture = LoadTexture("resources/skybox.gif");
   platform_texture = LoadTexture("resources/platform_texture.png");
   qm_texture = LoadTexture("resources/question_mark_texture.png");
@@ -62,6 +65,7 @@ Renderer3D::Renderer3D()
   flags.set(1);
   flags.set(4);
   flags.set(5);
+  flags.set(7);
 
   qms.at(0).set_model(&qm_model);
   qms.at(0).set_pos({-1.0F, 0.0F, 0.0F});
@@ -170,6 +174,11 @@ void Renderer3D::update_impl() {
 
   UpdateCamera(&camera);
 
+  if (flags.test(7)) {
+    qms.at(0).set_pos(RV3ToA3F(p1_pos));
+    qms.at(1).set_pos(RV3ToA3F(p2_pos));
+    flags.reset(7);
+  }
   for (auto &obj : qms) {
     obj.update(dt);
   }
@@ -191,6 +200,76 @@ void Renderer3D::draw_impl() {
     obj.draw();
   }
   EndMode3D();
-  DrawText("Testing...", 0, 0, 20, RAYWHITE);
+  // DrawText("Testing...", 0, 0, 20, RAYWHITE);
+
+  if (!flags.test(3)) {
+    const float triple_single_width = GetScreenWidth() / 3.0F;
+    float actual_width = triple_single_width;
+    if (triple_single_width > (float)ICON_MAX_WIDTH) {
+      actual_width = ICON_MAX_WIDTH;
+    }
+
+    if (flags.test(2)) {
+      DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
+                    {255, 80, 80, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    GetScreenWidth(), triple_single_width, {255, 80, 80, 255});
+    } else {
+      DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
+                    {80, 80, 255, 255});
+      DrawRectangle(0, GetScreenHeight() - triple_single_width,
+                    GetScreenWidth(), triple_single_width, {80, 80, 255, 255});
+    }
+    DrawTexturePro(spriteSheet,
+                   {READY_DIMS[0], READY_DIMS[1], READY_DIMS[2], READY_DIMS[3]},
+                   {0, 0, GetScreenWidth() * 4.0F / 5.0F, triple_single_width},
+                   {0.0F, 0.0F}, 0.0F, WHITE);
+    DrawTexturePro(spriteSheet,
+                   {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
+                    QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
+                   {GetScreenWidth() * 4.0F / 5.0F, 0, GetScreenWidth() / 5.0F,
+                    triple_single_width},
+                   {0.0F, 0.0F}, 0.0F, WHITE);
+
+    DrawRectangleLines((triple_single_width - actual_width) / 2.0F,
+                       GetScreenHeight() - triple_single_width +
+                           (triple_single_width - actual_width) / 2.0F,
+                       actual_width, actual_width, BLACK);
+    DrawRectangleLines(
+        triple_single_width + (triple_single_width - actual_width) / 2.0F,
+        GetScreenHeight() - triple_single_width +
+            (triple_single_width - actual_width) / 2.0F,
+        actual_width, actual_width, BLACK);
+    DrawRectangleLines(GetScreenWidth() - triple_single_width +
+                           (triple_single_width - actual_width) / 2.0F,
+                       GetScreenHeight() - triple_single_width +
+                           (triple_single_width - actual_width) / 2.0F,
+                       actual_width, actual_width, BLACK);
+    DrawTexturePro(spriteSheet,
+                   {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
+                   {(triple_single_width - actual_width) / 2.0F,
+                    GetScreenHeight() - triple_single_width +
+                        (triple_single_width - actual_width) / 2.0F,
+                    actual_width, actual_width},
+                   {0.0F, 0.0F}, 0.0F, WHITE);
+    DrawTexturePro(
+        spriteSheet,
+        {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
+        {triple_single_width + (triple_single_width - actual_width) / 2.0F,
+         GetScreenHeight() - triple_single_width +
+             (triple_single_width - actual_width) / 2.0F,
+         actual_width, actual_width},
+        {0.0F, 0.0F}, 0.0F, WHITE);
+    DrawTexturePro(spriteSheet,
+                   {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+                    SCISSORS_DIMS[3]},
+                   {GetScreenWidth() - triple_single_width +
+                        (triple_single_width - actual_width) / 2.0F,
+                    GetScreenHeight() - triple_single_width +
+                        (triple_single_width - actual_width) / 2.0F,
+                    actual_width, actual_width},
+                   {0.0F, 0.0F}, 0.0F, WHITE);
+  }
+
   EndDrawing();
 }
