@@ -147,6 +147,9 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     opponent_choices.at(2) = '?';
     flags.reset(11);
     flags.reset(8);
+    flags.reset(0);
+    overview_timer = OVERVIEW_TIMER_MAX;
+    set_random_overview();
   }
 }
 
@@ -172,32 +175,14 @@ void Renderer3D::update_impl() {
   const float height2 = actual_width2;
 
   if (flags.test(0)) {
+    camera.position = camera.target;
+    camera.position.z += 10.0F;
+    camera.position.y += 4.0F;
   } else {
     overview_timer -= dt;
     if (overview_timer <= 0.0F) {
       overview_timer += OVERVIEW_TIMER_MAX;
-      const decltype(flags) prevFlags = flags;
-      const auto is_same = [](const decltype(flags) &l,
-                              const decltype(flags) &r) {
-        return l.test(4) == r.test(4) && l.test(5) == r.test(5) &&
-               l.test(6) == r.test(6);
-      };
-      while (is_same(prevFlags, flags) ||
-             (flags.test(6) && (flags.test(4) || flags.test(5)))) {
-#ifdef __EMSCRIPTEN__
-        flags.set(1, call_js_get_random() > 0.5F);
-        int value = call_js_get_random() * 4.99F;
-        flags.set(4, (value & 1) != 0);
-        flags.set(5, (value & 2) != 0);
-        flags.set(6, (value & 4) != 0);
-#else
-        flags.set(1, GetRandomValue(0, 1) == 0);
-        int value = GetRandomValue(0, 4);
-        flags.set(4, (value & 1) != 0);
-        flags.set(5, (value & 2) != 0);
-        flags.set(6, (value & 4) != 0);
-#endif
-      }
+      set_random_overview();
     }
 
     float value =
@@ -321,6 +306,7 @@ void Renderer3D::update_impl() {
                      (char)choices.at(2), 0};
       call_js_set_choices(&buf[0], &buf[2], &buf[4]);
       flags.set(11);
+      flags.set(0);
     }
   }
 
@@ -481,4 +467,28 @@ void Renderer3D::draw_impl() {
   }
 
   EndDrawing();
+}
+
+void Renderer3D::set_random_overview() {
+  const decltype(flags) prevFlags = flags;
+  const auto is_same = [](const decltype(flags) &l, const decltype(flags) &r) {
+    return l.test(4) == r.test(4) && l.test(5) == r.test(5) &&
+           l.test(6) == r.test(6);
+  };
+  while (is_same(prevFlags, flags) ||
+         (flags.test(6) && (flags.test(4) || flags.test(5)))) {
+#ifdef __EMSCRIPTEN__
+    flags.set(1, call_js_get_random() > 0.5F);
+    int value = call_js_get_random() * 4.99F;
+    flags.set(4, (value & 1) != 0);
+    flags.set(5, (value & 2) != 0);
+    flags.set(6, (value & 4) != 0);
+#else
+    flags.set(1, GetRandomValue(0, 1) == 0);
+    int value = GetRandomValue(0, 4);
+    flags.set(4, (value & 1) != 0);
+    flags.set(5, (value & 2) != 0);
+    flags.set(6, (value & 4) != 0);
+#endif
+  }
 }

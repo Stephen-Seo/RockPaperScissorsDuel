@@ -14,7 +14,8 @@ SOURCES = \
 		../src/3d/obj.cc \
 		../src/3d/a3f.cc \
 		../src/3d/a3f_conv.cc \
-		../src/3d/qm.cc
+		../src/3d/qm.cc \
+		../src/3d/anim_concurrent.cc
 
 HEADERS = \
 		../src/constants.h \
@@ -26,7 +27,9 @@ HEADERS = \
 		../src/3d/obj.h \
 		../src/3d/a3f.h \
 		../src/3d/a3f_conv.h \
-		../src/3d/qm.h
+		../src/3d/qm.h \
+		../src/3d/anims.h \
+		../src/3d/anim_concurrent.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 

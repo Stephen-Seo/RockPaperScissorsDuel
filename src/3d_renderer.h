@@ -34,6 +34,8 @@ class Renderer3D : public GameRenderer {
   void update_impl();
   void draw_impl();
 
+  void set_random_overview();
+
   std::array<QuestionMark, 2> qms;
 
   Camera camera;
