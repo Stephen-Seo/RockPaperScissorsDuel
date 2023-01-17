@@ -1,6 +1,6 @@
 #include "anim_sequence.h"
 
-AnimSequence::AnimSequence() {}
+AnimSequence::AnimSequence(Model *model) : Anims(model) {}
 
 AnimSequence::~AnimSequence() {}
 
@@ -15,9 +15,9 @@ void AnimSequence::do_update(float dt) {
   }
 }
 
-void AnimSequence::do_draw(Model *m) {
+void AnimSequence::do_draw() {
   if (!anims.empty()) {
-    anims.front()->do_draw(m);
+    anims.front()->do_draw();
   }
 }
 

@@ -12,13 +12,16 @@ class Anims {
   using UPtr = std::unique_ptr<Anims>;
   using SPtr = std::shared_ptr<Anims>;
 
-  Anims() {}
+  Anims(Model *model) : model(model) {}
   virtual ~Anims() {}
 
   virtual bool is_done() = 0;
 
   virtual void do_update(float dt) = 0;
-  virtual void do_draw(Model *m) = 0;
+  virtual void do_draw() = 0;
+
+ protected:
+  Model *model;
 };
 
 #endif

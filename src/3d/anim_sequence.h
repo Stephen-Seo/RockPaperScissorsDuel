@@ -8,13 +8,13 @@
 
 class AnimSequence : public Anims {
  public:
-  AnimSequence();
+  AnimSequence(Model *model);
   ~AnimSequence() override;
 
   bool is_done() override;
 
   void do_update(float dt) override;
-  void do_draw(Model *m) override;
+  void do_draw() override;
 
   void push_anim(UPtr &&p);
 

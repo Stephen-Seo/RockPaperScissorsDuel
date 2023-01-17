@@ -1,6 +1,6 @@
 #include "anim_concurrent.h"
 
-AnimConcurrent::AnimConcurrent() {}
+AnimConcurrent::AnimConcurrent(Model *model) : Anims(model) {}
 
 AnimConcurrent::~AnimConcurrent() {}
 
@@ -17,9 +17,9 @@ void AnimConcurrent::do_update(float dt) {
   }
 }
 
-void AnimConcurrent::do_draw(Model *m) {
+void AnimConcurrent::do_draw() {
   for (auto &anim : anims) {
-    anim->do_draw(m);
+    anim->do_draw();
   }
 }
 

@@ -8,13 +8,13 @@
 
 class AnimConcurrent : public Anims {
  public:
-  AnimConcurrent();
+  AnimConcurrent(Model *model);
   ~AnimConcurrent() override;
 
   bool is_done() override;
 
   void do_update(float dt) override;
-  void do_draw(Model *m) override;
+  void do_draw() override;
 
   void push_anim(UPtr &&p);
 
