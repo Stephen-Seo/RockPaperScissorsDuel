@@ -78,5 +78,6 @@ constexpr float QM_ANGLE_TIMER_MAX = 5.0F;
 constexpr float QM_Y_TIMER_MAX = 3.5F;
 
 constexpr float MODEL_SHRINK_TIME = 1.0F;
+constexpr float MODEL_GROW_TIME = 1.0F;
 
 #endif
