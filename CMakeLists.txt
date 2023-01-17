@@ -27,6 +27,7 @@ set(RPSDuelNative_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_concurrent.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_sequence.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_shrink.cc"
 )
 
 set(RPSDuelNative_HEADERS
@@ -42,6 +43,7 @@ set(RPSDuelNative_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anims.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_sequence.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_shrink.h"
 )
 
 add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})
