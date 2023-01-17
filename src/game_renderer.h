@@ -12,7 +12,7 @@ class GameRenderer {
                             char second_first, char second_second,
                             char second_third, bool first_ready,
                             bool second_ready, int pos, int matchup_idx,
-                            bool gameover) = 0;
+                            bool gameover, bool matchup_started) = 0;
 
   virtual void do_update() = 0;
 

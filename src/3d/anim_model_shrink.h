@@ -9,12 +9,12 @@ class AnimModelShrink : public Anims {
   AnimModelShrink(Model *model, A3F pos);
   ~AnimModelShrink() override;
 
-  bool is_done() override;
-
   void do_update(float dt) override;
   void do_draw() override;
 
  private:
+  bool is_done_impl() override;
+
   A3F pos;
   float timer;
 };

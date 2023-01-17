@@ -12,11 +12,11 @@ AnimModelGrow::AnimModelGrow(Model *model, A3F pos)
 
 AnimModelGrow::~AnimModelGrow() {}
 
-bool AnimModelGrow::is_done() { return timer <= 0.0F; }
-
 void AnimModelGrow::do_update(float dt) { timer -= dt; }
 
 void AnimModelGrow::do_draw() {
   DrawModel(*model, A3FToRV3(pos),
             timer >= 0.0F ? (1.0F - timer / MODEL_GROW_TIME) : 1.0F, WHITE);
 }
+
+bool AnimModelGrow::is_done_impl() { return timer <= 0.0F; }

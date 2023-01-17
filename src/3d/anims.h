@@ -12,16 +12,26 @@ class Anims {
   using UPtr = std::unique_ptr<Anims>;
   using SPtr = std::shared_ptr<Anims>;
 
-  Anims(Model *model) : model(model) {}
+  using FP = void (*)(void *);
+
+  Anims(Model *model);
   virtual ~Anims() {}
 
-  virtual bool is_done() = 0;
+  bool is_done();
+  void reset_is_done();
 
   virtual void do_update(float dt) = 0;
   virtual void do_draw() = 0;
 
+  void set_end_callback(FP function_ptr, void *ud);
+
  protected:
+  virtual bool is_done_impl() = 0;
+
   Model *model;
+  void *userdata;
+  FP function_ptr;
+  bool is_done_finished;
 };
 
 #endif

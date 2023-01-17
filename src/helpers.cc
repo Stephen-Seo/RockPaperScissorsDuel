@@ -98,3 +98,39 @@ void Helpers::overview_orbit(Vector3 *out, float value, bool is_opposite,
   out->y = OVERVIEW_ORBIT_Y;
   out->z = -(value * value - 1.0F) * OVERVIEW_ORBIT_RADIUS;
 }
+
+int Helpers::a_vs_b(char a, char b) {
+  if (a == 'r') {
+    if (b == 'r') {
+      return 0;
+    } else if (b == 'p') {
+      return -1;
+    } else if (b == 's') {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else if (a == 'p') {
+    if (b == 'r') {
+      return 1;
+    } else if (b == 'p') {
+      return 0;
+    } else if (b == 's') {
+      return -1;
+    } else {
+      return 0;
+    }
+  } else if (a == 's') {
+    if (b == 'r') {
+      return -1;
+    } else if (b == 'p') {
+      return 1;
+    } else if (b == 's') {
+      return 0;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+}

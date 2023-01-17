@@ -6,15 +6,15 @@
 
 class AnimModelAttack : public Anims {
  public:
-  AnimModelAttack(Model *model, A3F pos);
+  AnimModelAttack(Model *model, A3F pos, bool is_p1);
   ~AnimModelAttack() override;
-
-  bool is_done() override;
 
   void do_update(float dt) override;
   void do_draw() override;
 
  private:
+  bool is_done_impl() override;
+
   A3F pos;
   A3F offset;
   float timer;
@@ -25,6 +25,7 @@ class AnimModelAttack : public Anims {
    * 3 - done
    */
   int state;
+  bool is_p1;
 };
 
 #endif

@@ -4,8 +4,6 @@ AnimSequence::AnimSequence(Model *model) : Anims(model) {}
 
 AnimSequence::~AnimSequence() {}
 
-bool AnimSequence::is_done() { return anims.empty(); }
-
 void AnimSequence::do_update(float dt) {
   if (!anims.empty()) {
     anims.front()->do_update(dt);
@@ -24,3 +22,5 @@ void AnimSequence::do_draw() {
 void AnimSequence::push_anim(UPtr &&p) {
   anims.emplace_back(std::forward<UPtr>(p));
 }
+
+bool AnimSequence::is_done_impl() { return anims.empty(); }

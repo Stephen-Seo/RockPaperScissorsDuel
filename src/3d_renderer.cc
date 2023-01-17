@@ -8,14 +8,22 @@
 // third party includes
 #include <raylib.h>
 
+#include <memory>
+
 // local includes
 #include "3d/a3f_conv.h"
+#include "3d/anim_concurrent.h"
+#include "3d/anim_model_attack.h"
+#include "3d/anim_model_grow.h"
+#include "3d/anim_model_shrink.h"
+#include "3d/anim_model_still.h"
 #include "constants.h"
 #include "ems.h"
 #include "helpers.h"
 
 Renderer3D::Renderer3D()
     : qms{},
+      anims(nullptr),
       root_pos{0.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX),
       button_color_timer(BUTTON_COLOR_TIME),
@@ -71,6 +79,7 @@ Renderer3D::Renderer3D()
   flags.set(1);
   flags.set(4);
   flags.set(5);
+  flags.set(14);
 
   qms.at(0).set_model(&qm_model);
   qms.at(0).set_pos({-1.0F, 0.0F, 0.0F});
@@ -106,7 +115,7 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
                               char second_first, char second_second,
                               char second_third, bool first_ready,
                               bool second_ready, int pos, int matchup_idx,
-                              bool gameover) {
+                              bool gameover, bool matchup_started) {
   if (std::strcmp(playerOne, currentPlayer) == 0) {
     flags.set(2);
     flags.reset(3);
@@ -120,6 +129,7 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
 
   flags.set(9, first_ready);
   flags.set(10, second_ready);
+  flags.set(13, matchup_started);
 
   flags.set(12);
 
@@ -127,18 +137,34 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     std::cout << "got pos: " << pos << std::endl;
     std::cout << "got matchup_idx: " << matchup_idx << std::endl;
     std::cout << "camera.target.x: " << camera.target.x << std::endl;
+    std::cout << "matchup started: " << (matchup_started ? "true" : "false")
+              << std::endl;
+    std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2 is "
+              << (second_ready ? "ready" : "NOT ready") << std::endl;
   }
 
-  received_pos = pos;
+  if (!flags.test(13)) {
+    received_pos = pos;
+  }
+  if (received_matchup_idx != matchup_idx) {
+    flags.reset(7);
+  }
   received_matchup_idx = matchup_idx;
 
   if (second_first != '?') {
-    opponent_choices.at(0) = second_first;
-    opponent_choices.at(1) = second_second;
-    opponent_choices.at(2) = second_third;
+    if (flags.test(2)) {
+      opponent_choices.at(0) = second_first;
+      opponent_choices.at(1) = second_second;
+      opponent_choices.at(2) = second_third;
+    } else {
+      opponent_choices.at(0) = first_first;
+      opponent_choices.at(1) = first_second;
+      opponent_choices.at(2) = first_third;
+    }
   }
 
-  if (flags.test(11) && first_first == '?' && second_first == '?') {
+  if (flags.test(11) && first_first == '?' && second_first == '?' &&
+      flags.test(15) && !flags.test(13)) {
     choices.at(0) = '?';
     choices.at(1) = '?';
     choices.at(2) = '?';
@@ -148,8 +174,20 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     flags.reset(11);
     flags.reset(8);
     flags.reset(0);
+    flags.reset(15);
+    flags.set(14);
     overview_timer = OVERVIEW_TIMER_MAX;
     set_random_overview();
+    qms.at(0).set_pos_x(received_pos * 2.0F - 1.0F);
+    qms.at(1).set_pos_x(received_pos * 2.0F + 1.0F);
+    camera.target.x = received_pos * 2.0F;
+    if (flags.test(2)) {
+      std::cerr << "RESET STATE for next round" << std::endl;
+    }
+  }
+
+  if (flags.test(2)) {
+    std::cout << flags.to_string().substr(64 - 16) << std::endl;
   }
 }
 
@@ -296,27 +334,160 @@ void Renderer3D::update_impl() {
     button_color_timer += BUTTON_COLOR_TIME;
   }
 
+  if (flags.test(8) && flags.test(9) && flags.test(10) && !flags.test(11)) {
+    char buf[6] = {(char)choices.at(0), 0, (char)choices.at(1), 0,
+                   (char)choices.at(2), 0};
+    flags.set(11);
+    flags.set(0);
+    call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    call_js_request_update();
+  }
+
   if (flags.test(12)) {
-    if (flags.test(8) && flags.test(11)) {
-      call_js_set_ready();
-      call_js_request_update();
-    } else if (flags.test(8) && flags.test(9) && flags.test(10) &&
-               !flags.test(11)) {
-      char buf[6] = {(char)choices.at(0), 0, (char)choices.at(1), 0,
-                     (char)choices.at(2), 0};
-      call_js_set_choices(&buf[0], &buf[2], &buf[4]);
-      flags.set(11);
-      flags.set(0);
+    if (flags.test(11) && !flags.test(7) && flags.test(13) && anims.is_done()) {
+      flags.set(7);
+      flags.reset(14);
+      flags.set(15);
+
+      anims.reset_is_done();
+
+      auto newAnim = std::make_unique<AnimConcurrent>(nullptr);
+      newAnim->push_anim(std::make_unique<AnimModelShrink>(
+          &qm_model, A3F{received_pos * 2.0F - 1.0F, 0.0F, 0.0F}));
+      newAnim->push_anim(std::make_unique<AnimModelShrink>(
+          &qm_model, A3F{received_pos * 2.0F + 1.0F, 0.0F, 0.0F}));
+      anims.push_anim(std::move(newAnim));
+
+      newAnim = std::make_unique<AnimConcurrent>(nullptr);
+      Model *p1_model = &qm_model;
+      Model *p2_model = &qm_model;
+      switch (choices.at(received_matchup_idx)) {
+        case 'r':
+          if (flags.test(2)) {
+            p1_model = &rock_model;
+          } else {
+            p2_model = &rock_model;
+          }
+          break;
+        case 'p':
+          if (flags.test(2)) {
+            p1_model = &paper_model;
+          } else {
+            p2_model = &paper_model;
+          }
+          break;
+        case 's':
+          if (flags.test(2)) {
+            p1_model = &scissors_model;
+          } else {
+            p2_model = &scissors_model;
+          }
+          break;
+      }
+      switch (opponent_choices.at(received_matchup_idx)) {
+        case 'r':
+          if (flags.test(2)) {
+            p2_model = &rock_model;
+          } else {
+            p1_model = &rock_model;
+          }
+          break;
+        case 'p':
+          if (flags.test(2)) {
+            p2_model = &paper_model;
+          } else {
+            p1_model = &paper_model;
+          }
+          break;
+        case 's':
+          if (flags.test(2)) {
+            p2_model = &scissors_model;
+          } else {
+            p1_model = &scissors_model;
+          }
+          break;
+      }
+      newAnim->push_anim(std::make_unique<AnimModelGrow>(
+          p1_model, A3F{received_pos * 2.0F - 1.0F, 0.0F, 0.0F}));
+      newAnim->push_anim(std::make_unique<AnimModelGrow>(
+          p2_model, A3F{received_pos * 2.0F + 1.0F, 0.0F, 0.0F}));
+      anims.push_anim(std::move(newAnim));
+
+      newAnim = std::make_unique<AnimConcurrent>(nullptr);
+
+      const int result = Helpers::a_vs_b(
+          flags.test(2) ? choices.at(received_matchup_idx)
+                        : opponent_choices.at(received_matchup_idx),
+          flags.test(2) ? opponent_choices.at(received_matchup_idx)
+                        : choices.at(received_matchup_idx));
+
+      switch (result) {
+        case -1:
+          newAnim->push_anim(std::make_unique<AnimModelStill>(
+              p1_model, A3F{received_pos * 2.0F - 1.0F, 0.0F, 0.0F},
+              MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
+          newAnim->push_anim(std::make_unique<AnimModelAttack>(
+              p2_model, A3F{received_pos * 2.0F + 1.0F, 0.0F, 0.0F}, false));
+          break;
+        case 1:
+          newAnim->push_anim(std::make_unique<AnimModelAttack>(
+              p1_model, A3F{received_pos * 2.0F - 1.0F, 0.0F, 0.0F}, true));
+          newAnim->push_anim(std::make_unique<AnimModelStill>(
+              p2_model, A3F{received_pos * 2.0F + 1.0F, 0.0F, 0.0F},
+              MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
+          break;
+        case 0:
+        default:
+          break;
+      }
+
+      if (result != 0) {
+        anims.push_anim(std::move(newAnim));
+      }
+
+      newAnim = std::make_unique<AnimConcurrent>(nullptr);
+      newAnim->push_anim(std::make_unique<AnimModelShrink>(
+          p1_model, A3F{received_pos * 2.0F - 1.0F, 0.0F, 0.0F}));
+      newAnim->push_anim(std::make_unique<AnimModelShrink>(
+          p2_model, A3F{received_pos * 2.0F + 1.0F, 0.0F, 0.0F}));
+
+      using DataT = std::tuple<decltype(flags) *, int *, int>;
+      DataT *data = new DataT{&flags, &received_pos, result};
+      newAnim->set_end_callback(
+          [](void *ud) {
+            auto *d = (std::tuple<decltype(flags) *, int *, int> *)(ud);
+            std::get<0>(*d)->set(14);
+            *std::get<1>(*d) += std::get<2>(*d);
+            delete d;
+          },
+          data);
+
+      anims.push_anim(std::move(newAnim));
+
+      newAnim = std::make_unique<AnimConcurrent>(nullptr);
+      newAnim->push_anim(std::make_unique<AnimModelGrow>(
+          &qm_model, A3F{(result + received_pos) * 2.0F - 1.0F, 0.0F, 0.0F}));
+      newAnim->push_anim(std::make_unique<AnimModelGrow>(
+          &qm_model, A3F{(result + received_pos) * 2.0F + 1.0F, 0.0F, 0.0F}));
+
+      anims.push_anim(std::move(newAnim));
     }
   }
 
   flags.reset(12);
 
-  qms.at(0).get_pos().at(0) +=
-      ((received_pos * 2.0F - 1.0F) - qms.at(0).get_pos().at(0)) / 50.0F;
-  qms.at(1).get_pos().at(0) +=
-      ((received_pos * 2.0F + 1.0F) - qms.at(1).get_pos().at(0)) / 50.0F;
-  camera.target.x += (received_pos * 2.0F - camera.target.x) / 50.0F;
+  if (flags.test(8) && flags.test(11) && flags.test(7) && anims.is_done()) {
+    flags.set(14);
+    call_js_set_ready();
+    call_js_request_update();
+  }
+
+  if (flags.test(14)) {
+    float offset = received_pos * 2.0F - camera.target.x;
+    camera.target.x += offset / 4.0F;
+  }
+
+  anims.do_update(dt);
 }
 
 void Renderer3D::draw_impl() {
@@ -325,8 +496,12 @@ void Renderer3D::draw_impl() {
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
-  for (auto &obj : qms) {
-    obj.draw();
+  if (flags.test(0)) {
+    anims.do_draw();
+  } else {
+    for (auto &obj : qms) {
+      obj.draw();
+    }
   }
   EndMode3D();
 

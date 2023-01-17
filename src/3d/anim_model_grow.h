@@ -9,12 +9,12 @@ class AnimModelGrow : public Anims {
   AnimModelGrow(Model *model, A3F pos);
   ~AnimModelGrow() override;
 
-  bool is_done() override;
-
   void do_update(float dt) override;
   void do_draw() override;
 
  private:
+  bool is_done_impl() override;
+
   A3F pos;
   float timer;
 };

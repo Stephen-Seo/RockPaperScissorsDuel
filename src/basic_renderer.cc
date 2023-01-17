@@ -39,7 +39,7 @@ void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
                                  char second_first, char second_second,
                                  char second_third, bool first_ready,
                                  bool second_ready, int pos, int matchup_idx,
-                                 bool gameover) {
+                                 bool gameover, bool matchup_started) {
   // TODO DEBUG
   // if (std::strcmp(playerOne, currentPlayer) == 0) {
   //  std::clog << "update_state:\n"

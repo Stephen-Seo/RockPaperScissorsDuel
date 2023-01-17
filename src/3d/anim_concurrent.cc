@@ -4,8 +4,6 @@ AnimConcurrent::AnimConcurrent(Model *model) : Anims(model) {}
 
 AnimConcurrent::~AnimConcurrent() {}
 
-bool AnimConcurrent::is_done() { return anims.empty(); }
-
 void AnimConcurrent::do_update(float dt) {
   for (auto iter = anims.begin(); iter != anims.end();) {
     (*iter)->do_update(dt);
@@ -26,3 +24,5 @@ void AnimConcurrent::do_draw() {
 void AnimConcurrent::push_anim(UPtr &&p) {
   anims.emplace_back(std::forward<UPtr>(p));
 }
+
+bool AnimConcurrent::is_done_impl() { return anims.empty(); }

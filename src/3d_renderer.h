@@ -12,6 +12,8 @@
 #include <raylib.h>
 
 // local includes
+#include "3d/anim_sequence.h"
+#include "3d/anims.h"
 #include "3d/qm.h"
 
 class Renderer3D : public GameRenderer {
@@ -23,8 +25,8 @@ class Renderer3D : public GameRenderer {
                     const char *currentPlayer, char first_first,
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
-                    bool second_ready, int pos, int matchup_idx,
-                    bool gameover) override;
+                    bool second_ready, int pos, int matchup_idx, bool gameover,
+                    bool matchup_started) override;
 
   void do_update() override;
 
@@ -55,6 +57,8 @@ class Renderer3D : public GameRenderer {
   Model paper_model;
   Model scissors_model;
 
+  AnimSequence anims;
+
   Vector3 root_pos;
 
   /*
@@ -73,12 +77,15 @@ class Renderer3D : public GameRenderer {
    *    101 - UNUSED
    *    110 - UNUSED
    *    111 - UNUSED
-   * 7 - UNUSED
+   * 7 - anims set for current matchup
    * 8 - choices locked
    * 9 - p1 ready
    * 10 - p2 ready
    * 11 - choices submitted
    * 12 - update received
+   * 13 - matchup started
+   * 14 - do update camera target/pos
+   * 15 - anims was set for matchup
    */
   std::bitset<64> flags;
 

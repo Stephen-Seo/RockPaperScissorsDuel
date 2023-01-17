@@ -10,6 +10,7 @@ Rune.initLogic({
         pos: 0,
         matchup_idx: 0,
         gameover: false,
+        matchup_started: false,
     }),
     actions: {
         set_choices: ({first, second, third}, { game, playerId }) => {
@@ -81,6 +82,12 @@ Rune.initLogic({
             }
 
             // Both sides are ready, iterate through matchups
+            if (!game.matchup_started) {
+                game.matchup_started = true;
+                game.ready[0] = false;
+                game.ready[1] = false;
+                return;
+            }
 
             // check if first won the matchup
             if ((game.first_choices[game.matchup_idx] === 'r'
@@ -121,6 +128,7 @@ Rune.initLogic({
                     }
                     game.matchup_idx = 0;
                 }
+                game.matchup_started = false;
             }
         },
     },

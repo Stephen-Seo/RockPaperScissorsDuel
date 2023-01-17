@@ -8,16 +8,15 @@
 #include "../helpers.h"
 #include "a3f_conv.h"
 
-AnimModelAttack::AnimModelAttack(Model *model, A3F pos)
+AnimModelAttack::AnimModelAttack(Model *model, A3F pos, bool is_p1)
     : Anims(model),
       pos(pos),
       offset{0.0F, 0.0F, 0.0F},
       timer(MODEL_ATTACK_TIME_0),
-      state(0) {}
+      state(0),
+      is_p1(is_p1) {}
 
 AnimModelAttack::~AnimModelAttack() {}
-
-bool AnimModelAttack::is_done() { return state == 3; }
 
 void AnimModelAttack::do_update(float dt) {
   timer -= dt;
@@ -43,14 +42,16 @@ void AnimModelAttack::do_update(float dt) {
                                    1.0F - timer / MODEL_ATTACK_TIME_0);
       break;
     case 1:
-      offset.at(0) = Helpers::lerp(MODEL_ATTACK_0_X, MODEL_ATTACK_1_X,
+      offset.at(0) = Helpers::lerp(MODEL_ATTACK_0_X,
+                                   MODEL_ATTACK_1_X * (is_p1 ? 1.0F : -1.0F),
                                    1.0F - timer / MODEL_ATTACK_TIME_1);
       offset.at(1) = Helpers::lerp(MODEL_ATTACK_0_Y, MODEL_ATTACK_1_Y,
                                    1.0F - timer / MODEL_ATTACK_TIME_1);
       break;
     case 2:
-      offset.at(0) = Helpers::lerp(MODEL_ATTACK_1_X, MODEL_ATTACK_2_X,
-                                   1.0F - timer / MODEL_ATTACK_TIME_2);
+      offset.at(0) =
+          Helpers::lerp(MODEL_ATTACK_1_X * (is_p1 ? 1.0F : -1.0F),
+                        MODEL_ATTACK_2_X, 1.0F - timer / MODEL_ATTACK_TIME_2);
       offset.at(1) = Helpers::lerp(MODEL_ATTACK_1_Y, MODEL_ATTACK_2_Y,
                                    1.0F - timer / MODEL_ATTACK_TIME_2);
       break;
@@ -64,3 +65,5 @@ void AnimModelAttack::do_update(float dt) {
 void AnimModelAttack::do_draw() {
   DrawModel(*model, A3FToRV3(pos + offset), 1.0F, WHITE);
 }
+
+bool AnimModelAttack::is_done_impl() { return state == 3; }

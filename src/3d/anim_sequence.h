@@ -11,12 +11,13 @@ class AnimSequence : public Anims {
   AnimSequence(Model *model);
   ~AnimSequence() override;
 
-  bool is_done() override;
-
   void do_update(float dt) override;
   void do_draw() override;
 
   void push_anim(UPtr &&p);
+
+ protected:
+  bool is_done_impl() override;
 
  private:
   std::list<UPtr> anims;

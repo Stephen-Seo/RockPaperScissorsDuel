@@ -25,11 +25,13 @@ set(RPSDuelNative_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/a3f.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/a3f_conv.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anims.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_concurrent.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_sequence.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_shrink.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_grow.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_attack.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_still.cc"
 )
 
 set(RPSDuelNative_HEADERS
@@ -48,6 +50,7 @@ set(RPSDuelNative_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_shrink.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_grow.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_attack.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_still.h"
 )
 
 add_executable(RPSDuelNative ${RPSDuelNative_SOURCES})
