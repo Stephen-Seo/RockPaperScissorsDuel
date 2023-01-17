@@ -18,7 +18,8 @@ SOURCES = \
 		../src/3d/anim_concurrent.cc \
 		../src/3d/anim_sequence.cc \
 		../src/3d/anim_model_shrink.cc \
-		../src/3d/anim_model_grow.cc
+		../src/3d/anim_model_grow.cc \
+		../src/3d/anim_model_attack.cc
 
 HEADERS = \
 		../src/constants.h \
@@ -35,7 +36,8 @@ HEADERS = \
 		../src/3d/anim_concurrent.h \
 		../src/3d/anim_sequence.h \
 		../src/3d/anim_model_shrink.h \
-		../src/3d/anim_model_grow.h
+		../src/3d/anim_model_grow.h \
+		../src/3d/anim_model_attack.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 

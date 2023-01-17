@@ -80,4 +80,14 @@ constexpr float QM_Y_TIMER_MAX = 3.5F;
 constexpr float MODEL_SHRINK_TIME = 1.0F;
 constexpr float MODEL_GROW_TIME = 1.0F;
 
+constexpr float MODEL_ATTACK_TIME_0 = 0.4F;
+constexpr float MODEL_ATTACK_TIME_1 = 0.3F;
+constexpr float MODEL_ATTACK_TIME_2 = 0.4F;
+constexpr float MODEL_ATTACK_0_X = 0.0F;
+constexpr float MODEL_ATTACK_0_Y = 2.0F;
+constexpr float MODEL_ATTACK_1_X = -1.0F;
+constexpr float MODEL_ATTACK_1_Y = 0.2F;
+constexpr float MODEL_ATTACK_2_X = 0.0F;
+constexpr float MODEL_ATTACK_2_Y = 0.0F;
+
 #endif
