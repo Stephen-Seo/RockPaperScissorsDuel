@@ -130,10 +130,11 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
   flags.set(9, first_ready);
   flags.set(10, second_ready);
   flags.set(13, matchup_started);
+  flags.set(14, gameover_called);
 
   flags.set(12);
 
-  if (flags.test(2)) {
+  if (flags.test(3)) {
     std::cout << "got pos: " << pos << std::endl;
     std::cout << "camera.target.x: " << camera.target.x << std::endl;
     std::cout << "matchup started: " << (matchup_started ? "true" : "false")
@@ -158,6 +159,16 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     }
   }
 
+  if (flags.test(3)) {
+    choices.at(0) = first_first;
+    choices.at(1) = first_second;
+    choices.at(2) = first_third;
+    opponent_choices.at(0) = second_first;
+    opponent_choices.at(1) = second_second;
+    opponent_choices.at(2) = second_third;
+    flags.set(0, flags.test(13));
+  }
+
   if ((flags.test(11) || flags.test(3)) && first_first == '?' &&
       second_first == '?' && flags.test(15) && !flags.test(13)) {
     choices.at(0) = '?';
@@ -174,7 +185,7 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     overview_timer = OVERVIEW_TIMER_MAX;
     set_random_overview();
     camera.target.x = received_pos * 2.0F;
-    if (flags.test(2)) {
+    if (flags.test(3)) {
       std::cerr << "RESET STATE for next round" << std::endl;
     }
   }
@@ -182,7 +193,7 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
   qms.at(0).set_pos_x(received_pos * 2.0F - 1.0F);
   qms.at(1).set_pos_x(received_pos * 2.0F + 1.0F);
 
-  if (flags.test(2)) {
+  if (flags.test(3)) {
     std::cout << flags.to_string().substr(64 - 16) << std::endl;
   }
 }
@@ -320,7 +331,9 @@ void Renderer3D::update_impl() {
                  GetTouchX() <= GetScreenWidth() && GetTouchY() >= 0 &&
                  GetTouchY() <= triple_single_width) {
         flags.set(8);
-        call_js_set_ready();
+        if (!flags.test(14)) {
+          call_js_set_ready();
+        }
       }
     }
   }
@@ -335,7 +348,9 @@ void Renderer3D::update_impl() {
                    (char)choices.at(2), 0};
     flags.set(11);
     flags.set(0);
-    call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    if (!flags.test(14)) {
+      call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+    }
   }
 
   if (flags.test(12) || flags.test(3)) {
@@ -356,7 +371,8 @@ void Renderer3D::update_impl() {
 
   flags.reset(12);
 
-  if (flags.test(8) && flags.test(11) && flags.test(7) && anims.is_done()) {
+  if (flags.test(8) && flags.test(11) && flags.test(7) && anims.is_done() &&
+      !flags.test(14)) {
     call_js_set_matchup_done();
   }
 
@@ -561,21 +577,21 @@ int Renderer3D::setup_anims(int idx, int score) {
   Model *p2_model = &qm_model;
   switch (choices.at(idx)) {
     case 'r':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p1_model = &rock_model;
       } else {
         p2_model = &rock_model;
       }
       break;
     case 'p':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p1_model = &paper_model;
       } else {
         p2_model = &paper_model;
       }
       break;
     case 's':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p1_model = &scissors_model;
       } else {
         p2_model = &scissors_model;
@@ -584,21 +600,21 @@ int Renderer3D::setup_anims(int idx, int score) {
   }
   switch (opponent_choices.at(idx)) {
     case 'r':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p2_model = &rock_model;
       } else {
         p1_model = &rock_model;
       }
       break;
     case 'p':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p2_model = &paper_model;
       } else {
         p1_model = &paper_model;
       }
       break;
     case 's':
-      if (flags.test(2)) {
+      if (flags.test(2) || flags.test(3)) {
         p2_model = &scissors_model;
       } else {
         p1_model = &scissors_model;
@@ -614,8 +630,10 @@ int Renderer3D::setup_anims(int idx, int score) {
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
 
   const int result = Helpers::a_vs_b(
-      flags.test(2) ? choices.at(idx) : opponent_choices.at(idx),
-      flags.test(2) ? opponent_choices.at(idx) : choices.at(idx));
+      (flags.test(2) || flags.test(3)) ? choices.at(idx)
+                                       : opponent_choices.at(idx),
+      (flags.test(2) || flags.test(3)) ? opponent_choices.at(idx)
+                                       : choices.at(idx));
 
   switch (result) {
     case -1:

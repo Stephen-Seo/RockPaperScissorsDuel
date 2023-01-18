@@ -88,7 +88,7 @@ class Renderer3D : public GameRenderer {
    * 11 - choices submitted
    * 12 - update received
    * 13 - matchup started
-   * 14 - UNUSED
+   * 14 - gameover called
    * 15 - anims was set for matchup
    */
   std::bitset<64> flags;
