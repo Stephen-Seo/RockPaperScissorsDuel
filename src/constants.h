@@ -77,8 +77,8 @@ constexpr float QM_MAX_Y_OFFSET = 0.3F;
 constexpr float QM_ANGLE_TIMER_MAX = 5.0F;
 constexpr float QM_Y_TIMER_MAX = 3.5F;
 
-constexpr float MODEL_SHRINK_TIME = 1.0F;
-constexpr float MODEL_GROW_TIME = 1.0F;
+constexpr float MODEL_SHRINK_TIME = 0.8F;
+constexpr float MODEL_GROW_TIME = 0.8F;
 
 constexpr float MODEL_ATTACK_TIME_0 = 0.4F;
 constexpr float MODEL_ATTACK_TIME_1 = 0.3F;

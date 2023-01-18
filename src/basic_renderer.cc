@@ -38,8 +38,9 @@ void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
                                  char first_second, char first_third,
                                  char second_first, char second_second,
                                  char second_third, bool first_ready,
-                                 bool second_ready, int pos, int matchup_idx,
-                                 bool gameover, bool matchup_started) {
+                                 bool second_ready, bool first_matchup_done,
+                                 bool second_matchup_done, int pos,
+                                 bool gameover_called, bool matchup_started) {
   // TODO DEBUG
   // if (std::strcmp(playerOne, currentPlayer) == 0) {
   //  std::clog << "update_state:\n"
@@ -124,7 +125,7 @@ void BasicRenderer::update_state(const char *playerOne, const char *playerTwo,
     cachedPos = pos;
   }
 
-  if (gameover) {
+  if (gameover_called) {
     flags.set(14);
   }
 }
@@ -371,7 +372,8 @@ void BasicRenderer::update_impl() {
       prevPos == cachedPos && is_choices_set() && is_opponent_choices_set()) {
     flags.reset(12);
     if (!flags.test(14)) {
-      call_js_request_update();
+      // call_js_request_update();
+      call_js_set_matchup_done();
     }
     // std::cout << "Requesting update..." << std::endl; // TODO DEBUG
   }
@@ -381,7 +383,8 @@ void BasicRenderer::update_impl() {
     requestTimer = REQUEST_TIMER_MAX;
     if (flags.test(10) && flags.test(11)) {
       if (!flags.test(14)) {
-        call_js_request_update();
+        // call_js_request_update();
+        call_js_set_matchup_done();
       }
       // std::cout << "Requesting update (timer)..." << std::endl; // TODO DEBUG
     }

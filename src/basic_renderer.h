@@ -21,7 +21,8 @@ class BasicRenderer : public GameRenderer {
                     const char *currentPlayer, char first_first,
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
-                    bool second_ready, int pos, int matchup_idx, bool gameover,
+                    bool second_ready, bool first_matchup_done,
+                    bool second_matchup_done, int pos, bool gameover_called,
                     bool matchup_started) override;
 
   void do_update() override;

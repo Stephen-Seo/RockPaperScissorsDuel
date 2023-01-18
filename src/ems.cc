@@ -17,6 +17,9 @@ EM_JS(void, js_set_choices,
 
 EM_JS(void, js_request_update, (), { Rune.actions.request_update("unused"); });
 
+EM_JS(void, js_set_matchup_done, (),
+      { Rune.actions.set_matchup_done("unused"); });
+
 EM_JS(int, canvas_get_width, (),
       { return document.getElementById("canvas").clientWidth; });
 
@@ -47,12 +50,22 @@ void call_js_set_choices(const char *first, const char *second,
 #endif
 }
 
-void call_js_request_update() {
+// void call_js_request_update() {
+//#ifdef __EMSCRIPTEN__
+//   js_request_update();
+//#else
+//   std::clog
+//       << "WARNING: emscripten not enabled, cannot call js_request_update()!"
+//       << std::endl;
+//#endif
+// }
+
+void call_js_set_matchup_done() {
 #ifdef __EMSCRIPTEN__
-  js_request_update();
+  js_set_matchup_done();
 #else
   std::clog
-      << "WARNING: emscripten not enabled, cannot call js_request_update()!"
+      << "WARNING: emscripten not enabled, cannot call js_set_matchup_done()!"
       << std::endl;
 #endif
 }
