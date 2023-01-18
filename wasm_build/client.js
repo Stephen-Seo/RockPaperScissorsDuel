@@ -1,5 +1,4 @@
-// Use setTimeout to give the .wasm binary time to load first.
-setTimeout(() => {
+function do_rune_init() {
 Rune.initClient({
     visualUpdate: ({ newGame, yourPlayerId}) => {
         const { player1, player2, first_choices, second_choices, ready, matchup_done, pos, prev_pos, gameover, gameover_called, matchup_started } = newGame;
@@ -56,4 +55,14 @@ Rune.initClient({
         }
     },
 });
-}, 500);
+}
+
+let em_checking_interval_id = setInterval(
+    () => {
+        if (Module !== undefined && Module.ccall !== undefined) {
+            do_rune_init();
+            clearInterval(em_checking_interval_id);
+            console.log("Rune initialized!");
+        }
+    }, 500
+);
