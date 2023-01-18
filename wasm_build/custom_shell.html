@@ -29,6 +29,8 @@
   </head>
   <body>
     <script src="https://cdn.jsdelivr.net/npm/rune-games-sdk@3/multiplayer.js"></script>
+    <script src="logic.js" defer></script>
+    <script src="client.js" defer></script>
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
     <script type='text/javascript'>
       var Module = {
@@ -61,7 +63,5 @@
       };
     </script>
     {{{ SCRIPT }}}
-    <script src="logic.js" defer></script>
-    <script src="client.js" defer></script>
   </body>
 </html>
