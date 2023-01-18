@@ -133,14 +133,15 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
 
   flags.set(12);
 
-  //if (flags.test(3)) {
-  //  std::cout << "got pos: " << pos << std::endl;
-  //  std::cout << "camera.target.x: " << camera.target.x << std::endl;
-  //  std::cout << "matchup started: " << (matchup_started ? "true" : "false")
-  //            << std::endl;
-  //  std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2 is "
-  //            << (second_ready ? "ready" : "NOT ready") << std::endl;
-  //}
+  // if (flags.test(3)) {
+  //   std::cout << "got pos: " << pos << std::endl;
+  //   std::cout << "camera.target.x: " << camera.target.x << std::endl;
+  //   std::cout << "matchup started: " << (matchup_started ? "true" : "false")
+  //             << std::endl;
+  //   std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2
+  //   is "
+  //             << (second_ready ? "ready" : "NOT ready") << std::endl;
+  // }
 
   this->prev_pos = prev_pos;
   if (!flags.test(13) && anims.is_done()) {
@@ -168,6 +169,11 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     opponent_choices.at(0) = second_first;
     opponent_choices.at(1) = second_second;
     opponent_choices.at(2) = second_third;
+
+    if (!matchup_started) {
+      flags.reset(16);
+      flags.reset(17);
+    }
   }
 
   if (flags.test(11) && first_first == '?' && second_first == '?' &&
@@ -175,9 +181,9 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     reset_for_next();
   }
 
-  //if (flags.test(3)) {
-  //  std::cout << flags.to_string().substr(64 - 16) << std::endl;
-  //}
+  // if (flags.test(3)) {
+  //   std::cout << flags.to_string().substr(64 - 16) << std::endl;
+  // }
 }
 
 void Renderer3D::do_update() {
@@ -335,9 +341,9 @@ void Renderer3D::update_impl() {
     }
   }
 
-  if (flags.test(12) || flags.test(3)) {
-    if ((flags.test(11) || flags.test(3)) && !flags.test(7) && flags.test(13) &&
-        anims.is_done()) {
+  if (flags.test(12)) {
+    if ((flags.test(11) || (flags.test(3) && !flags.test(16))) &&
+        !flags.test(7) && flags.test(13) && anims.is_done()) {
       flags.set(7);
       flags.set(15);
 
@@ -347,6 +353,10 @@ void Renderer3D::update_impl() {
         if (result < -3 || result > 3) {
           break;
         }
+      }
+
+      if (flags.test(3)) {
+        flags.set(16);
       }
     }
   }
@@ -367,11 +377,12 @@ void Renderer3D::update_impl() {
 
   if (flags.test(3)) {
     if (flags.test(0)) {
-      if (anims.is_done()) {
+      if (anims.is_done() && !flags.test(17)) {
         reset_for_next();
         received_pos = prev_pos;
+        flags.set(17);
       }
-    } else if (flags.test(13)) {
+    } else if (flags.test(13) && flags.test(16)) {
       flags.set(0);
     }
   }
@@ -705,7 +716,7 @@ void Renderer3D::reset_for_next() {
   overview_timer = OVERVIEW_TIMER_MAX;
   set_random_overview();
   camera.target.x = received_pos * 2.0F;
-  //if (flags.test(3)) {
-  //  std::cerr << "RESET STATE for next round" << std::endl;
-  //}
+  // if (flags.test(3)) {
+  //   std::cerr << "RESET STATE for next round" << std::endl;
+  // }
 }

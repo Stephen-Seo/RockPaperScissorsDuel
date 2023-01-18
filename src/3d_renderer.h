@@ -92,6 +92,8 @@ class Renderer3D : public GameRenderer {
    * 13 - matchup started
    * 14 - gameover called
    * 15 - anims was set for matchup
+   * 16 - spectator saw matchup
+   * 17 - spectator did reset after matchup
    */
   std::bitset<64> flags;
 
