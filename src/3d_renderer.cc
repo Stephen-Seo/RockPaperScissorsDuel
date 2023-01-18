@@ -145,10 +145,6 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
   if (!flags.test(13)) {
     received_pos = pos;
   }
-  // if (received_matchup_idx != matchup_idx) {
-  //   flags.reset(7);
-  // }
-  // received_matchup_idx = matchup_idx;
 
   if (second_first != '?') {
     if (flags.test(2)) {
@@ -328,12 +324,6 @@ void Renderer3D::update_impl() {
       }
     }
   }
-
-  // if (!flags.test(3) && flags.test(8) &&
-  //     ((flags.test(2) && !flags.test(9)) ||
-  //      (!flags.test(2) && !flags.test(10)))) {
-  //   call_js_set_ready();
-  // }
 
   button_color_timer -= dt;
   if (button_color_timer <= 0.0F) {
