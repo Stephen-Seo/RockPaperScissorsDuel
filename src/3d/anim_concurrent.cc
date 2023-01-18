@@ -1,6 +1,7 @@
 #include "anim_concurrent.h"
 
-AnimConcurrent::AnimConcurrent(Model *model) : Anims(model) {}
+AnimConcurrent::AnimConcurrent(Model *model)
+    : Anims(model, {0.0F, 0.0F, 0.0F}, {255, 255, 255, 255}) {}
 
 AnimConcurrent::~AnimConcurrent() {}
 

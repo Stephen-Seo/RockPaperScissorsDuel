@@ -1,6 +1,7 @@
 #include "anim_sequence.h"
 
-AnimSequence::AnimSequence(Model *model) : Anims(model) {}
+AnimSequence::AnimSequence(Model *model)
+    : Anims(model, {0.0F, 0.0F, 0.0F}, {255, 255, 255, 255}) {}
 
 AnimSequence::~AnimSequence() {}
 

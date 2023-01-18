@@ -1,7 +1,9 @@
 #include "anims.h"
 
-Anims::Anims(Model *model)
-    : model(model),
+Anims::Anims(Model *model, A3F pos, A4C color)
+    : pos(pos),
+      color(color),
+      model(model),
       userdata(nullptr),
       function_ptr(nullptr),
       is_done_finished(false) {}

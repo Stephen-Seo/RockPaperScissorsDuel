@@ -6,7 +6,7 @@
 
 class AnimModelShrink : public Anims {
  public:
-  AnimModelShrink(Model *model, A3F pos);
+  AnimModelShrink(Model *model, A3F pos, A4C color);
   ~AnimModelShrink() override;
 
   void do_update(float dt) override;
@@ -15,7 +15,6 @@ class AnimModelShrink : public Anims {
  private:
   bool is_done_impl() override;
 
-  A3F pos;
   float timer;
 };
 

@@ -4,6 +4,9 @@
 // standard library includes
 #include <memory>
 
+// local includes
+#include "a3f.h"
+
 // forward declarations
 struct Model;
 
@@ -14,7 +17,7 @@ class Anims {
 
   using FP = void (*)(void *);
 
-  Anims(Model *model);
+  Anims(Model *model, A3F pos, A4C color);
   virtual ~Anims() {}
 
   bool is_done();
@@ -28,6 +31,8 @@ class Anims {
  protected:
   virtual bool is_done_impl() = 0;
 
+  A3F pos;
+  A4C color;
   Model *model;
   void *userdata;
   FP function_ptr;

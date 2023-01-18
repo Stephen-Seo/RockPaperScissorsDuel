@@ -6,7 +6,7 @@
 
 class AnimModelGrow : public Anims {
  public:
-  AnimModelGrow(Model *model, A3F pos);
+  AnimModelGrow(Model *model, A3F pos, A4C color);
   ~AnimModelGrow() override;
 
   void do_update(float dt) override;
@@ -15,7 +15,6 @@ class AnimModelGrow : public Anims {
  private:
   bool is_done_impl() override;
 
-  A3F pos;
   float timer;
 };
 

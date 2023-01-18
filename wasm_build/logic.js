@@ -9,6 +9,7 @@ Rune.initLogic({
         ready: new Array(2).fill(false),
         matchup_done: new Array(2).fill(false),
         pos: 0,
+        prev_pos: 0,
         gameover: false,
         gameover_called: false,
         matchup_started: false,
@@ -94,6 +95,7 @@ Rune.initLogic({
 
             if (is_choices_filled(game.first_choices) && is_choices_filled(game.second_choices)) {
                 game.matchup_started = true;
+                game.prev_pos = game.pos;
                 for (let i = 0; i < 3; ++i) {
                     let result = check_matchup(game.first_choices[i], game.second_choices[i]);
                     if (result > 0) {
@@ -152,6 +154,7 @@ Rune.initLogic({
                 game.second_choices[0] = '?';
                 game.second_choices[1] = '?';
                 game.second_choices[2] = '?';
+                game.prev_pos = game.pos;
             }
         },
     },

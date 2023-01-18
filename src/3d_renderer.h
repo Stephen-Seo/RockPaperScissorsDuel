@@ -26,8 +26,8 @@ class Renderer3D : public GameRenderer {
                     char first_second, char first_third, char second_first,
                     char second_second, char second_third, bool first_ready,
                     bool second_ready, bool first_matchup_done,
-                    bool second_matchup_done, int pos, bool gameover_called,
-                    bool matchup_started) override;
+                    bool second_matchup_done, int pos, int prev_pos,
+                    bool gameover_called, bool matchup_started) override;
 
   void do_update() override;
 
@@ -41,6 +41,8 @@ class Renderer3D : public GameRenderer {
 
   // Returns score after round "idx"
   int setup_anims(int idx, int score);
+
+  void reset_for_next();
 
   std::array<QuestionMark, 2> qms;
 
@@ -97,6 +99,7 @@ class Renderer3D : public GameRenderer {
   float button_color_timer;
 
   int received_pos;
+  int prev_pos;
   // int received_matchup_idx;
 
   std::array<unsigned char, 3> choices;

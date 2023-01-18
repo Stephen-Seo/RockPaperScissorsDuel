@@ -8,9 +8,8 @@
 #include "../helpers.h"
 #include "a3f_conv.h"
 
-AnimModelAttack::AnimModelAttack(Model *model, A3F pos, bool is_p1)
-    : Anims(model),
-      pos(pos),
+AnimModelAttack::AnimModelAttack(Model *model, A3F pos, A4C color, bool is_p1)
+    : Anims(model, pos, color),
       offset{0.0F, 0.0F, 0.0F},
       timer(MODEL_ATTACK_TIME_0),
       state(0),
@@ -63,7 +62,7 @@ void AnimModelAttack::do_update(float dt) {
 }
 
 void AnimModelAttack::do_draw() {
-  DrawModel(*model, A3FToRV3(pos + offset), 1.0F, WHITE);
+  DrawModel(*model, A3FToRV3(pos + offset), 1.0F, A4CToC(color));
 }
 
 bool AnimModelAttack::is_done_impl() { return state == 3; }

@@ -4,11 +4,10 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <memory>
 
 // third party includes
 #include <raylib.h>
-
-#include <memory>
 
 // local includes
 #include "3d/a3f_conv.h"
@@ -114,7 +113,7 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
                               char second_first, char second_second,
                               char second_third, bool first_ready,
                               bool second_ready, bool first_matchup_done,
-                              bool second_matchup_done, int pos,
+                              bool second_matchup_done, int pos, int prev_pos,
                               bool gameover_called, bool matchup_started) {
   if (std::strcmp(playerOne, currentPlayer) == 0) {
     flags.set(2);
@@ -143,8 +142,11 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
               << (second_ready ? "ready" : "NOT ready") << std::endl;
   }
 
-  if (!flags.test(13)) {
+  this->prev_pos = prev_pos;
+  if (!flags.test(13) && anims.is_done()) {
     received_pos = pos;
+  } else if (flags.test(3) && anims.is_done()) {
+    received_pos = prev_pos;
   }
 
   if (second_first != '?') {
@@ -166,32 +168,12 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     opponent_choices.at(0) = second_first;
     opponent_choices.at(1) = second_second;
     opponent_choices.at(2) = second_third;
-    flags.set(0, flags.test(13));
   }
 
-  if ((flags.test(11) || flags.test(3)) && first_first == '?' &&
-      second_first == '?' && flags.test(15) && !flags.test(13)) {
-    choices.at(0) = '?';
-    choices.at(1) = '?';
-    choices.at(2) = '?';
-    opponent_choices.at(0) = '?';
-    opponent_choices.at(1) = '?';
-    opponent_choices.at(2) = '?';
-    flags.reset(11);
-    flags.reset(8);
-    flags.reset(0);
-    flags.reset(15);
-    flags.reset(7);
-    overview_timer = OVERVIEW_TIMER_MAX;
-    set_random_overview();
-    camera.target.x = received_pos * 2.0F;
-    if (flags.test(3)) {
-      std::cerr << "RESET STATE for next round" << std::endl;
-    }
+  if (flags.test(11) && first_first == '?' && second_first == '?' &&
+      flags.test(15) && !flags.test(13)) {
+    reset_for_next();
   }
-
-  qms.at(0).set_pos_x(received_pos * 2.0F - 1.0F);
-  qms.at(1).set_pos_x(received_pos * 2.0F + 1.0F);
 
   if (flags.test(3)) {
     std::cout << flags.to_string().substr(64 - 16) << std::endl;
@@ -382,6 +364,20 @@ void Renderer3D::update_impl() {
   }
 
   anims.do_update(dt);
+
+  if (flags.test(3)) {
+    if (flags.test(0)) {
+      if (anims.is_done()) {
+        reset_for_next();
+        received_pos = prev_pos;
+      }
+    } else if (flags.test(13)) {
+      flags.set(0);
+    }
+  }
+
+  qms.at(0).set_pos_x(received_pos * 2.0F - 1.0F);
+  qms.at(1).set_pos_x(received_pos * 2.0F + 1.0F);
 }
 
 void Renderer3D::draw_impl() {
@@ -567,9 +563,9 @@ int Renderer3D::setup_anims(int idx, int score) {
 
   auto newAnim = std::make_unique<AnimConcurrent>(nullptr);
   newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      &qm_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}));
+      &qm_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 0, 0, 255}));
   newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      &qm_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}));
+      &qm_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{0, 0, 255, 255}));
   anims.push_anim(std::move(newAnim));
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
@@ -622,9 +618,9 @@ int Renderer3D::setup_anims(int idx, int score) {
       break;
   }
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}));
+      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}));
+      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
   anims.push_anim(std::move(newAnim));
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
@@ -639,15 +635,19 @@ int Renderer3D::setup_anims(int idx, int score) {
     case -1:
       newAnim->push_anim(std::make_unique<AnimModelStill>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+          A4C{255, 255, 255, 255},
           MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
-          p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, false));
+          p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+          A4C{255, 255, 255, 255}, false));
       break;
     case 1:
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
-          p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, true));
+          p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+          A4C{255, 255, 255, 255}, true));
       newAnim->push_anim(std::make_unique<AnimModelStill>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+          A4C{255, 255, 255, 255},
           MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
       break;
     case 0:
@@ -661,9 +661,9 @@ int Renderer3D::setup_anims(int idx, int score) {
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
   newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}));
+      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
   newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}));
+      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
 
   using DataT = std::tuple<int *, int>;
   DataT *data = new DataT{&received_pos, result};
@@ -679,11 +679,33 @@ int Renderer3D::setup_anims(int idx, int score) {
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      &qm_model, A3F{(result + score) * 2.0F - 1.0F, 0.0F, 0.0F}));
+      &qm_model, A3F{(result + score) * 2.0F - 1.0F, 0.0F, 0.0F},
+      A4C{255, 0, 0, 255}));
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      &qm_model, A3F{(result + score) * 2.0F + 1.0F, 0.0F, 0.0F}));
+      &qm_model, A3F{(result + score) * 2.0F + 1.0F, 0.0F, 0.0F},
+      A4C{0, 0, 255, 255}));
 
   anims.push_anim(std::move(newAnim));
 
   return score + result;
+}
+
+void Renderer3D::reset_for_next() {
+  choices.at(0) = '?';
+  choices.at(1) = '?';
+  choices.at(2) = '?';
+  opponent_choices.at(0) = '?';
+  opponent_choices.at(1) = '?';
+  opponent_choices.at(2) = '?';
+  flags.reset(11);
+  flags.reset(8);
+  flags.reset(0);
+  flags.reset(15);
+  flags.reset(7);
+  overview_timer = OVERVIEW_TIMER_MAX;
+  set_random_overview();
+  camera.target.x = received_pos * 2.0F;
+  if (flags.test(3)) {
+    std::cerr << "RESET STATE for next round" << std::endl;
+  }
 }

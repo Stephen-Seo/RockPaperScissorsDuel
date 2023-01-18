@@ -30,13 +30,13 @@ int EMSCRIPTEN_KEEPALIVE game_visual_update(
     const char *playerOne, const char *playerTwo, const char *currentPlayer,
     char first_first, char first_second, char first_third, char second_first,
     char second_second, char second_third, bool first_ready, bool second_ready,
-    bool first_matchup_done, bool second_matchup_done, int pos,
+    bool first_matchup_done, bool second_matchup_done, int pos, int prev_pos,
     bool gameover_called, bool matchup_started) {
   ((GameRenderer *)global_game_ptr)
       ->update_state(playerOne, playerTwo, currentPlayer, first_first,
                      first_second, first_third, second_first, second_second,
                      second_third, first_ready, second_ready,
-                     first_matchup_done, second_matchup_done, pos,
+                     first_matchup_done, second_matchup_done, pos, prev_pos,
                      gameover_called, matchup_started);
   return 0;
 }

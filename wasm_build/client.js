@@ -1,6 +1,6 @@
 Rune.initClient({
     visualUpdate: ({ newGame, yourPlayerId}) => {
-        const { player1, player2, first_choices, second_choices, ready, matchup_done, pos, gameover, gameover_called, matchup_started } = newGame;
+        const { player1, player2, first_choices, second_choices, ready, matchup_done, pos, prev_pos, gameover, gameover_called, matchup_started } = newGame;
 
         function is_choices_filled(choices) {
             for (let i = 0; i < 3; ++i) {
@@ -19,7 +19,7 @@ Rune.initClient({
                     'number', 'number', 'number',
                     'boolean', 'boolean',
                     'boolean', 'boolean',
-                    'number', 'boolean', 'boolean'],
+                    'number', 'number', 'boolean', 'boolean'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     first_choices[0].charCodeAt(0),
@@ -30,7 +30,7 @@ Rune.initClient({
                     second_choices[2].charCodeAt(0),
                     ready[0], ready[1],
                     matchup_done[0], matchup_done[1],
-                    pos, gameover_called, matchup_started]);
+                    pos, prev_pos, gameover_called, matchup_started]);
         } else {
             Module.ccall('game_visual_update',
                 'number',
@@ -39,7 +39,7 @@ Rune.initClient({
                     'number', 'number', 'number',
                     'boolean', 'boolean',
                     'boolean', 'boolean',
-                    'number', 'boolean', 'boolean'],
+                    'number', 'number', 'boolean', 'boolean'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     '?'.charCodeAt(0),
@@ -50,7 +50,7 @@ Rune.initClient({
                     '?'.charCodeAt(0),
                     ready[0], ready[1],
                     matchup_done[0], matchup_done[1],
-                    pos, gameover_called, matchup_started]);
+                    pos, prev_pos, gameover_called, matchup_started]);
         }
     },
 });
