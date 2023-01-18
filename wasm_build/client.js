@@ -59,7 +59,7 @@ Rune.initClient({
 
 let em_checking_interval_id = setInterval(
     () => {
-        if (Module !== undefined && Module.ccall !== undefined) {
+        if (Module !== undefined && Module.ccall !== undefined && Module.asm !== undefined) {
             do_rune_init();
             clearInterval(em_checking_interval_id);
             console.log("Rune initialized!");
