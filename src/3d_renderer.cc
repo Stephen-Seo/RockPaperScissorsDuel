@@ -133,14 +133,14 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
 
   flags.set(12);
 
-  if (flags.test(3)) {
-    std::cout << "got pos: " << pos << std::endl;
-    std::cout << "camera.target.x: " << camera.target.x << std::endl;
-    std::cout << "matchup started: " << (matchup_started ? "true" : "false")
-              << std::endl;
-    std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2 is "
-              << (second_ready ? "ready" : "NOT ready") << std::endl;
-  }
+  //if (flags.test(3)) {
+  //  std::cout << "got pos: " << pos << std::endl;
+  //  std::cout << "camera.target.x: " << camera.target.x << std::endl;
+  //  std::cout << "matchup started: " << (matchup_started ? "true" : "false")
+  //            << std::endl;
+  //  std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2 is "
+  //            << (second_ready ? "ready" : "NOT ready") << std::endl;
+  //}
 
   this->prev_pos = prev_pos;
   if (!flags.test(13) && anims.is_done()) {
@@ -175,9 +175,9 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     reset_for_next();
   }
 
-  if (flags.test(3)) {
-    std::cout << flags.to_string().substr(64 - 16) << std::endl;
-  }
+  //if (flags.test(3)) {
+  //  std::cout << flags.to_string().substr(64 - 16) << std::endl;
+  //}
 }
 
 void Renderer3D::do_update() {
@@ -705,7 +705,7 @@ void Renderer3D::reset_for_next() {
   overview_timer = OVERVIEW_TIMER_MAX;
   set_random_overview();
   camera.target.x = received_pos * 2.0F;
-  if (flags.test(3)) {
-    std::cerr << "RESET STATE for next round" << std::endl;
-  }
+  //if (flags.test(3)) {
+  //  std::cerr << "RESET STATE for next round" << std::endl;
+  //}
 }
