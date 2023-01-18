@@ -50,6 +50,7 @@ all: | format ${OUTDIR} ${OUTDIR}/rock_paper_scissors_duel.html ${OUTDIR}/index.
 
 ${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} ${OUTDIR}/client.js ${OUTDIR}/logic.js
 	${CXX} -o ${OUTDIR}/rock_paper_scissors_duel.html \
+		-s BINARYEN_ASYNC_COMPILATION=0 \
 		-s USE_GLFW=3 -I../wasm_includes -L../wasm_libs -lraylib \
 		--shell-file custom_shell.html \
 		-sEXPORTED_FUNCTIONS=_main,_game_visual_update \
