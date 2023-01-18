@@ -1,4 +1,4 @@
-// Use setTimeout to give the .wasm binary to load first.
+// Use setTimeout to give the .wasm binary time to load first.
 setTimeout(() => {
 Rune.initClient({
     visualUpdate: ({ newGame, yourPlayerId}) => {
