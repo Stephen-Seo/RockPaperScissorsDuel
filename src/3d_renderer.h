@@ -48,6 +48,14 @@ class Renderer3D : public GameRenderer {
 
   void reset_for_next();
 
+  void load_sounds();
+
+  Sound *get_random_rock_sfx();
+  Sound *get_random_paper_sfx();
+  Sound *get_random_scissors_sfx();
+
+  Sound *type_to_sfx(char type);
+
   std::array<QuestionMark, 2> qms;
 
   Deferred2DMap deferred_2d_draw_map;
@@ -68,6 +76,10 @@ class Renderer3D : public GameRenderer {
   Model rock_model;
   Model paper_model;
   Model scissors_model;
+
+  std::array<Sound, 5> paper_sfx;
+  std::array<Sound, 5> scissors_sfx;
+  std::array<Sound, 4> rock_sfx;
 
   AnimSequence anims;
 
@@ -100,6 +112,7 @@ class Renderer3D : public GameRenderer {
    * 15 - anims was set for matchup
    * 16 - spectator saw matchup
    * 17 - spectator did reset after matchup
+   * 18 - sounds loaded
    */
   std::bitset<64> flags;
 
@@ -108,7 +121,6 @@ class Renderer3D : public GameRenderer {
 
   int received_pos;
   int prev_pos;
-  // int received_matchup_idx;
 
   std::array<unsigned char, 3> choices;
   std::array<unsigned char, 3> opponent_choices;

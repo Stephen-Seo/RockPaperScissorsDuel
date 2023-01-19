@@ -405,6 +405,10 @@ void Renderer3D::update_impl() {
   for (int id : to_delete) {
     deferred_2d_draw_map.erase(id);
   }
+
+  if (!flags.test(18)) {
+    load_sounds();
+  }
 }
 
 void Renderer3D::draw_impl() {
@@ -689,28 +693,50 @@ int Renderer3D::setup_anims(int idx, int score) {
   // }
 
   switch (result) {
-    case -1:
-      seqAnim->push_anim(std::make_unique<AnimModelStill>(
+    case -1: {
+      auto anim_still = std::make_unique<AnimModelStill>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
-          A4C{255, 200, 200, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1));
+          A4C{255, 200, 200, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      anim_still->set_end_callback(
+          [](void *ud) {
+            if (ud != nullptr) {
+              auto *sfx = (Sound *)ud;
+              PlaySound(*sfx);
+            }
+          },
+          (flags.test(2) || flags.test(3))
+              ? type_to_sfx(opponent_choices.at(idx))
+              : type_to_sfx(choices.at(idx)));
+      seqAnim->push_anim(std::move(anim_still));
       seqAnim->push_anim(std::make_unique<AnimFalling2D>(
           A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255}, &spriteSheet,
           p1_dims, false, &deferred_2d_draw_map));
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
           A4C{200, 200, 255, 255}, false));
-      break;
-    case 1:
+    } break;
+    case 1: {
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
           A4C{255, 200, 200, 255}, true));
-      seqAnim->push_anim(std::make_unique<AnimModelStill>(
+      auto anim_still = std::make_unique<AnimModelStill>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
-          A4C{200, 200, 255, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1));
+          A4C{200, 200, 255, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      anim_still->set_end_callback(
+          [](void *ud) {
+            if (ud != nullptr) {
+              auto *sfx = (Sound *)ud;
+              PlaySound(*sfx);
+            }
+          },
+          (flags.test(2) || flags.test(3))
+              ? type_to_sfx(choices.at(idx))
+              : type_to_sfx(opponent_choices.at(idx)));
+      seqAnim->push_anim(std::move(anim_still));
       seqAnim->push_anim(std::make_unique<AnimFalling2D>(
           A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255}, &spriteSheet,
           p2_dims, true, &deferred_2d_draw_map));
-      break;
+    } break;
     case 0:
     default:
       break;
@@ -786,4 +812,65 @@ void Renderer3D::reset_for_next() {
   // if (flags.test(3)) {
   //   std::cerr << "RESET STATE for next round" << std::endl;
   // }
+}
+
+void Renderer3D::load_sounds() {
+  InitAudioDevice();
+  if (IsAudioDeviceReady()) {
+    flags.set(18);
+    paper_sfx.at(0) = LoadSound("resources/sfx_paper0.ogg");
+    paper_sfx.at(1) = LoadSound("resources/sfx_paper1.ogg");
+    paper_sfx.at(2) = LoadSound("resources/sfx_paper2.ogg");
+    paper_sfx.at(3) = LoadSound("resources/sfx_paper3.ogg");
+    paper_sfx.at(4) = LoadSound("resources/sfx_paper4.ogg");
+
+    scissors_sfx.at(0) = LoadSound("resources/sfx_scissors0.ogg");
+    scissors_sfx.at(1) = LoadSound("resources/sfx_scissors1.ogg");
+    scissors_sfx.at(2) = LoadSound("resources/sfx_scissors2.ogg");
+    scissors_sfx.at(3) = LoadSound("resources/sfx_scissors3.ogg");
+    scissors_sfx.at(4) = LoadSound("resources/sfx_scissors4.ogg");
+
+    rock_sfx.at(0) = LoadSound("resources/sfx_rock0.ogg");
+    rock_sfx.at(1) = LoadSound("resources/sfx_rock1.ogg");
+    rock_sfx.at(2) = LoadSound("resources/sfx_rock2.ogg");
+    rock_sfx.at(3) = LoadSound("resources/sfx_rock3.ogg");
+  }
+}
+
+Sound *Renderer3D::get_random_rock_sfx() {
+#ifdef __EMSCRIPTEN__
+  return &rock_sfx.at(call_js_get_random() * rock_sfx.size());
+#else
+  return &rock_sfx.at(GetRandomValue(0, rock_sfx.size() - 1));
+#endif
+}
+
+Sound *Renderer3D::get_random_paper_sfx() {
+#ifdef __EMSCRIPTEN__
+  return &paper_sfx.at(call_js_get_random() * paper_sfx.size());
+#else
+  return &paper_sfx.at(GetRandomValue(0, paper_sfx.size() - 1));
+#endif
+}
+
+Sound *Renderer3D::get_random_scissors_sfx() {
+#ifdef __EMSCRIPTEN__
+  return &scissors_sfx.at(call_js_get_random() * scissors_sfx.size());
+#else
+  return &scissors_sfx.at(GetRandomValue(0, scissors_sfx.size() - 1));
+#endif
+}
+
+Sound *Renderer3D::type_to_sfx(char type) {
+  switch (type) {
+    case 'r':
+      return get_random_rock_sfx();
+    case 'p':
+      return get_random_paper_sfx();
+    case 's':
+      return get_random_scissors_sfx();
+    default:
+      break;
+  }
+  return nullptr;
 }
