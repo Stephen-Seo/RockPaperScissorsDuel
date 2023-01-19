@@ -4,7 +4,7 @@
 #include <raylib.h>
 
 // local includes
-#include "a3f_conv.h"
+#include "arrays_conv.h"
 
 AnimModelStill::AnimModelStill(Model *model, A3F pos, A4C color, float time)
     : Anims(model, pos, color), timer(time) {}

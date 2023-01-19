@@ -90,4 +90,12 @@ constexpr float MODEL_ATTACK_1_Y = 0.2F;
 constexpr float MODEL_ATTACK_2_X = 0.0F;
 constexpr float MODEL_ATTACK_2_Y = 0.0F;
 
+constexpr float MODEL_ATTACK_ANGLE_START = 0.0F;
+constexpr float MODEL_ATTACK_ANGLE_END = 90.0F;
+
+constexpr float MODEL_FALLING_2D_DX = 80.0F;
+constexpr float MODEL_FALLING_2D_DY = -30.0F;
+constexpr float MODEL_FALLING_2D_DDY = 150.0F;
+constexpr float MODEL_FALLING_2D_DA = 270.0F;
+
 #endif

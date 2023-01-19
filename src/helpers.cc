@@ -134,3 +134,18 @@ int Helpers::a_vs_b(char a, char b) {
     return 0;
   }
 }
+
+A4F Helpers::get_sprite_dims(char type) {
+  switch (type) {
+    case 'r':
+      return A4F{ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]};
+    case 'p':
+      return A4F{PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]};
+    case 's':
+      return A4F{SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+                 SCISSORS_DIMS[3]};
+    default:
+      return A4F{QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
+                 QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]};
+  }
+}

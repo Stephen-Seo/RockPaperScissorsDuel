@@ -7,6 +7,7 @@
 // standard library includes
 #include <array>
 #include <bitset>
+#include <unordered_map>
 
 // third party includes
 #include <raylib.h>
@@ -14,10 +15,13 @@
 // local includes
 #include "3d/anim_sequence.h"
 #include "3d/anims.h"
+#include "3d/deferred_2d_draw.h"
 #include "3d/qm.h"
 
 class Renderer3D : public GameRenderer {
  public:
+  using Deferred2DMap = std::unordered_map<int, Deferred2DDraw>;
+
   Renderer3D();
   ~Renderer3D() override;
 
@@ -45,6 +49,8 @@ class Renderer3D : public GameRenderer {
   void reset_for_next();
 
   std::array<QuestionMark, 2> qms;
+
+  Deferred2DMap deferred_2d_draw_map;
 
   Camera camera;
 

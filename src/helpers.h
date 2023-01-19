@@ -1,6 +1,9 @@
 #ifndef ROCK_PAPER_SCISSORS_DUEL_HELPERS_H_
 #define ROCK_PAPER_SCISSORS_DUEL_HELPERS_H_
 
+// local includes
+#include "3d/arrays.h"
+
 // forard declarations
 struct Vector3;
 
@@ -27,6 +30,8 @@ extern void overview_orbit(Vector3 *out, float value, bool is_opposite,
                            float offset_x);
 
 extern int a_vs_b(char a, char b);
+
+extern A4F get_sprite_dims(char type);
 
 }  // namespace Helpers
 

@@ -5,7 +5,7 @@
 
 // local includes
 #include "../constants.h"
-#include "a3f_conv.h"
+#include "arrays_conv.h"
 
 AnimModelShrink::AnimModelShrink(Model *model, A3F pos, A4C color)
     : Anims(model, pos, color), timer(MODEL_SHRINK_TIME) {}

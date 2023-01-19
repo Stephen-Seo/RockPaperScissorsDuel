@@ -51,13 +51,13 @@ void call_js_set_choices(const char *first, const char *second,
 }
 
 // void call_js_request_update() {
-//#ifdef __EMSCRIPTEN__
+// #ifdef __EMSCRIPTEN__
 //   js_request_update();
-//#else
+// #else
 //   std::clog
 //       << "WARNING: emscripten not enabled, cannot call js_request_update()!"
 //       << std::endl;
-//#endif
+// #endif
 // }
 
 void call_js_set_matchup_done() {

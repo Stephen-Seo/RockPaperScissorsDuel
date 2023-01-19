@@ -5,17 +5,19 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 // third party includes
 #include <raylib.h>
 
 // local includes
-#include "3d/a3f_conv.h"
 #include "3d/anim_concurrent.h"
+#include "3d/anim_falling_2d.h"
 #include "3d/anim_model_attack.h"
 #include "3d/anim_model_grow.h"
 #include "3d/anim_model_shrink.h"
 #include "3d/anim_model_still.h"
+#include "3d/arrays_conv.h"
 #include "constants.h"
 #include "ems.h"
 #include "helpers.h"
@@ -389,6 +391,20 @@ void Renderer3D::update_impl() {
 
   qms.at(0).set_pos_x(received_pos * 2.0F - 1.0F);
   qms.at(1).set_pos_x(received_pos * 2.0F + 1.0F);
+
+  std::vector<int> to_delete;
+  for (auto &iter : deferred_2d_draw_map) {
+    if (iter.second.is_activated()) {
+      iter.second.update(dt);
+      if (iter.second.is_oob()) {
+        to_delete.push_back(iter.first);
+      }
+    }
+  }
+
+  for (int id : to_delete) {
+    deferred_2d_draw_map.erase(id);
+  }
 }
 
 void Renderer3D::draw_impl() {
@@ -542,6 +558,12 @@ void Renderer3D::draw_impl() {
     DrawText("Waiting...", 0, 0, 20, RAYWHITE);
   }
 
+  for (auto &iter : deferred_2d_draw_map) {
+    if (iter.second.is_activated()) {
+      iter.second.draw();
+    }
+  }
+
   EndDrawing();
 }
 
@@ -629,9 +651,9 @@ int Renderer3D::setup_anims(int idx, int score) {
       break;
   }
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
+      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 200, 200, 255}));
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
-      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
+      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{200, 200, 255, 255}));
   anims.push_anim(std::move(newAnim));
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
@@ -642,24 +664,52 @@ int Renderer3D::setup_anims(int idx, int score) {
       (flags.test(2) || flags.test(3)) ? opponent_choices.at(idx)
                                        : choices.at(idx));
 
+  auto seqAnim = std::make_unique<AnimSequence>(nullptr);
+
+  A4F p1_dims = (flags.test(2) || flags.test(3))
+                    ? Helpers::get_sprite_dims(choices.at(idx))
+                    : Helpers::get_sprite_dims(opponent_choices.at(idx));
+  A4F p2_dims = (flags.test(2) || flags.test(3))
+                    ? Helpers::get_sprite_dims(opponent_choices.at(idx))
+                    : Helpers::get_sprite_dims(choices.at(idx));
+  Vector3 oldPos = camera.position;
+  camera.position = camera.target;
+  camera.position.z += 10.0F;
+  camera.position.y += 4.0F;
+  Vector2 p1_pos =
+      GetWorldToScreen({camera.target.x - 1.0F, 0.35F, 0.0F}, camera);
+  Vector2 p2_pos =
+      GetWorldToScreen({camera.target.x + 1.0F, 0.35F, 0.0F}, camera);
+  camera.position = oldPos;
+
+  // if (flags.test(2)) {
+  //   std::cout << "p1_pos x is " << (score * 2.0F - 1.0F) << " or " <<
+  //   p1_pos.x
+  //             << std::endl;
+  // }
+
   switch (result) {
     case -1:
-      newAnim->push_anim(std::make_unique<AnimModelStill>(
+      seqAnim->push_anim(std::make_unique<AnimModelStill>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
-          A4C{255, 255, 255, 255},
-          MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
+          A4C{255, 200, 200, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1));
+      seqAnim->push_anim(std::make_unique<AnimFalling2D>(
+          A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255}, &spriteSheet,
+          p1_dims, false, &deferred_2d_draw_map));
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
-          A4C{255, 255, 255, 255}, false));
+          A4C{200, 200, 255, 255}, false));
       break;
     case 1:
       newAnim->push_anim(std::make_unique<AnimModelAttack>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
-          A4C{255, 255, 255, 255}, true));
-      newAnim->push_anim(std::make_unique<AnimModelStill>(
+          A4C{255, 200, 200, 255}, true));
+      seqAnim->push_anim(std::make_unique<AnimModelStill>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
-          A4C{255, 255, 255, 255},
-          MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1 + MODEL_ATTACK_TIME_2));
+          A4C{200, 200, 255, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1));
+      seqAnim->push_anim(std::make_unique<AnimFalling2D>(
+          A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255}, &spriteSheet,
+          p2_dims, true, &deferred_2d_draw_map));
       break;
     case 0:
     default:
@@ -667,14 +717,27 @@ int Renderer3D::setup_anims(int idx, int score) {
   }
 
   if (result != 0) {
+    newAnim->push_anim(std::move(seqAnim));
     anims.push_anim(std::move(newAnim));
   }
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
-  newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
-  newAnim->push_anim(std::make_unique<AnimModelShrink>(
-      p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255}));
+  if (result > 0) {
+    newAnim->push_anim(std::make_unique<AnimModelShrink>(
+        p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+        A4C{255, 200, 200, 255}));
+  } else if (result < 0) {
+    newAnim->push_anim(std::make_unique<AnimModelShrink>(
+        p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+        A4C{200, 200, 255, 255}));
+  } else {
+    newAnim->push_anim(std::make_unique<AnimModelShrink>(
+        p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+        A4C{255, 200, 200, 255}));
+    newAnim->push_anim(std::make_unique<AnimModelShrink>(
+        p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+        A4C{200, 200, 255, 255}));
+  }
 
   using DataT = std::tuple<int *, int>;
   DataT *data = new DataT{&received_pos, result};
@@ -716,6 +779,7 @@ void Renderer3D::reset_for_next() {
   overview_timer = OVERVIEW_TIMER_MAX;
   set_random_overview();
   camera.target.x = received_pos * 2.0F;
+
   // if (flags.test(3)) {
   //   std::cerr << "RESET STATE for next round" << std::endl;
   // }

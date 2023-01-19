@@ -5,7 +5,7 @@
 #include <optional>
 
 // local includes
-#include "a3f.h"
+#include "arrays.h"
 
 // forward declarations
 struct Model;

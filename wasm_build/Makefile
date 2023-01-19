@@ -12,8 +12,8 @@ SOURCES = \
 		../src/3d_renderer.cc \
 		../src/constants.cc \
 		../src/3d/obj.cc \
-		../src/3d/a3f.cc \
-		../src/3d/a3f_conv.cc \
+		../src/3d/arrays.cc \
+		../src/3d/arrays_conv.cc \
 		../src/3d/qm.cc \
 		../src/3d/anims.cc \
 		../src/3d/anim_concurrent.cc \
@@ -21,7 +21,9 @@ SOURCES = \
 		../src/3d/anim_model_shrink.cc \
 		../src/3d/anim_model_grow.cc \
 		../src/3d/anim_model_attack.cc \
-		../src/3d/anim_model_still.cc
+		../src/3d/anim_model_still.cc \
+		../src/3d/anim_falling_2d.cc \
+		../src/3d/deferred_2d_draw.cc
 
 HEADERS = \
 		../src/constants.h \
@@ -31,8 +33,8 @@ HEADERS = \
 		../src/game_renderer.h \
 		../src/3d_renderer.h \
 		../src/3d/obj.h \
-		../src/3d/a3f.h \
-		../src/3d/a3f_conv.h \
+		../src/3d/arrays.h \
+		../src/3d/arrays_conv.h \
 		../src/3d/qm.h \
 		../src/3d/anims.h \
 		../src/3d/anim_concurrent.h \
@@ -40,7 +42,9 @@ HEADERS = \
 		../src/3d/anim_model_shrink.h \
 		../src/3d/anim_model_grow.h \
 		../src/3d/anim_model_attack.h \
-		../src/3d/anim_model_still.h
+		../src/3d/anim_model_still.h \
+		../src/3d/anim_falling_2d.h \
+		../src/3d/deferred_2d_draw.h
 
 CXX = source ${HOME}/git/emsdk/emsdk_env.sh && em++
 

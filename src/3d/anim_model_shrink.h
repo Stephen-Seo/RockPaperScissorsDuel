@@ -1,8 +1,8 @@
 #ifndef ROCK_PAPER_SCISSORS_DUEL_3D_ANIM_MODEL_SHRINK_H_
 #define ROCK_PAPER_SCISSORS_DUEL_3D_ANIM_MODEL_SHRINK_H_
 
-#include "a3f.h"
 #include "anims.h"
+#include "arrays.h"
 
 class AnimModelShrink : public Anims {
  public:

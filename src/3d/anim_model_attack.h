@@ -1,8 +1,8 @@
 #ifndef ROCK_PAPER_SCISSORS_DUEL_3D_MODEL_ATTACK_H_
 #define ROCK_PAPER_SCISSORS_DUEL_3D_MODEL_ATTACK_H_
 
-#include "a3f.h"
 #include "anims.h"
+#include "arrays.h"
 
 class AnimModelAttack : public Anims {
  public:
@@ -24,6 +24,7 @@ class AnimModelAttack : public Anims {
    * 3 - done
    */
   int state;
+  float angle;
   bool is_p1;
 };
 

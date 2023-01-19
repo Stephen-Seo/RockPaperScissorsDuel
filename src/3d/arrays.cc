@@ -1,4 +1,4 @@
-#include "a3f.h"
+#include "arrays.h"
 
 A3F operator+(const A3F &a, const A3F &b) {
   return A3F{a[0] + b[0], a[1] + b[1], a[2] + b[2]};
