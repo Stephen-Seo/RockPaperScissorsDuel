@@ -14,7 +14,9 @@ AnimModelStill::~AnimModelStill() {}
 void AnimModelStill::do_update(float dt) { timer -= dt; }
 
 void AnimModelStill::do_draw() {
-  DrawModel(*model, A3FToRV3(pos), 1.0F, A4CToC(color));
+  if (model) {
+    DrawModel(*model, A3FToRV3(pos), 1.0F, A4CToC(color));
+  }
 }
 
 bool AnimModelStill::is_done_impl() { return timer <= 0.0F; }

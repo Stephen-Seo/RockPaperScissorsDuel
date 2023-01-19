@@ -93,9 +93,11 @@ constexpr float MODEL_ATTACK_2_Y = 0.0F;
 constexpr float MODEL_ATTACK_ANGLE_START = 0.0F;
 constexpr float MODEL_ATTACK_ANGLE_END = 90.0F;
 
-constexpr float MODEL_FALLING_2D_DX = 80.0F;
-constexpr float MODEL_FALLING_2D_DY = -30.0F;
-constexpr float MODEL_FALLING_2D_DDY = 150.0F;
+constexpr float MODEL_FALLING_2D_DX = 90.0F;
+constexpr float MODEL_FALLING_2D_DY = -40.0F;
+constexpr float MODEL_FALLING_2D_DDY = 180.0F;
 constexpr float MODEL_FALLING_2D_DA = 270.0F;
+
+constexpr float MODEL_STILL_FALLING_WAIT_TIME = 0.5F;
 
 #endif

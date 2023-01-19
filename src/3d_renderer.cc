@@ -731,12 +731,15 @@ int Renderer3D::setup_anims(int idx, int score) {
         p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
         A4C{200, 200, 255, 255}));
   } else {
-    newAnim->push_anim(std::make_unique<AnimModelShrink>(
-        p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
-        A4C{255, 200, 200, 255}));
-    newAnim->push_anim(std::make_unique<AnimModelShrink>(
-        p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
-        A4C{200, 200, 255, 255}));
+    newAnim->push_anim(std::make_unique<AnimFalling2D>(
+        A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255}, &spriteSheet,
+        p1_dims, false, &deferred_2d_draw_map));
+    newAnim->push_anim(std::make_unique<AnimFalling2D>(
+        A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255}, &spriteSheet,
+        p2_dims, true, &deferred_2d_draw_map));
+    newAnim->push_anim(std::make_unique<AnimModelStill>(
+        nullptr, A3F{0.0F, 0.0F, 0.0F}, A4C{255, 255, 255, 255},
+        MODEL_STILL_FALLING_WAIT_TIME));
   }
 
   using DataT = std::tuple<int *, int>;
