@@ -745,6 +745,14 @@ int Renderer3D::setup_anims(int idx, int score) {
   if (result != 0) {
     newAnim->push_anim(std::move(seqAnim));
     anims.push_anim(std::move(newAnim));
+  } else {
+    newAnim->set_end_callback(
+        [](void *ud) {
+          auto *sfx = (Sound *)ud;
+          PlaySound(*sfx);
+        },
+        get_random_draw_sfx());
+    anims.push_anim(std::move(newAnim));
   }
 
   newAnim = std::make_unique<AnimConcurrent>(nullptr);
@@ -834,6 +842,10 @@ void Renderer3D::load_sounds() {
     rock_sfx.at(1) = LoadSound("resources/sfx_rock1.ogg");
     rock_sfx.at(2) = LoadSound("resources/sfx_rock2.ogg");
     rock_sfx.at(3) = LoadSound("resources/sfx_rock3.ogg");
+
+    draw_sfx.at(0) = LoadSound("resources/sfx_draw0.ogg");
+    draw_sfx.at(1) = LoadSound("resources/sfx_draw1.ogg");
+    draw_sfx.at(2) = LoadSound("resources/sfx_draw2.ogg");
   }
 }
 
@@ -858,6 +870,14 @@ Sound *Renderer3D::get_random_scissors_sfx() {
   return &scissors_sfx.at(call_js_get_random() * scissors_sfx.size());
 #else
   return &scissors_sfx.at(GetRandomValue(0, scissors_sfx.size() - 1));
+#endif
+}
+
+Sound *Renderer3D::get_random_draw_sfx() {
+#ifdef __EMSCRIPTEN__
+  return &draw_sfx.at(call_js_get_random() * draw_sfx.size());
+#else
+  return &draw_sfx.at(GetRandomValue(0, draw_sfx.size() - 1));
 #endif
 }
 

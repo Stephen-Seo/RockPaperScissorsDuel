@@ -53,6 +53,7 @@ class Renderer3D : public GameRenderer {
   Sound *get_random_rock_sfx();
   Sound *get_random_paper_sfx();
   Sound *get_random_scissors_sfx();
+  Sound *get_random_draw_sfx();
 
   Sound *type_to_sfx(char type);
 
@@ -80,6 +81,7 @@ class Renderer3D : public GameRenderer {
   std::array<Sound, 5> paper_sfx;
   std::array<Sound, 5> scissors_sfx;
   std::array<Sound, 4> rock_sfx;
+  std::array<Sound, 3> draw_sfx;
 
   AnimSequence anims;
 
