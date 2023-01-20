@@ -419,7 +419,8 @@ void Renderer3D::draw_impl() {
   DrawModel(platform_model, root_pos, 1.0F, WHITE);
   if (flags.test(0)) {
     anims.do_draw();
-  } else {
+  }
+  if (anims.is_done()) {
     for (auto &obj : qms) {
       obj.draw();
     }
