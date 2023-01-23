@@ -5,7 +5,7 @@ Anims::Anims(Model *model, A3F pos, A4C color)
       color(color),
       model(model),
       userdata(nullptr),
-      function_ptr(nullptr),
+      function(std::nullopt),
       is_done_finished(false) {}
 
 bool Anims::is_done() {
@@ -14,8 +14,8 @@ bool Anims::is_done() {
   }
   bool result = is_done_impl();
   if (result) {
-    if (function_ptr) {
-      function_ptr(userdata);
+    if (function.has_value()) {
+      function.value()(userdata);
     }
     is_done_finished = true;
   }
@@ -26,5 +26,5 @@ void Anims::reset_is_done() { is_done_finished = false; }
 
 void Anims::set_end_callback(Anims::FP fp, void *ud) {
   userdata = ud;
-  function_ptr = fp;
+  function = fp;
 }
