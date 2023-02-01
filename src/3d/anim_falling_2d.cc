@@ -1,20 +1,14 @@
 #include "anim_falling_2d.h"
 
 // local includes
-#include <raylib.h>
-
 #include "../constants.h"
+#include "../ems.h"
 #include "arrays_conv.h"
 #include "deferred_2d_draw.h"
 
 AnimFalling2D::AnimFalling2D(A3F pos, A4C color, Texture2D *texture, A4F txywh,
                              bool is_going_right, Deferred2DMap *map)
-    : Anims(nullptr, pos, color),
-      map(map),
-      wh{txywh.at(2), txywh.at(3)},
-      dx(is_going_right ? MODEL_FALLING_2D_DX : -MODEL_FALLING_2D_DX),
-      dy(MODEL_FALLING_2D_DY),
-      ddy(MODEL_FALLING_2D_DDY) {
+    : Anims(nullptr, pos, color), map(map), wh{txywh.at(2), txywh.at(3)} {
   Deferred2DDraw def(texture, txywh, A2F{pos.at(0), pos.at(1)},
                      A2F{txywh.at(2) / 2.0F, txywh.at(3) / 2.0F}, color, 0.0F,
                      is_going_right);

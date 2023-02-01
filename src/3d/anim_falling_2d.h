@@ -39,9 +39,6 @@ class AnimFalling2D : public Anims {
  private:
   Deferred2DMap *map;
   A2F wh;
-  float dx;
-  float dy;
-  float ddy;
   int def_id;
 };
 

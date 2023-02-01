@@ -71,6 +71,9 @@ constexpr float BUTTON_COLOR_MAX = 180.0F;
 constexpr float SCREEN_SHAKE_DEFAULT_FACTOR = 7.0F;
 constexpr float SCREEN_SHAKE_TIME = 0.3F;
 
+constexpr int ANIM_FALLING_AMT = 7;
+constexpr int ANIM_FALLING_OPP_THRESHOLD = 5;
+
 // src/3D/
 
 constexpr float QM_ANGLE_TIMER_VARIANCE = 2.0F;

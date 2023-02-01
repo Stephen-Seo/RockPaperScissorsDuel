@@ -1,9 +1,8 @@
 #include "deferred_2d_draw.h"
 
 // local includes
-#include <raylib.h>
-
 #include "../constants.h"
+#include "../ems.h"
 #include "arrays_conv.h"
 
 int Deferred2DDraw::id_counter = 0;
@@ -17,8 +16,10 @@ Deferred2DDraw::Deferred2DDraw(Texture2D *texture, A4F txywh, A2F pos,
       origin(origin),
       color(color),
       angle(angle),
-      dx(is_going_right ? MODEL_FALLING_2D_DX : -MODEL_FALLING_2D_DX),
-      dy(MODEL_FALLING_2D_DY),
+      dx(is_going_right ? (MODEL_FALLING_2D_DX * call_js_get_random())
+                        : (-MODEL_FALLING_2D_DX * call_js_get_random())),
+      dy(MODEL_FALLING_2D_DY * 2.0F * call_js_get_random() -
+         MODEL_FALLING_2D_DY),
       ddy(MODEL_FALLING_2D_DDY),
       id(id_counter++),
       activated(false),
