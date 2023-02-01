@@ -28,7 +28,10 @@ Renderer3D::Renderer3D()
       root_pos{0.0F, 0.0F, 0.0F},
       overview_timer(OVERVIEW_TIMER_MAX),
       button_color_timer(BUTTON_COLOR_TIME),
+      screen_shake_factor(SCREEN_SHAKE_DEFAULT_FACTOR),
+      screen_shake_timer(0.0F),
       received_pos(0),
+      prev_pos(0),
       choices{'?', '?', '?'},
       opponent_choices{'?', '?', '?'} {
   qms.at(0).set_pos_x(-1.0F);
@@ -80,6 +83,7 @@ Renderer3D::Renderer3D()
   flags.set(1);
   flags.set(4);
   flags.set(5);
+  flags.set(19);
 
   qms.at(0).set_model(&qm_model);
   qms.at(0).set_pos({-1.0F, 0.0F, 0.0F});
@@ -92,6 +96,10 @@ Renderer3D::Renderer3D()
 }
 
 Renderer3D::~Renderer3D() {
+  if (renderTexture.has_value()) {
+    UnloadRenderTexture(renderTexture.value());
+  }
+
   UnloadTexture(spriteSheet);
 
   UnloadTexture(skybox_texture);
@@ -183,6 +191,14 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     reset_for_next();
   }
 
+  if (flags.test(19)) {
+    flags.reset(19);
+    if (renderTexture.has_value()) {
+      UnloadRenderTexture(renderTexture.value());
+    }
+    renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+  }
+
   // if (flags.test(3)) {
   //   std::cout << flags.to_string().substr(64 - 16) << std::endl;
   // }
@@ -193,7 +209,7 @@ void Renderer3D::do_update() {
   draw_impl();
 }
 
-void Renderer3D::screen_size_changed() {}
+void Renderer3D::screen_size_changed() { flags.set(19); }
 
 void Renderer3D::update_impl() {
   const float dt = GetFrameTime();
@@ -409,10 +425,22 @@ void Renderer3D::update_impl() {
   if (!flags.test(18)) {
     load_sounds();
   }
+
+  if (flags.test(21)) {
+    screen_shake_timer -= dt;
+    if (screen_shake_timer <= 0.0F) {
+      flags.reset(20);
+      flags.reset(21);
+    }
+  }
 }
 
 void Renderer3D::draw_impl() {
-  BeginDrawing();
+  if (flags.test(20) && renderTexture.has_value()) {
+    BeginTextureMode(renderTexture.value());
+  } else {
+    BeginDrawing();
+  }
   ClearBackground(BLACK);
   BeginMode3D(camera);
   DrawModel(skybox_model, root_pos, 1.0F, WHITE);
@@ -569,7 +597,29 @@ void Renderer3D::draw_impl() {
     }
   }
 
-  EndDrawing();
+  if (flags.test(20) && renderTexture.has_value()) {
+    EndTextureMode();
+
+    float offset_x = 0;
+    float offset_y = 0;
+
+    if (flags.test(21)) {
+      offset_x = screen_shake_factor * 2.0F * call_js_get_random() -
+                 screen_shake_factor;
+      offset_y = screen_shake_factor * 2.0F * call_js_get_random() -
+                 screen_shake_factor;
+    }
+
+    BeginDrawing();
+    DrawTextureRec(renderTexture.value().texture,
+                   Rectangle{offset_x, offset_y,
+                             (float)renderTexture.value().texture.width,
+                             (float)-renderTexture.value().texture.height},
+                   Vector2{0, 0}, WHITE);
+    EndDrawing();
+  } else {
+    EndDrawing();
+  }
 }
 
 void Renderer3D::set_random_overview() {
@@ -693,21 +743,28 @@ int Renderer3D::setup_anims(int idx, int score) {
   //             << std::endl;
   // }
 
+  using CDataT = std::tuple<Sound *, decltype(flags) *, float *>;
   switch (result) {
     case -1: {
       auto anim_still = std::make_unique<AnimModelStill>(
           p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
           A4C{255, 200, 200, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
+                                   ? type_to_sfx(opponent_choices.at(idx))
+                                   : type_to_sfx(choices.at(idx)),
+                               &flags, &screen_shake_timer};
       anim_still->set_end_callback(
           [](void *ud) {
-            if (ud != nullptr) {
-              auto *sfx = (Sound *)ud;
-              PlaySound(*sfx);
+            auto *ptr = (CDataT *)ud;
+            if (std::get<0>(*ptr) != nullptr) {
+              PlaySound(*std::get<0>(*ptr));
             }
+            std::get<1>(*ptr)->set(20);
+            std::get<1>(*ptr)->set(21);
+            *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
+            delete ptr;
           },
-          (flags.test(2) || flags.test(3))
-              ? type_to_sfx(opponent_choices.at(idx))
-              : type_to_sfx(choices.at(idx)));
+          ptr);
       seqAnim->push_anim(std::move(anim_still));
       seqAnim->push_anim(std::make_unique<AnimFalling2D>(
           A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255}, &spriteSheet,
@@ -723,16 +780,22 @@ int Renderer3D::setup_anims(int idx, int score) {
       auto anim_still = std::make_unique<AnimModelStill>(
           p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
           A4C{200, 200, 255, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
+                                   ? type_to_sfx(choices.at(idx))
+                                   : type_to_sfx(opponent_choices.at(idx)),
+                               &flags, &screen_shake_timer};
       anim_still->set_end_callback(
           [](void *ud) {
-            if (ud != nullptr) {
-              auto *sfx = (Sound *)ud;
-              PlaySound(*sfx);
+            auto *ptr = (CDataT *)ud;
+            if (std::get<0>(*ptr) != nullptr) {
+              PlaySound(*std::get<0>(*ptr));
             }
+            std::get<1>(*ptr)->set(20);
+            std::get<1>(*ptr)->set(21);
+            *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
+            delete ptr;
           },
-          (flags.test(2) || flags.test(3))
-              ? type_to_sfx(choices.at(idx))
-              : type_to_sfx(opponent_choices.at(idx)));
+          ptr);
       seqAnim->push_anim(std::move(anim_still));
       seqAnim->push_anim(std::make_unique<AnimFalling2D>(
           A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255}, &spriteSheet,

@@ -7,6 +7,7 @@
 // standard library includes
 #include <array>
 #include <bitset>
+#include <optional>
 #include <unordered_map>
 
 // third party includes
@@ -63,6 +64,8 @@ class Renderer3D : public GameRenderer {
 
   Camera camera;
 
+  std::optional<RenderTexture2D> renderTexture;
+
   Texture2D spriteSheet;
   Texture2D skybox_texture;
   Texture2D platform_texture;
@@ -115,11 +118,16 @@ class Renderer3D : public GameRenderer {
    * 16 - spectator saw matchup
    * 17 - spectator did reset after matchup
    * 18 - sounds loaded
+   * 19 - size dirty for render texture
+   * 20 - rendering to render texture
+   * 21 - screen shake active
    */
   std::bitset<64> flags;
 
   float overview_timer;
   float button_color_timer;
+  float screen_shake_factor;
+  float screen_shake_timer;
 
   int received_pos;
   int prev_pos;
