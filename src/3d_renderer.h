@@ -58,6 +58,8 @@ class Renderer3D : public GameRenderer {
 
   Sound *type_to_sfx(char type);
 
+  void draw_waiting_spinner();
+
   std::array<QuestionMark, 2> qms;
 
   Deferred2DMap deferred_2d_draw_map;
@@ -128,6 +130,7 @@ class Renderer3D : public GameRenderer {
   float button_color_timer;
   float screen_shake_factor;
   float screen_shake_timer;
+  float waiting_spinner_timer;
 
   int received_pos;
   int prev_pos;

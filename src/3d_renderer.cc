@@ -30,6 +30,7 @@ Renderer3D::Renderer3D()
       button_color_timer(BUTTON_COLOR_TIME),
       screen_shake_factor(SCREEN_SHAKE_DEFAULT_FACTOR),
       screen_shake_timer(0.0F),
+      waiting_spinner_timer(0.0F),
       received_pos(0),
       prev_pos(0),
       choices{'?', '?', '?'},
@@ -276,6 +277,7 @@ void Renderer3D::update_impl() {
           choices.at(1) = 'r';
         } else {
           choices.at(2) = 'r';
+          flags.set(8);
         }
       } else if (GetTouchX() >=
                      triple_single_width +
@@ -291,6 +293,7 @@ void Renderer3D::update_impl() {
           choices.at(1) = 'p';
         } else {
           choices.at(2) = 'p';
+          flags.set(8);
         }
       } else if (GetTouchX() >=
                      GetScreenWidth() - triple_single_width +
@@ -306,6 +309,7 @@ void Renderer3D::update_impl() {
           choices.at(1) = 's';
         } else {
           choices.at(2) = 's';
+          flags.set(8);
         }
       } else if (GetTouchX() >= (triple_single_width - actual_width2) / 2.0F &&
                  GetTouchX() <=
@@ -332,14 +336,6 @@ void Renderer3D::update_impl() {
                  GetTouchY() >= GetScreenHeight() - height - height2 &&
                  GetTouchY() <= GetScreenHeight() - height) {
         choices.at(2) = '?';
-      } else if (choices.at(0) != '?' && choices.at(1) != '?' &&
-                 choices.at(2) != '?' && GetTouchX() >= 0 &&
-                 GetTouchX() <= GetScreenWidth() && GetTouchY() >= 0 &&
-                 GetTouchY() <= triple_single_width) {
-        flags.set(8);
-        if (!flags.test(14)) {
-          call_js_set_ready();
-        }
       }
     }
   }
@@ -428,10 +424,25 @@ void Renderer3D::update_impl() {
 
   if (flags.test(21)) {
     screen_shake_timer -= dt;
-    if (screen_shake_timer <= 0.0F) {
+    if (screen_shake_timer < 0.0F) {
       flags.reset(20);
       flags.reset(21);
+    } else {
+      screen_shake_factor =
+          screen_shake_timer / SCREEN_SHAKE_TIME * SCREEN_SHAKE_DEFAULT_FACTOR;
     }
+  }
+
+  if (flags.test(8) && ((flags.test(2) && !flags.test(9)) ||
+                        (!flags.test(2) && !flags.test(10)))) {
+    if (!flags.test(14)) {
+      call_js_set_ready();
+    }
+  }
+
+  waiting_spinner_timer -= dt;
+  if (waiting_spinner_timer < 0.0F) {
+    waiting_spinner_timer += WAITING_SPINNER_TIME;
   }
 }
 
@@ -498,19 +509,6 @@ void Renderer3D::draw_impl() {
                     height + height2, {80, 80, 255, 255});
       DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height,
                     {color_value, color_value, 255, 255});
-    }
-    if (choices.at(0) != '?' && choices.at(1) != '?' && choices.at(2) != '?') {
-      DrawTexturePro(
-          spriteSheet,
-          {READY_DIMS[0], READY_DIMS[1], READY_DIMS[2], READY_DIMS[3]},
-          {0, 0, GetScreenWidth() * 4.0F / 5.0F, triple_single_width},
-          {0.0F, 0.0F}, 0.0F, WHITE);
-      DrawTexturePro(spriteSheet,
-                     {QUESTIONMARK_DIMS[0], QUESTIONMARK_DIMS[1],
-                      QUESTIONMARK_DIMS[2], QUESTIONMARK_DIMS[3]},
-                     {GetScreenWidth() * 4.0F / 5.0F, 0,
-                      GetScreenWidth() / 5.0F, triple_single_width},
-                     {0.0F, 0.0F}, 0.0F, WHITE);
     }
 
     DrawRectangleLines((triple_single_width - actual_width) / 2.0F,
@@ -587,8 +585,8 @@ void Renderer3D::draw_impl() {
           break;
       }
     }
-  } else {
-    DrawText("Waiting...", 0, 0, 20, RAYWHITE);
+  } else if (anims.is_done()) {
+    draw_waiting_spinner();
   }
 
   for (auto &iter : deferred_2d_draw_map) {
@@ -970,4 +968,18 @@ Sound *Renderer3D::type_to_sfx(char type) {
       break;
   }
   return nullptr;
+}
+
+void Renderer3D::draw_waiting_spinner() {
+  float radius = GetScreenWidth() / SPINNER_RADIUS_WIDTH_FRAC;
+  if (waiting_spinner_timer >= WAITING_SPINNER_TIME / 2.0F) {
+    float time = (waiting_spinner_timer - WAITING_SPINNER_TIME / 2.0F) /
+                 (WAITING_SPINNER_TIME / 2.0F);
+    DrawCircleSector(Vector2{radius, radius}, radius, 180.0F,
+                     360.0F * time + 180.0F, 16, Color{255, 255, 255, 100});
+  } else {
+    float time = waiting_spinner_timer / (WAITING_SPINNER_TIME / 2.0F);
+    DrawCircleSector(Vector2{radius, radius}, radius, 180.0F + 360.0F * time,
+                     180.0F + 360.0F, 16, Color{255, 255, 255, 100});
+  }
 }
