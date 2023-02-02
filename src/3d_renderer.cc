@@ -806,7 +806,7 @@ int Renderer3D::setup_anims(int idx, int score) {
       auto falling_anims = std::make_unique<AnimConcurrent>(nullptr);
       for (int i = 0; i < ANIM_FALLING_AMT; ++i) {
         falling_anims->push_anim(std::make_unique<AnimFalling2D>(
-            A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{255, 200, 200, 255},
+            A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255},
             &spriteSheet, p2_dims, i < ANIM_FALLING_OPP_THRESHOLD,
             &deferred_2d_draw_map));
       }
