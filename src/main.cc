@@ -16,7 +16,6 @@
 
 // local includes
 #include "3d_renderer.h"
-#include "basic_renderer.h"
 #include "constants.h"
 #include "game_renderer.h"
 

@@ -16,7 +16,6 @@ endif()
 
 set(RPSDuelNative_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/basic_renderer.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ems.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d_renderer.cc"
@@ -41,7 +40,6 @@ set(RPSDuelNative_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/constants.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_renderer.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/basic_renderer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d_renderer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/obj.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/arrays.h"
