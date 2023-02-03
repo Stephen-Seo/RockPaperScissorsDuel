@@ -29,6 +29,8 @@ constexpr int DEFAULT_STATUS_TEXT_SIZE = 30;
 
 // Renderer3D
 
+constexpr float OVERVIEW_COUNT_F = 5.0F;
+
 constexpr float OVERVIEW_TIMER_MAX = 14.0F;
 
 constexpr float OVERVIEW_LEFT_X = -20.0F;

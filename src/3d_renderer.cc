@@ -490,24 +490,14 @@ void Renderer3D::draw_impl() {
                     (1.0F - button_color_value) * BUTTON_COLOR_MAX;
     }
     if (flags.test(2)) {
-      if (choices.at(0) != '?' && choices.at(1) != '?' &&
-          choices.at(2) != '?') {
-        DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                      {255, color_value, color_value, 255});
-      }
       DrawRectangle(0, GetScreenHeight() - height - height2, GetScreenWidth(),
                     height + height2, {255, 80, 80, 255});
-      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height,
+      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height + 1,
                     {255, color_value, color_value, 255});
     } else {
-      if (choices.at(0) != '?' && choices.at(1) != '?' &&
-          choices.at(2) != '?') {
-        DrawRectangle(0, 0, GetScreenWidth(), triple_single_width,
-                      {color_value, color_value, 255, 255});
-      }
       DrawRectangle(0, GetScreenHeight() - height - height2, GetScreenWidth(),
                     height + height2, {80, 80, 255, 255});
-      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height,
+      DrawRectangle(0, GetScreenHeight() - height, GetScreenWidth(), height + 1,
                     {color_value, color_value, 255, 255});
     }
 
@@ -630,13 +620,13 @@ void Renderer3D::set_random_overview() {
          (flags.test(6) && (flags.test(4) || flags.test(5)))) {
 #ifdef __EMSCRIPTEN__
     flags.set(1, call_js_get_random() > 0.5F);
-    int value = call_js_get_random() * 4.99F;
+    int value = call_js_get_random() * OVERVIEW_COUNT_F;
     flags.set(4, (value & 1) != 0);
     flags.set(5, (value & 2) != 0);
     flags.set(6, (value & 4) != 0);
 #else
     flags.set(1, GetRandomValue(0, 1) == 0);
-    int value = GetRandomValue(0, 4);
+    int value = GetRandomValue(0, (int)OVERVIEW_COUNT_F - 1);
     flags.set(4, (value & 1) != 0);
     flags.set(5, (value & 2) != 0);
     flags.set(6, (value & 4) != 0);
