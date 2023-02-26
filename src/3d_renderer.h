@@ -129,6 +129,7 @@ class Renderer3D : public GameRenderer {
   float overview_timer;
   float button_color_timer;
   float screen_shake_factor;
+  float screen_shake_rot_factor;
   float screen_shake_timer;
   float waiting_spinner_timer;
 

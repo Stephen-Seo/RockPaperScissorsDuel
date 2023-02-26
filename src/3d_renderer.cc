@@ -29,6 +29,7 @@ Renderer3D::Renderer3D()
       overview_timer(OVERVIEW_TIMER_MAX),
       button_color_timer(BUTTON_COLOR_TIME),
       screen_shake_factor(SCREEN_SHAKE_DEFAULT_FACTOR),
+      screen_shake_rot_factor(SCREEN_SHAKE_DEFAULT_ROT_FACTOR),
       screen_shake_timer(0.0F),
       waiting_spinner_timer(0.0F),
       received_pos(0),
@@ -430,6 +431,8 @@ void Renderer3D::update_impl() {
     } else {
       screen_shake_factor =
           screen_shake_timer / SCREEN_SHAKE_TIME * SCREEN_SHAKE_DEFAULT_FACTOR;
+      screen_shake_rot_factor = screen_shake_timer / SCREEN_SHAKE_TIME *
+                                SCREEN_SHAKE_DEFAULT_ROT_FACTOR;
     }
   }
 
@@ -590,20 +593,29 @@ void Renderer3D::draw_impl() {
 
     float offset_x = 0;
     float offset_y = 0;
+    float rotation = 0;
 
     if (flags.test(21)) {
       offset_x = screen_shake_factor * 2.0F * call_js_get_random() -
                  screen_shake_factor;
       offset_y = screen_shake_factor * 2.0F * call_js_get_random() -
                  screen_shake_factor;
+      rotation = screen_shake_rot_factor * 2.0F * call_js_get_random() -
+                 screen_shake_rot_factor;
     }
 
     BeginDrawing();
-    DrawTextureRec(renderTexture.value().texture,
-                   Rectangle{offset_x, offset_y,
-                             (float)renderTexture.value().texture.width,
-                             (float)-renderTexture.value().texture.height},
-                   Vector2{0, 0}, WHITE);
+    DrawTexturePro(
+        renderTexture.value().texture,
+        Rectangle{0, 0, (float)renderTexture.value().texture.width,
+                  (float)-renderTexture.value().texture.height},
+        Rectangle{offset_x + (float)(renderTexture.value().texture.width / 2),
+                  offset_y + (float)(renderTexture.value().texture.height / 2),
+                  (float)renderTexture.value().texture.width,
+                  (float)renderTexture.value().texture.height},
+        Vector2{(float)(renderTexture.value().texture.width / 2),
+                (float)(renderTexture.value().texture.height / 2)},
+        rotation, WHITE);
     EndDrawing();
   } else {
     EndDrawing();
