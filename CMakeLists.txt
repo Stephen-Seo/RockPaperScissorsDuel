@@ -46,6 +46,7 @@ set(RPSDuelNative_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/arrays_conv.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/qm.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anims.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_concurrent.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_sequence.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_shrink.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/3d/anim_model_grow.h"
