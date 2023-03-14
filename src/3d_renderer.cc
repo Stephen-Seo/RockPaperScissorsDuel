@@ -119,14 +119,12 @@ Renderer3D::~Renderer3D() {
   UnloadModel(scissors_model);
 }
 
-void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
-                              const char *currentPlayer, char first_first,
-                              char first_second, char first_third,
-                              char second_first, char second_second,
-                              char second_third, bool first_ready,
-                              bool second_ready, bool first_matchup_done,
-                              bool second_matchup_done, int pos, int prev_pos,
-                              bool gameover_called, bool matchup_started) {
+void Renderer3D::update_state(
+    const char *playerOne, const char *playerTwo, const char *currentPlayer,
+    char first_first, char first_second, char first_third, char second_first,
+    char second_second, char second_third, bool first_ready, bool second_ready,
+    bool first_matchup_done, bool second_matchup_done, int pos, int prev_pos,
+    bool gameover_called, bool matchup_started, const char *currentName) {
   if (std::strcmp(playerOne, currentPlayer) == 0) {
     flags.set(2);
     flags.reset(3);
@@ -137,6 +135,14 @@ void Renderer3D::update_state(const char *playerOne, const char *playerTwo,
     flags.reset(2);
     flags.set(3);
   }
+
+  // DEBUG
+  //if (flags.test(2)) {
+  //  std::cout << "Player one str is \"" << playerOne << "\"" << std::endl;
+  //} else {
+  //  std::cout << "Player two str is \"" << playerTwo << "\"" << std::endl;
+  //}
+  //std::cout << "Name is \"" << currentName << std::endl;
 
   flags.set(9, first_ready);
   flags.set(10, second_ready);

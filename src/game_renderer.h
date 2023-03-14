@@ -13,7 +13,8 @@ class GameRenderer {
                             char second_third, bool first_ready,
                             bool second_ready, bool first_matchup_done,
                             bool second_matchup_done, int pos, int prev_pos,
-                            bool gameover_called, bool matchup_started) = 0;
+                            bool gameover_called, bool matchup_started,
+                            const char *currentName) = 0;
 
   virtual void do_update() = 0;
 

@@ -32,7 +32,8 @@ class Renderer3D : public GameRenderer {
                     char second_second, char second_third, bool first_ready,
                     bool second_ready, bool first_matchup_done,
                     bool second_matchup_done, int pos, int prev_pos,
-                    bool gameover_called, bool matchup_started) override;
+                    bool gameover_called, bool matchup_started,
+                    const char *currentName) override;
 
   void do_update() override;
 

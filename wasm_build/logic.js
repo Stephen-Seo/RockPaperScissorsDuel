@@ -141,7 +141,14 @@ Rune.initLogic({
                 game.matchup_started = false;
                 if (game.gameover) {
                     game.gameover_called = true;
-                    Rune.gameOver();
+                    let p1_status = game.pos > 0 ? "WON" : "LOST";
+                    let p2_status = game.pos < 0 ? "WON" : "LOST";
+                    Rune.gameOver({
+                        players: {
+                            [game.player1]: p1_status,
+                            [game.player2]: p2_status,
+                        }
+                    });
                 }
 
                 game.ready[0] = false;
