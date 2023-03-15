@@ -2,7 +2,12 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/fetch.h>
 #include <emscripten/html5.h>
+
+#include <cstring>
+
+#include "game_renderer.h"
 
 EM_JS(void, js_set_ready, (), { Rune.actions.set_ready("unused"); });
 
@@ -91,5 +96,57 @@ float call_js_get_random() {
   return get_random();
 #else
   return -1.0F;
+#endif
+}
+
+#ifdef __EMSCRIPTEN__
+void fetch_avatar1_url_success(emscripten_fetch_t *fetch) {
+  GameRenderer *game = (GameRenderer *)fetch->userData;
+  game->avatar1_loaded(fetch->numBytes, fetch->data);
+  emscripten_fetch_close(fetch);
+}
+
+void fetch_avatar1_url_fail(emscripten_fetch_t *fetch) {
+  GameRenderer *game = (GameRenderer *)fetch->userData;
+  game->avatar1_loaded(0, nullptr);
+  emscripten_fetch_close(fetch);
+}
+
+void fetch_avatar2_url_success(emscripten_fetch_t *fetch) {
+  GameRenderer *game = (GameRenderer *)fetch->userData;
+  game->avatar2_loaded(fetch->numBytes, fetch->data);
+  emscripten_fetch_close(fetch);
+}
+
+void fetch_avatar2_url_fail(emscripten_fetch_t *fetch) {
+  GameRenderer *game = (GameRenderer *)fetch->userData;
+  game->avatar2_loaded(0, nullptr);
+  emscripten_fetch_close(fetch);
+}
+#endif
+
+void fetch_avatar1_url(const char *url, void *game_ptr) {
+#ifdef __EMSCRIPTEN__
+  emscripten_fetch_attr_t attr;
+  emscripten_fetch_attr_init(&attr);
+  std::strcpy(attr.requestMethod, "GET");
+  attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+  attr.onsuccess = fetch_avatar1_url_success;
+  attr.onerror = fetch_avatar1_url_fail;
+  attr.userData = game_ptr;
+  emscripten_fetch(&attr, url);
+#endif
+}
+
+void fetch_avatar2_url(const char *url, void *game_ptr) {
+#ifdef __EMSCRIPTEN__
+  emscripten_fetch_attr_t attr;
+  emscripten_fetch_attr_init(&attr);
+  std::strcpy(attr.requestMethod, "GET");
+  attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+  attr.onsuccess = fetch_avatar2_url_success;
+  attr.onerror = fetch_avatar2_url_fail;
+  attr.userData = game_ptr;
+  emscripten_fetch(&attr, url);
 #endif
 }

@@ -56,6 +56,7 @@ ${OUTDIR}/rock_paper_scissors_duel.html: ${SOURCES} ${HEADERS} ${OUTDIR}/client.
 		--shell-file custom_shell.html \
 		-sEXPORTED_FUNCTIONS=_main,_game_visual_update \
 		-sEXPORTED_RUNTIME_METHODS=ccall \
+		-sFETCH \
 		--preload-file ../resources \
 		${OTHER_FLAGS} \
 		${SOURCES}

@@ -33,11 +33,15 @@ class Renderer3D : public GameRenderer {
                     bool second_ready, bool first_matchup_done,
                     bool second_matchup_done, int pos, int prev_pos,
                     bool gameover_called, bool matchup_started,
-                    const char *currentName) override;
+                    const char *currentName, const char *player1AvatarUrl,
+                    const char *player2AvatarUrl) override;
 
   void do_update() override;
 
   void screen_size_changed() override;
+
+  void avatar1_loaded(unsigned long long size, const char *data) override;
+  void avatar2_loaded(unsigned long long size, const char *data) override;
 
  private:
   void update_impl();
@@ -76,6 +80,14 @@ class Renderer3D : public GameRenderer {
   Texture2D rock_texture;
   Texture2D paper_texture;
   Texture2D scissors_texture;
+
+  std::optional<Texture2D> avatar1_texture;
+  std::optional<Texture2D> avatar2_texture;
+
+  Mesh avatar_mesh;
+
+  std::optional<Material> avatar1_material;
+  std::optional<Material> avatar2_material;
 
   Model skybox_model;
   Model platform_model;
@@ -124,6 +136,10 @@ class Renderer3D : public GameRenderer {
    * 19 - size dirty for render texture
    * 20 - rendering to render texture
    * 21 - screen shake active
+   * 22 - try to load p1 avatar
+   * 23 - try to load p2 avatar
+   * 24 - tried to load p1 avatar
+   * 25 - tried to load p2 avatar
    */
   std::bitset<64> flags;
 

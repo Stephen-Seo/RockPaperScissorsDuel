@@ -13,8 +13,20 @@ Rune.initClient({
         }
 
         let current_name = "spectator";
+
         if (yourPlayerId !== undefined) {
             current_name = players[yourPlayerId].displayName;
+        }
+
+        let player1_avatar_url = "unknown";
+        let player2_avatar_url = "unknown";
+
+        if (players[player1] !== undefined && players[player1].avatarUrl !== undefined) {
+            player1_avatar_url = players[player1].avatarUrl;
+        }
+
+        if (players[player2] !== undefined && players[player2].avatarUrl !== undefined) {
+            player2_avatar_url = players[player2].avatarUrl;
         }
 
         if (is_choices_filled(first_choices) && is_choices_filled(second_choices)) {
@@ -26,7 +38,8 @@ Rune.initClient({
                     'boolean', 'boolean',
                     'boolean', 'boolean',
                     'number', 'number', 'boolean', 'boolean',
-                    'string'],
+                    'string',
+                    'string', 'string'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     first_choices[0].charCodeAt(0),
@@ -38,7 +51,8 @@ Rune.initClient({
                     ready[0], ready[1],
                     matchup_done[0], matchup_done[1],
                     pos, prev_pos, gameover_called, matchup_started,
-                    current_name]);
+                    current_name,
+                    player1_avatar_url, player2_avatar_url]);
         } else {
             Module.ccall('game_visual_update',
                 'number',
@@ -48,7 +62,8 @@ Rune.initClient({
                     'boolean', 'boolean',
                     'boolean', 'boolean',
                     'number', 'number', 'boolean', 'boolean',
-                    'string'],
+                    'string',
+                    'string', 'string'],
                 [player1, player2,
                     yourPlayerId === undefined ? 'undefined' : yourPlayerId,
                     '?'.charCodeAt(0),
@@ -60,7 +75,8 @@ Rune.initClient({
                     ready[0], ready[1],
                     matchup_done[0], matchup_done[1],
                     pos, prev_pos, gameover_called, matchup_started,
-                    current_name]);
+                    current_name,
+                    player1_avatar_url, player2_avatar_url]);
         }
     },
 });
