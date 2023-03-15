@@ -114,6 +114,22 @@ Renderer3D::~Renderer3D() {
   UnloadTexture(paper_texture);
   UnloadTexture(scissors_texture);
 
+  UnloadMesh(avatar_mesh);
+
+  if (avatar1_texture.has_value()) {
+    UnloadTexture(avatar1_texture.value());
+  }
+  if (avatar2_texture.has_value()) {
+    UnloadTexture(avatar2_texture.value());
+  }
+
+  if (avatar1_material.has_value()) {
+    UnloadMaterial(avatar1_material.value());
+  }
+  if (avatar2_material.has_value()) {
+    UnloadMaterial(avatar2_material.value());
+  }
+
   UnloadModel(skybox_model);
   UnloadModel(platform_model);
   UnloadModel(qm_model);
