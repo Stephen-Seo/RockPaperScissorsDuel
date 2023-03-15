@@ -703,12 +703,13 @@ void Renderer3D::draw_impl() {
         renderTexture.value().texture,
         Rectangle{0, 0, (float)renderTexture.value().texture.width,
                   (float)-renderTexture.value().texture.height},
-        Rectangle{offset_x + (float)(renderTexture.value().texture.width / 2),
-                  offset_y + (float)(renderTexture.value().texture.height / 2),
-                  (float)renderTexture.value().texture.width,
-                  (float)renderTexture.value().texture.height},
-        Vector2{(float)(renderTexture.value().texture.width / 2),
-                (float)(renderTexture.value().texture.height / 2)},
+        Rectangle{
+            offset_x + (float)(renderTexture.value().texture.width / 2.0F),
+            offset_y + (float)(renderTexture.value().texture.height / 2.0F),
+            (float)renderTexture.value().texture.width,
+            (float)renderTexture.value().texture.height},
+        Vector2{(float)(renderTexture.value().texture.width / 2.0F),
+                (float)(renderTexture.value().texture.height / 2.0F)},
         rotation, WHITE);
     EndDrawing();
   } else {
