@@ -97,7 +97,31 @@ Renderer3D::Renderer3D()
   qms.at(1).set_color_r(0);
   qms.at(1).set_color_g(0);
 
-  avatar_mesh = GenMeshPlane(0.5F, 0.5F, 1, 1);
+  avatar_model = LoadModelFromMesh(GenMeshPlane(1.0F, 1.0F, 1, 1));
+
+  // TODO DEBUG
+  // auto texture1 = LoadRenderTexture(16, 16);
+  // BeginTextureMode(texture1);
+  // DrawCircle(8, 8, 8, Color{255, 255, 0, 255});
+  // EndTextureMode();
+  // auto texture2 = LoadRenderTexture(16, 16);
+  // BeginTextureMode(texture2);
+  // DrawCircle(8, 8, 8, Color{0, 255, 255, 255});
+  // EndTextureMode();
+
+  // auto image1 = LoadImageFromTexture(texture1.texture);
+  // avatar1_texture = LoadTextureFromImage(image1);
+  // UnloadImage(image1);
+
+  // auto image2 = LoadImageFromTexture(texture2.texture);
+  // avatar2_texture = LoadTextureFromImage(image2);
+  // UnloadImage(image2);
+
+  // UnloadRenderTexture(texture1);
+  // UnloadRenderTexture(texture2);
+
+  // flags.set(24);
+  // flags.set(25);
 }
 
 Renderer3D::~Renderer3D() {
@@ -114,20 +138,13 @@ Renderer3D::~Renderer3D() {
   UnloadTexture(paper_texture);
   UnloadTexture(scissors_texture);
 
-  UnloadMesh(avatar_mesh);
+  UnloadModel(avatar_model);
 
   if (avatar1_texture.has_value()) {
     UnloadTexture(avatar1_texture.value());
   }
   if (avatar2_texture.has_value()) {
     UnloadTexture(avatar2_texture.value());
-  }
-
-  if (avatar1_material.has_value()) {
-    UnloadMaterial(avatar1_material.value());
-  }
-  if (avatar2_material.has_value()) {
-    UnloadMaterial(avatar2_material.value());
   }
 
   UnloadModel(skybox_model);
@@ -228,15 +245,13 @@ void Renderer3D::update_state(
   }
 
   if (player1AvatarUrl && std::strcmp(player1AvatarUrl, "unknown") != 0 &&
-      !flags.test(22) && !flags.test(24) && !avatar1_texture.has_value() &&
-      !avatar1_material.has_value()) {
+      !flags.test(22) && !flags.test(24) && !avatar1_texture.has_value()) {
     flags.set(22);
     fetch_avatar1_url(player1AvatarUrl, this);
   }
 
   if (player2AvatarUrl && std::strcmp(player2AvatarUrl, "unknown") != 0 &&
-      !flags.test(23) && !flags.test(25) && !avatar2_texture.has_value() &&
-      !avatar2_material.has_value()) {
+      !flags.test(23) && !flags.test(25) && !avatar2_texture.has_value()) {
     flags.set(23);
     fetch_avatar2_url(player2AvatarUrl, this);
   }
@@ -258,19 +273,17 @@ void Renderer3D::avatar1_loaded(unsigned long long size, const char *data) {
   flags.set(24);
 
   if (size == 0 || !data) {
+    std::cerr << "ERROR: Failed to load avatar for player 1!\n";
     return;
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
   if (!avatar.data) {
+    std::cerr << "ERROR: Failed to load avatar for player 1!\n";
     return;
   }
   avatar1_texture = LoadTextureFromImage(avatar);
   UnloadImage(avatar);
-
-  avatar1_material = LoadMaterialDefault();
-  SetMaterialTexture(&avatar1_material.value(), MATERIAL_MAP_DIFFUSE,
-                     avatar1_texture.value());
 }
 
 void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
@@ -278,19 +291,17 @@ void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
   flags.set(25);
 
   if (size == 0 || !data) {
+    std::cerr << "ERROR: Failed to load avatar for player 2!\n";
     return;
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
   if (!avatar.data) {
+    std::cerr << "ERROR: Failed to load avatar for player 2!\n";
     return;
   }
   avatar2_texture = LoadTextureFromImage(avatar);
   UnloadImage(avatar);
-
-  avatar2_material = LoadMaterialDefault();
-  SetMaterialTexture(&avatar2_material.value(), MATERIAL_MAP_DIFFUSE,
-                     avatar2_texture.value());
 }
 
 void Renderer3D::update_impl() {
@@ -548,18 +559,20 @@ void Renderer3D::draw_impl() {
     }
   }
 
-  if (avatar1_material.has_value()) {
-    Matrix m =
-        MatrixMultiply(MatrixTranslate(camera.target.x - 0.5F, -0.2F, 1.0F),
-                       MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
-    DrawMesh(avatar_mesh, avatar1_material.value(), m);
+  if (avatar1_texture.has_value()) {
+    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+        avatar1_texture.value();
+    DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
+                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+                WHITE);
   }
 
-  if (avatar2_material.has_value()) {
-    Matrix m =
-        MatrixMultiply(MatrixTranslate(camera.target.x + 0.5F, -0.2F, 1.0F),
-                       MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
-    DrawMesh(avatar_mesh, avatar2_material.value(), m);
+  if (avatar2_texture.has_value()) {
+    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+        avatar2_texture.value();
+    DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
+                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+                WHITE);
   }
   EndMode3D();
 

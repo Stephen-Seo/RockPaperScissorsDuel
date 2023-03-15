@@ -84,10 +84,7 @@ class Renderer3D : public GameRenderer {
   std::optional<Texture2D> avatar1_texture;
   std::optional<Texture2D> avatar2_texture;
 
-  Mesh avatar_mesh;
-
-  std::optional<Material> avatar1_material;
-  std::optional<Material> avatar2_material;
+  Model avatar_model;
 
   Model skybox_model;
   Model platform_model;
