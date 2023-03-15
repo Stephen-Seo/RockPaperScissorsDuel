@@ -24,12 +24,19 @@
 #include "helpers.h"
 
 Renderer3D::Renderer3D()
-    : qms{}, anims(nullptr), root_pos{0.0F, 0.0F, 0.0F},
-      overview_timer(OVERVIEW_TIMER_MAX), button_color_timer(BUTTON_COLOR_TIME),
+    : qms{},
+      anims(nullptr),
+      root_pos{0.0F, 0.0F, 0.0F},
+      overview_timer(OVERVIEW_TIMER_MAX),
+      button_color_timer(BUTTON_COLOR_TIME),
       screen_shake_factor(SCREEN_SHAKE_DEFAULT_FACTOR),
       screen_shake_rot_factor(SCREEN_SHAKE_DEFAULT_ROT_FACTOR),
-      screen_shake_timer(0.0F), waiting_spinner_timer(0.0F), received_pos(0),
-      prev_pos(0), choices{'?', '?', '?'}, opponent_choices{'?', '?', '?'} {
+      screen_shake_timer(0.0F),
+      waiting_spinner_timer(0.0F),
+      received_pos(0),
+      prev_pos(0),
+      choices{'?', '?', '?'},
+      opponent_choices{'?', '?', '?'} {
   qms.at(0).set_pos_x(-1.0F);
   qms.at(1).set_pos_x(1.0F);
 
@@ -516,6 +523,20 @@ void Renderer3D::draw_impl() {
       obj.draw();
     }
   }
+
+  if (avatar1_material.has_value()) {
+    Matrix m =
+        MatrixMultiply(MatrixTranslate(camera.target.x - 0.5F, -0.2F, 1.0F),
+                       MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
+    DrawMesh(avatar_mesh, avatar1_material.value(), m);
+  }
+
+  if (avatar2_material.has_value()) {
+    Matrix m =
+        MatrixMultiply(MatrixTranslate(camera.target.x + 0.5F, -0.2F, 1.0F),
+                       MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
+    DrawMesh(avatar_mesh, avatar2_material.value(), m);
+  }
   EndMode3D();
 
   if (!flags.test(3) && !flags.test(8)) {
@@ -555,9 +576,9 @@ void Renderer3D::draw_impl() {
 
     DrawRectangleLines((triple_single_width - actual_width) / 2.0F,
                        GetScreenHeight() - height, actual_width, height, BLACK);
-    DrawRectangleLines(triple_single_width +
-                           (triple_single_width - actual_width) / 2.0F,
-                       GetScreenHeight() - height, actual_width, height, BLACK);
+    DrawRectangleLines(
+        triple_single_width + (triple_single_width - actual_width) / 2.0F,
+        GetScreenHeight() - height, actual_width, height, BLACK);
     DrawRectangleLines(GetScreenWidth() - triple_single_width +
                            (triple_single_width - actual_width) / 2.0F,
                        GetScreenHeight() - height, actual_width, height, BLACK);
@@ -594,53 +615,41 @@ void Renderer3D::draw_impl() {
 
     for (unsigned int i = 0; i < choices.size(); ++i) {
       switch (choices[i]) {
-      case 'r':
-        DrawTexturePro(spriteSheet,
-                       {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
-                       {triple_single_width * (float)i +
-                            (triple_single_width - actual_width2) / 2.0F,
-                        GetScreenHeight() - height - height2, actual_width2,
-                        height2},
-                       {0.0F, 0.0F}, 0.0F, WHITE);
-        break;
-      case 'p':
-        DrawTexturePro(
-            spriteSheet,
-            {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
-            {triple_single_width * (float)i +
-                 (triple_single_width - actual_width2) / 2.0F,
-             GetScreenHeight() - height - height2, actual_width2, height2},
-            {0.0F, 0.0F}, 0.0F, WHITE);
-        break;
-      case 's':
-        DrawTexturePro(spriteSheet,
-                       {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
-                        SCISSORS_DIMS[3]},
-                       {triple_single_width * (float)i +
-                            (triple_single_width - actual_width2) / 2.0F,
-                        GetScreenHeight() - height - height2, actual_width2,
-                        height2},
-                       {0.0F, 0.0F}, 0.0F, WHITE);
-        break;
-      case '?':
-      default:
-        break;
+        case 'r':
+          DrawTexturePro(
+              spriteSheet,
+              {ROCK_DIMS[0], ROCK_DIMS[1], ROCK_DIMS[2], ROCK_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - height - height2, actual_width2, height2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case 'p':
+          DrawTexturePro(
+              spriteSheet,
+              {PAPER_DIMS[0], PAPER_DIMS[1], PAPER_DIMS[2], PAPER_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - height - height2, actual_width2, height2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case 's':
+          DrawTexturePro(
+              spriteSheet,
+              {SCISSORS_DIMS[0], SCISSORS_DIMS[1], SCISSORS_DIMS[2],
+               SCISSORS_DIMS[3]},
+              {triple_single_width * (float)i +
+                   (triple_single_width - actual_width2) / 2.0F,
+               GetScreenHeight() - height - height2, actual_width2, height2},
+              {0.0F, 0.0F}, 0.0F, WHITE);
+          break;
+        case '?':
+        default:
+          break;
       }
     }
   } else if (anims.is_done()) {
     draw_waiting_spinner();
-  }
-
-  if (avatar1_material.has_value()) {
-    Matrix m = MatrixMultiply(MatrixTranslate(received_pos - 0.5F, -0.2F, 1.0F),
-                              MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
-    DrawMesh(avatar_mesh, avatar1_material.value(), m);
-  }
-
-  if (avatar2_material.has_value()) {
-    Matrix m = MatrixMultiply(MatrixTranslate(received_pos + 0.5F, -0.2F, 1.0F),
-                              MatrixRotate(Vector3{1.0F, 0.0F, 0.0F}, 90.0F));
-    DrawMesh(avatar_mesh, avatar2_material.value(), m);
   }
 
   for (auto &iter : deferred_2d_draw_map) {
@@ -721,50 +730,50 @@ int Renderer3D::setup_anims(int idx, int score) {
   Model *p1_model = &qm_model;
   Model *p2_model = &qm_model;
   switch (choices.at(idx)) {
-  case 'r':
-    if (flags.test(2) || flags.test(3)) {
-      p1_model = &rock_model;
-    } else {
-      p2_model = &rock_model;
-    }
-    break;
-  case 'p':
-    if (flags.test(2) || flags.test(3)) {
-      p1_model = &paper_model;
-    } else {
-      p2_model = &paper_model;
-    }
-    break;
-  case 's':
-    if (flags.test(2) || flags.test(3)) {
-      p1_model = &scissors_model;
-    } else {
-      p2_model = &scissors_model;
-    }
-    break;
+    case 'r':
+      if (flags.test(2) || flags.test(3)) {
+        p1_model = &rock_model;
+      } else {
+        p2_model = &rock_model;
+      }
+      break;
+    case 'p':
+      if (flags.test(2) || flags.test(3)) {
+        p1_model = &paper_model;
+      } else {
+        p2_model = &paper_model;
+      }
+      break;
+    case 's':
+      if (flags.test(2) || flags.test(3)) {
+        p1_model = &scissors_model;
+      } else {
+        p2_model = &scissors_model;
+      }
+      break;
   }
   switch (opponent_choices.at(idx)) {
-  case 'r':
-    if (flags.test(2) || flags.test(3)) {
-      p2_model = &rock_model;
-    } else {
-      p1_model = &rock_model;
-    }
-    break;
-  case 'p':
-    if (flags.test(2) || flags.test(3)) {
-      p2_model = &paper_model;
-    } else {
-      p1_model = &paper_model;
-    }
-    break;
-  case 's':
-    if (flags.test(2) || flags.test(3)) {
-      p2_model = &scissors_model;
-    } else {
-      p1_model = &scissors_model;
-    }
-    break;
+    case 'r':
+      if (flags.test(2) || flags.test(3)) {
+        p2_model = &rock_model;
+      } else {
+        p1_model = &rock_model;
+      }
+      break;
+    case 'p':
+      if (flags.test(2) || flags.test(3)) {
+        p2_model = &paper_model;
+      } else {
+        p1_model = &paper_model;
+      }
+      break;
+    case 's':
+      if (flags.test(2) || flags.test(3)) {
+        p2_model = &scissors_model;
+      } else {
+        p1_model = &scissors_model;
+      }
+      break;
   }
   newAnim->push_anim(std::make_unique<AnimModelGrow>(
       p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 200, 200, 255}));
@@ -806,76 +815,78 @@ int Renderer3D::setup_anims(int idx, int score) {
 
   using CDataT = std::tuple<Sound *, decltype(flags) *, float *>;
   switch (result) {
-  case -1: {
-    auto anim_still = std::make_unique<AnimModelStill>(
-        p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 200, 200, 255},
-        MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
-    CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
-                                 ? type_to_sfx(opponent_choices.at(idx))
-                                 : type_to_sfx(choices.at(idx)),
-                             &flags, &screen_shake_timer};
-    anim_still->set_end_callback(
-        [](void *ud) {
-          auto *ptr = (CDataT *)ud;
-          if (std::get<0>(*ptr) != nullptr) {
-            PlaySound(*std::get<0>(*ptr));
-          }
-          std::get<1>(*ptr)->set(20);
-          std::get<1>(*ptr)->set(21);
-          *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
-          delete ptr;
-        },
-        ptr);
-    seqAnim->push_anim(std::move(anim_still));
+    case -1: {
+      auto anim_still = std::make_unique<AnimModelStill>(
+          p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+          A4C{255, 200, 200, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
+                                   ? type_to_sfx(opponent_choices.at(idx))
+                                   : type_to_sfx(choices.at(idx)),
+                               &flags, &screen_shake_timer};
+      anim_still->set_end_callback(
+          [](void *ud) {
+            auto *ptr = (CDataT *)ud;
+            if (std::get<0>(*ptr) != nullptr) {
+              PlaySound(*std::get<0>(*ptr));
+            }
+            std::get<1>(*ptr)->set(20);
+            std::get<1>(*ptr)->set(21);
+            *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
+            delete ptr;
+          },
+          ptr);
+      seqAnim->push_anim(std::move(anim_still));
 
-    auto falling_anims = std::make_unique<AnimConcurrent>(nullptr);
-    for (int i = 0; i < ANIM_FALLING_AMT; ++i) {
-      falling_anims->push_anim(std::make_unique<AnimFalling2D>(
-          A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255}, &spriteSheet,
-          p1_dims, i >= ANIM_FALLING_OPP_THRESHOLD, &deferred_2d_draw_map));
-    }
-    seqAnim->push_anim(std::move(falling_anims));
+      auto falling_anims = std::make_unique<AnimConcurrent>(nullptr);
+      for (int i = 0; i < ANIM_FALLING_AMT; ++i) {
+        falling_anims->push_anim(std::make_unique<AnimFalling2D>(
+            A3F{p1_pos.x, p1_pos.y, 0.0F}, A4C{255, 200, 200, 255},
+            &spriteSheet, p1_dims, i >= ANIM_FALLING_OPP_THRESHOLD,
+            &deferred_2d_draw_map));
+      }
+      seqAnim->push_anim(std::move(falling_anims));
 
-    newAnim->push_anim(std::make_unique<AnimModelAttack>(
-        p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{200, 200, 255, 255},
-        false));
-  } break;
-  case 1: {
-    newAnim->push_anim(std::make_unique<AnimModelAttack>(
-        p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F}, A4C{255, 200, 200, 255},
-        true));
-    auto anim_still = std::make_unique<AnimModelStill>(
-        p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F}, A4C{200, 200, 255, 255},
-        MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
-    CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
-                                 ? type_to_sfx(choices.at(idx))
-                                 : type_to_sfx(opponent_choices.at(idx)),
-                             &flags, &screen_shake_timer};
-    anim_still->set_end_callback(
-        [](void *ud) {
-          auto *ptr = (CDataT *)ud;
-          if (std::get<0>(*ptr) != nullptr) {
-            PlaySound(*std::get<0>(*ptr));
-          }
-          std::get<1>(*ptr)->set(20);
-          std::get<1>(*ptr)->set(21);
-          *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
-          delete ptr;
-        },
-        ptr);
-    seqAnim->push_anim(std::move(anim_still));
+      newAnim->push_anim(std::make_unique<AnimModelAttack>(
+          p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+          A4C{200, 200, 255, 255}, false));
+    } break;
+    case 1: {
+      newAnim->push_anim(std::make_unique<AnimModelAttack>(
+          p1_model, A3F{score * 2.0F - 1.0F, 0.0F, 0.0F},
+          A4C{255, 200, 200, 255}, true));
+      auto anim_still = std::make_unique<AnimModelStill>(
+          p2_model, A3F{score * 2.0F + 1.0F, 0.0F, 0.0F},
+          A4C{200, 200, 255, 255}, MODEL_ATTACK_TIME_0 + MODEL_ATTACK_TIME_1);
+      CDataT *ptr = new CDataT{(flags.test(2) || flags.test(3))
+                                   ? type_to_sfx(choices.at(idx))
+                                   : type_to_sfx(opponent_choices.at(idx)),
+                               &flags, &screen_shake_timer};
+      anim_still->set_end_callback(
+          [](void *ud) {
+            auto *ptr = (CDataT *)ud;
+            if (std::get<0>(*ptr) != nullptr) {
+              PlaySound(*std::get<0>(*ptr));
+            }
+            std::get<1>(*ptr)->set(20);
+            std::get<1>(*ptr)->set(21);
+            *std::get<2>(*ptr) = SCREEN_SHAKE_TIME;
+            delete ptr;
+          },
+          ptr);
+      seqAnim->push_anim(std::move(anim_still));
 
-    auto falling_anims = std::make_unique<AnimConcurrent>(nullptr);
-    for (int i = 0; i < ANIM_FALLING_AMT; ++i) {
-      falling_anims->push_anim(std::make_unique<AnimFalling2D>(
-          A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255}, &spriteSheet,
-          p2_dims, i < ANIM_FALLING_OPP_THRESHOLD, &deferred_2d_draw_map));
-    }
-    seqAnim->push_anim(std::move(falling_anims));
-  } break;
-  case 0:
-  default:
-    break;
+      auto falling_anims = std::make_unique<AnimConcurrent>(nullptr);
+      for (int i = 0; i < ANIM_FALLING_AMT; ++i) {
+        falling_anims->push_anim(std::make_unique<AnimFalling2D>(
+            A3F{p2_pos.x, p2_pos.y, 0.0F}, A4C{200, 200, 255, 255},
+            &spriteSheet, p2_dims, i < ANIM_FALLING_OPP_THRESHOLD,
+            &deferred_2d_draw_map));
+      }
+      seqAnim->push_anim(std::move(falling_anims));
+    } break;
+    case 0:
+    default:
+      break;
   }
 
   if (result != 0) {
@@ -1019,14 +1030,14 @@ Sound *Renderer3D::get_random_draw_sfx() {
 
 Sound *Renderer3D::type_to_sfx(char type) {
   switch (type) {
-  case 'r':
-    return get_random_rock_sfx();
-  case 'p':
-    return get_random_paper_sfx();
-  case 's':
-    return get_random_scissors_sfx();
-  default:
-    break;
+    case 'r':
+      return get_random_rock_sfx();
+    case 'p':
+      return get_random_paper_sfx();
+    case 's':
+      return get_random_scissors_sfx();
+    default:
+      break;
   }
   return nullptr;
 }
