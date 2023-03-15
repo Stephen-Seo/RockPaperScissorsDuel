@@ -246,7 +246,11 @@ void Renderer3D::avatar1_loaded(unsigned long long size, const char *data) {
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
+  if (!avatar.data) {
+    return;
+  }
   avatar1_texture = LoadTextureFromImage(avatar);
+  UnloadImage(avatar);
 
   avatar1_material = LoadMaterialDefault();
   SetMaterialTexture(&avatar1_material.value(), MATERIAL_MAP_DIFFUSE,
@@ -262,7 +266,11 @@ void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
+  if (!avatar.data) {
+    return;
+  }
   avatar2_texture = LoadTextureFromImage(avatar);
+  UnloadImage(avatar);
 
   avatar2_material = LoadMaterialDefault();
   SetMaterialTexture(&avatar2_material.value(), MATERIAL_MAP_DIFFUSE,
