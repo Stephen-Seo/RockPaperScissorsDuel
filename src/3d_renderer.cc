@@ -181,6 +181,7 @@ void Renderer3D::update_state(
     flags.reset(2);
     flags.set(3);
   }
+  flags.reset(26);
 
   // DEBUG
   // if (flags.test(2)) {
@@ -483,8 +484,9 @@ void Renderer3D::update_impl() {
   flags.reset(12);
 
   if (flags.test(8) && flags.test(11) && flags.test(7) && anims.is_done() &&
-      !flags.test(14)) {
+      !flags.test(14) && !flags.test(26)) {
     call_js_set_matchup_done();
+    flags.set(26);
   }
 
   {

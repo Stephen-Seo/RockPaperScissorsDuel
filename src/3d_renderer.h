@@ -138,6 +138,7 @@ class Renderer3D : public GameRenderer {
    * 23 - try to load p2 avatar
    * 24 - tried to load p1 avatar
    * 25 - tried to load p2 avatar
+   * 26 - call_js_set_matchup_done called
    */
   std::bitset<64> flags;
 
