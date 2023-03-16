@@ -99,6 +99,12 @@ Renderer3D::Renderer3D()
 
   avatar_model = LoadModelFromMesh(GenMeshPlane(1.0F, 1.0F, 1, 1));
 
+  auto placeholder_image = LoadImage("resources/avatar-placeholder.png");
+  if (placeholder_image.data) {
+    avatar_placeholder_texture = LoadTextureFromImage(placeholder_image);
+    UnloadImage(placeholder_image);
+  }
+
   // TODO DEBUG
   // auto texture1 = LoadRenderTexture(16, 16);
   // BeginTextureMode(texture1);
@@ -140,6 +146,9 @@ Renderer3D::~Renderer3D() {
 
   UnloadModel(avatar_model);
 
+  if (avatar_placeholder_texture.has_value()) {
+    UnloadTexture(avatar_placeholder_texture.value());
+  }
   if (avatar1_texture.has_value()) {
     UnloadTexture(avatar1_texture.value());
   }
@@ -569,11 +578,23 @@ void Renderer3D::draw_impl() {
     DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
                 Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
                 WHITE);
+  } else if (avatar_placeholder_texture.has_value()) {
+    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+        avatar_placeholder_texture.value();
+    DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
+                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+                WHITE);
   }
 
   if (avatar2_texture.has_value()) {
     avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
         avatar2_texture.value();
+    DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
+                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+                WHITE);
+  } else if (avatar_placeholder_texture.has_value()) {
+    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+        avatar_placeholder_texture.value();
     DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
                 Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
                 WHITE);

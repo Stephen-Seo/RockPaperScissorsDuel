@@ -81,6 +81,7 @@ class Renderer3D : public GameRenderer {
   Texture2D paper_texture;
   Texture2D scissors_texture;
 
+  std::optional<Texture2D> avatar_placeholder_texture;
   std::optional<Texture2D> avatar1_texture;
   std::optional<Texture2D> avatar2_texture;
 
