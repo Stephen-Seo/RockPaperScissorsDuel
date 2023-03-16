@@ -273,13 +273,15 @@ void Renderer3D::avatar1_loaded(unsigned long long size, const char *data) {
   flags.set(24);
 
   if (size == 0 || !data) {
-    std::cerr << "ERROR: Failed to load avatar for player 1!\n";
+    std::cerr
+        << "ERROR: Failed to load avatar for player 1! (no image provided)\n";
     return;
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
   if (!avatar.data) {
-    std::cerr << "ERROR: Failed to load avatar for player 1!\n";
+    std::cerr
+        << "ERROR: Failed to load avatar for player 1! (failed to decode)\n";
     return;
   }
   avatar1_texture = LoadTextureFromImage(avatar);
@@ -291,13 +293,15 @@ void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
   flags.set(25);
 
   if (size == 0 || !data) {
-    std::cerr << "ERROR: Failed to load avatar for player 2!\n";
+    std::cerr
+        << "ERROR: Failed to load avatar for player 2! (no image provided)\n";
     return;
   }
 
   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
   if (!avatar.data) {
-    std::cerr << "ERROR: Failed to load avatar for player 2!\n";
+    std::cerr
+        << "ERROR: Failed to load avatar for player 2! (failed to decode)\n";
     return;
   }
   avatar2_texture = LoadTextureFromImage(avatar);
