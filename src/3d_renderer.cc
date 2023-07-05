@@ -56,8 +56,6 @@ Renderer3D::Renderer3D()
 
   camera.projection = CAMERA_PERSPECTIVE;
 
-  SetCameraMode(camera, CAMERA_CUSTOM);
-
   spriteSheet = LoadTexture("resources/rockpaperscissorsSpriteSheet.png");
 
   skybox_texture = LoadTexture("resources/skybox.gif");
@@ -363,8 +361,6 @@ void Renderer3D::update_impl() {
                               camera.target.x);
     }
   }
-
-  UpdateCamera(&camera);
 
   for (auto &obj : qms) {
     obj.update(dt);
