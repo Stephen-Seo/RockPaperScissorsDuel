@@ -1,12 +1,9 @@
-project(RockPaperScissorsDuelNative)
 cmake_minimum_required(VERSION 3.18.4)
+project(RockPaperScissorsDuelNative)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wpedantic")
-set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -D NDEBUG")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -D NDEBUG")
+add_compile_options(-Wall -Wextra -Wpedantic
+    $<$<CONFIG:DEBUG>:-O0>
+)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Debug', none was specified.")
