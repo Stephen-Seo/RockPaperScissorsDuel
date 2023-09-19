@@ -74,6 +74,8 @@ int main() {
   emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, renderer.get(),
                                  false, resize_event_callback);
 
+  call_js_init_rune();
+
   emscripten_set_main_loop_arg(game_update, renderer.get(), 0, 1);
 #else
   SetTargetFPS(60);

@@ -32,6 +32,12 @@ EM_JS(int, canvas_get_height, (),
       { return document.getElementById("canvas").clientHeight; });
 
 EM_JS(float, get_random, (), { return Math.random(); });
+
+EM_JS(void, js_rune_init, (), {
+  console.log("WASM loaded, calling Rune init...");
+  do_rune_init();
+  console.log("Called Rune init.")
+});
 #endif
 
 #include <iostream>
@@ -96,6 +102,12 @@ float call_js_get_random() {
   return get_random();
 #else
   return -1.0F;
+#endif
+}
+
+void call_js_init_rune() {
+#ifdef __EMSCRIPTEN__
+  js_rune_init();
 #endif
 }
 

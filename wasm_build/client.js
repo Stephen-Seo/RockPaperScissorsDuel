@@ -81,15 +81,3 @@ Rune.initClient({
     },
 });
 }
-
-let em_checking_interval_id = setInterval(
-    () => {
-        if (typeof Module !== "undefined"
-                && typeof Module.ccall !== "undefined"
-                && typeof wasmExports !== "undefined") {
-            do_rune_init();
-            clearInterval(em_checking_interval_id);
-            console.log("Rune initialized!");
-        }
-    }, 500
-);
