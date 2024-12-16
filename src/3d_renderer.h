@@ -26,22 +26,22 @@ class Renderer3D : public GameRenderer {
   Renderer3D();
   ~Renderer3D() override;
 
-  void update_state(const char *playerOne, const char *playerTwo,
-                    const char *currentPlayer, char first_first,
-                    char first_second, char first_third, char second_first,
-                    char second_second, char second_third, bool first_ready,
-                    bool second_ready, bool first_matchup_done,
-                    bool second_matchup_done, int pos, int prev_pos,
-                    bool gameover_called, bool matchup_started,
-                    const char *currentName, const char *player1AvatarUrl,
-                    const char *player2AvatarUrl) override;
+  // void update_state(const char *playerOne, const char *playerTwo,
+  //                   const char *currentPlayer, char first_first,
+  //                   char first_second, char first_third, char second_first,
+  //                   char second_second, char second_third, bool first_ready,
+  //                   bool second_ready, bool first_matchup_done,
+  //                   bool second_matchup_done, int pos, int prev_pos,
+  //                   bool gameover_called, bool matchup_started,
+  //                   const char *currentName, const char *player1AvatarUrl,
+  //                   const char *player2AvatarUrl) override;
 
   void do_update() override;
 
   void screen_size_changed() override;
 
-  void avatar1_loaded(unsigned long long size, const char *data) override;
-  void avatar2_loaded(unsigned long long size, const char *data) override;
+  // void avatar1_loaded(unsigned long long size, const char *data) override;
+  // void avatar2_loaded(unsigned long long size, const char *data) override;
 
  private:
   void update_impl();
@@ -81,11 +81,11 @@ class Renderer3D : public GameRenderer {
   Texture2D paper_texture;
   Texture2D scissors_texture;
 
-  std::optional<Texture2D> avatar_placeholder_texture;
-  std::optional<Texture2D> avatar1_texture;
-  std::optional<Texture2D> avatar2_texture;
+  // std::optional<Texture2D> avatar_placeholder_texture;
+  // std::optional<Texture2D> avatar1_texture;
+  // std::optional<Texture2D> avatar2_texture;
 
-  Model avatar_model;
+  // Model avatar_model;
 
   Model skybox_model;
   Model platform_model;
@@ -139,6 +139,8 @@ class Renderer3D : public GameRenderer {
    * 24 - tried to load p1 avatar
    * 25 - tried to load p2 avatar
    * 26 - call_js_set_matchup_done called
+   * 27 - resetting to blank
+   * 28 - resetting to non-blank
    */
   std::bitset<64> flags;
 
@@ -148,6 +150,7 @@ class Renderer3D : public GameRenderer {
   float screen_shake_rot_factor;
   float screen_shake_timer;
   float waiting_spinner_timer;
+  float blank_screen_timer;
 
   int received_pos;
   int prev_pos;

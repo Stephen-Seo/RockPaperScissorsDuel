@@ -80,6 +80,8 @@ constexpr int ANIM_FALLING_OPP_THRESHOLD = 5;
 constexpr float WAITING_SPINNER_TIME = 2.0F;
 constexpr float SPINNER_RADIUS_WIDTH_FRAC = 20.0F;
 
+constexpr float BLANK_SCREEN_TIME = 1.0F;
+
 // src/3D/
 
 constexpr float QM_ANGLE_TIMER_VARIANCE = 2.0F;

@@ -18,7 +18,6 @@
 #include "3d/anim_model_grow.h"
 #include "3d/anim_model_shrink.h"
 #include "3d/anim_model_still.h"
-#include "3d/arrays_conv.h"
 #include "constants.h"
 #include "ems.h"
 #include "helpers.h"
@@ -33,6 +32,7 @@ Renderer3D::Renderer3D()
       screen_shake_rot_factor(SCREEN_SHAKE_DEFAULT_ROT_FACTOR),
       screen_shake_timer(0.0F),
       waiting_spinner_timer(0.0F),
+      blank_screen_timer(0.0f),
       received_pos(0),
       prev_pos(0),
       choices{'?', '?', '?'},
@@ -82,6 +82,7 @@ Renderer3D::Renderer3D()
       scissors_texture;
 
   flags.set(1);
+  flags.set(2);
   flags.set(4);
   flags.set(5);
   flags.set(19);
@@ -95,13 +96,13 @@ Renderer3D::Renderer3D()
   qms.at(1).set_color_r(0);
   qms.at(1).set_color_g(0);
 
-  avatar_model = LoadModelFromMesh(GenMeshPlane(1.0F, 1.0F, 1, 1));
+  // avatar_model = LoadModelFromMesh(GenMeshPlane(1.0F, 1.0F, 1, 1));
 
-  auto placeholder_image = LoadImage("resources/avatar-placeholder.png");
-  if (placeholder_image.data) {
-    avatar_placeholder_texture = LoadTextureFromImage(placeholder_image);
-    UnloadImage(placeholder_image);
-  }
+  // auto placeholder_image = LoadImage("resources/avatar-placeholder.png");
+  // if (placeholder_image.data) {
+  //   avatar_placeholder_texture = LoadTextureFromImage(placeholder_image);
+  //   UnloadImage(placeholder_image);
+  // }
 
   // TODO DEBUG
   // auto texture1 = LoadRenderTexture(16, 16);
@@ -142,17 +143,17 @@ Renderer3D::~Renderer3D() {
   UnloadTexture(paper_texture);
   UnloadTexture(scissors_texture);
 
-  UnloadModel(avatar_model);
+  // UnloadModel(avatar_model);
 
-  if (avatar_placeholder_texture.has_value()) {
-    UnloadTexture(avatar_placeholder_texture.value());
-  }
-  if (avatar1_texture.has_value()) {
-    UnloadTexture(avatar1_texture.value());
-  }
-  if (avatar2_texture.has_value()) {
-    UnloadTexture(avatar2_texture.value());
-  }
+  // if (avatar_placeholder_texture.has_value()) {
+  //   UnloadTexture(avatar_placeholder_texture.value());
+  // }
+  // if (avatar1_texture.has_value()) {
+  //   UnloadTexture(avatar1_texture.value());
+  // }
+  // if (avatar2_texture.has_value()) {
+  //   UnloadTexture(avatar2_texture.value());
+  // }
 
   UnloadModel(skybox_model);
   UnloadModel(platform_model);
@@ -162,112 +163,117 @@ Renderer3D::~Renderer3D() {
   UnloadModel(scissors_model);
 }
 
-void Renderer3D::update_state(
-    const char *playerOne, const char *playerTwo, const char *currentPlayer,
-    char first_first, char first_second, char first_third, char second_first,
-    char second_second, char second_third, bool first_ready, bool second_ready,
-    bool first_matchup_done, bool second_matchup_done, int pos, int prev_pos,
-    bool gameover_called, bool matchup_started, const char *currentName,
-    const char *player1AvatarUrl, const char *player2AvatarUrl) {
-  if (std::strcmp(playerOne, currentPlayer) == 0) {
-    flags.set(2);
-    flags.reset(3);
-  } else if (std::strcmp(playerTwo, currentPlayer) == 0) {
-    flags.reset(2);
-    flags.reset(3);
-  } else {
-    flags.reset(2);
-    flags.set(3);
-  }
-  flags.reset(26);
-
-  // DEBUG
-  // if (flags.test(2)) {
-  //  std::cout << "Player one str is \"" << playerOne << "\"" << std::endl;
-  //} else {
-  //  std::cout << "Player two str is \"" << playerTwo << "\"" << std::endl;
-  //}
-  // std::cout << "Name is \"" << currentName << std::endl;
-
-  flags.set(9, first_ready);
-  flags.set(10, second_ready);
-  flags.set(13, matchup_started);
-  flags.set(14, gameover_called);
-
-  flags.set(12);
-
-  // if (flags.test(3)) {
-  //   std::cout << "got pos: " << pos << std::endl;
-  //   std::cout << "camera.target.x: " << camera.target.x << std::endl;
-  //   std::cout << "matchup started: " << (matchup_started ? "true" : "false")
-  //             << std::endl;
-  //   std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") << "\np2
-  //   is "
-  //             << (second_ready ? "ready" : "NOT ready") << std::endl;
-  // }
-
-  this->prev_pos = prev_pos;
-  if (!flags.test(13) && anims.is_done()) {
-    received_pos = pos;
-  } else if (flags.test(3) && anims.is_done()) {
-    received_pos = prev_pos;
-  }
-
-  if (second_first != '?') {
-    if (flags.test(2)) {
-      opponent_choices.at(0) = second_first;
-      opponent_choices.at(1) = second_second;
-      opponent_choices.at(2) = second_third;
-    } else {
-      opponent_choices.at(0) = first_first;
-      opponent_choices.at(1) = first_second;
-      opponent_choices.at(2) = first_third;
-    }
-  }
-
-  if (flags.test(3)) {
-    choices.at(0) = first_first;
-    choices.at(1) = first_second;
-    choices.at(2) = first_third;
-    opponent_choices.at(0) = second_first;
-    opponent_choices.at(1) = second_second;
-    opponent_choices.at(2) = second_third;
-
-    if (!matchup_started) {
-      flags.reset(16);
-      flags.reset(17);
-    }
-  }
-
-  if (flags.test(11) && first_first == '?' && second_first == '?' &&
-      flags.test(15) && !flags.test(13)) {
-    reset_for_next();
-  }
-
-  if (flags.test(19)) {
-    flags.reset(19);
-    if (renderTexture.has_value()) {
-      UnloadRenderTexture(renderTexture.value());
-    }
-    renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-  }
-
-  if (player1AvatarUrl && std::strcmp(player1AvatarUrl, "unknown") != 0 &&
-      !flags.test(22) && !flags.test(24) && !avatar1_texture.has_value()) {
-    flags.set(22);
-    fetch_avatar1_url(player1AvatarUrl, this);
-  }
-
-  if (player2AvatarUrl && std::strcmp(player2AvatarUrl, "unknown") != 0 &&
-      !flags.test(23) && !flags.test(25) && !avatar2_texture.has_value()) {
-    flags.set(23);
-    fetch_avatar2_url(player2AvatarUrl, this);
-  }
-
-  // if (flags.test(3)) {
-  //   std::cout << flags.to_string().substr(64 - 16) << std::endl;
-  // }
-}
+// void Renderer3D::update_state(
+//     const char *playerOne, const char *playerTwo, const char *currentPlayer,
+//     char first_first, char first_second, char first_third, char second_first,
+//     char second_second, char second_third, bool first_ready, bool
+//     second_ready, bool first_matchup_done, bool second_matchup_done, int pos,
+//     int prev_pos, bool gameover_called, bool matchup_started, const char
+//     *currentName, const char *player1AvatarUrl, const char *player2AvatarUrl)
+//     {
+//   if (std::strcmp(playerOne, currentPlayer) == 0) {
+//     flags.set(2);
+//     flags.reset(3);
+//   } else if (std::strcmp(playerTwo, currentPlayer) == 0) {
+//     flags.reset(2);
+//     flags.reset(3);
+//   } else {
+//     flags.reset(2);
+//     flags.set(3);
+//   }
+//   flags.reset(26);
+//
+//   // DEBUG
+//   // if (flags.test(2)) {
+//   //  std::cout << "Player one str is \"" << playerOne << "\"" << std::endl;
+//   //} else {
+//   //  std::cout << "Player two str is \"" << playerTwo << "\"" << std::endl;
+//   //}
+//   // std::cout << "Name is \"" << currentName << std::endl;
+//
+//   flags.set(9, first_ready);
+//   flags.set(10, second_ready);
+//   flags.set(13, matchup_started);
+//   flags.set(14, gameover_called);
+//
+//   flags.set(12);
+//
+//   // if (flags.test(3)) {
+//   //   std::cout << "got pos: " << pos << std::endl;
+//   //   std::cout << "camera.target.x: " << camera.target.x << std::endl;
+//   //   std::cout << "matchup started: " << (matchup_started ? "true" :
+//   "false")
+//   //             << std::endl;
+//   //   std::cout << "p1 is " << (first_ready ? "ready" : "NOT ready") <<
+//   "\np2
+//   //   is "
+//   //             << (second_ready ? "ready" : "NOT ready") << std::endl;
+//   // }
+//
+//   this->prev_pos = prev_pos;
+//   if (!flags.test(13) && anims.is_done()) {
+//     received_pos = pos;
+//   } else if (flags.test(3) && anims.is_done()) {
+//     received_pos = prev_pos;
+//   }
+//
+//   if (second_first != '?') {
+//     if (flags.test(2)) {
+//       opponent_choices.at(0) = second_first;
+//       opponent_choices.at(1) = second_second;
+//       opponent_choices.at(2) = second_third;
+//     } else {
+//       opponent_choices.at(0) = first_first;
+//       opponent_choices.at(1) = first_second;
+//       opponent_choices.at(2) = first_third;
+//     }
+//   }
+//
+//   if (flags.test(3)) {
+//     choices.at(0) = first_first;
+//     choices.at(1) = first_second;
+//     choices.at(2) = first_third;
+//     opponent_choices.at(0) = second_first;
+//     opponent_choices.at(1) = second_second;
+//     opponent_choices.at(2) = second_third;
+//
+//     if (!matchup_started) {
+//       flags.reset(16);
+//       flags.reset(17);
+//     }
+//   }
+//
+//   if (flags.test(11) && first_first == '?' && second_first == '?' &&
+//       flags.test(15) && !flags.test(13)) {
+//     reset_for_next();
+//   }
+//
+//   if (flags.test(19)) {
+//     flags.reset(19);
+//     if (renderTexture.has_value()) {
+//       UnloadRenderTexture(renderTexture.value());
+//     }
+//     renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+//   }
+//
+//   // if (player1AvatarUrl && std::strcmp(player1AvatarUrl, "unknown") != 0 &&
+//   //     !flags.test(22) && !flags.test(24) && !avatar1_texture.has_value())
+//   {
+//   //   flags.set(22);
+//   //   fetch_avatar1_url(player1AvatarUrl, this);
+//   // }
+//
+//   // if (player2AvatarUrl && std::strcmp(player2AvatarUrl, "unknown") != 0 &&
+//   //     !flags.test(23) && !flags.test(25) && !avatar2_texture.has_value())
+//   {
+//   //   flags.set(23);
+//   //   fetch_avatar2_url(player2AvatarUrl, this);
+//   // }
+//
+//   // if (flags.test(3)) {
+//   //   std::cout << flags.to_string().substr(64 - 16) << std::endl;
+//   // }
+// }
 
 void Renderer3D::do_update() {
   update_impl();
@@ -276,45 +282,47 @@ void Renderer3D::do_update() {
 
 void Renderer3D::screen_size_changed() { flags.set(19); }
 
-void Renderer3D::avatar1_loaded(unsigned long long size, const char *data) {
-  flags.reset(22);
-  flags.set(24);
-
-  if (size == 0 || !data) {
-    std::cerr
-        << "ERROR: Failed to load avatar for player 1! (no image provided)\n";
-    return;
-  }
-
-  auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
-  if (!avatar.data) {
-    std::cerr
-        << "ERROR: Failed to load avatar for player 1! (failed to decode)\n";
-    return;
-  }
-  avatar1_texture = LoadTextureFromImage(avatar);
-  UnloadImage(avatar);
-}
-
-void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
-  flags.reset(23);
-  flags.set(25);
-
-  if (size == 0 || !data) {
-    std::cerr
-        << "ERROR: Failed to load avatar for player 2! (no image provided)\n";
-    return;
-  }
-
-  auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data, size);
-  if (!avatar.data) {
-    std::cerr
-        << "ERROR: Failed to load avatar for player 2! (failed to decode)\n";
-    return;
-  }
-  avatar2_texture = LoadTextureFromImage(avatar);
-  UnloadImage(avatar);
-}
+// void Renderer3D::avatar1_loaded(unsigned long long size, const char *data) {
+//   flags.reset(22);
+//   flags.set(24);
+//
+//   if (size == 0 || !data) {
+//     std::cerr
+//         << "ERROR: Failed to load avatar for player 1! (no image
+//         provided)\n";
+//     return;
+//   }
+//
+//   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data,
+//   size); if (!avatar.data) {
+//     std::cerr
+//         << "ERROR: Failed to load avatar for player 1! (failed to decode)\n";
+//     return;
+//   }
+//   avatar1_texture = LoadTextureFromImage(avatar);
+//   UnloadImage(avatar);
+// }
+//
+// void Renderer3D::avatar2_loaded(unsigned long long size, const char *data) {
+//   flags.reset(23);
+//   flags.set(25);
+//
+//   if (size == 0 || !data) {
+//     std::cerr
+//         << "ERROR: Failed to load avatar for player 2! (no image
+//         provided)\n";
+//     return;
+//   }
+//
+//   auto avatar = LoadImageFromMemory(".png", (const unsigned char *)data,
+//   size); if (!avatar.data) {
+//     std::cerr
+//         << "ERROR: Failed to load avatar for player 2! (failed to decode)\n";
+//     return;
+//   }
+//   avatar2_texture = LoadTextureFromImage(avatar);
+//   UnloadImage(avatar);
+// }
 
 void Renderer3D::update_impl() {
   const float dt = GetFrameTime();
@@ -362,6 +370,21 @@ void Renderer3D::update_impl() {
     }
   }
 
+  if (flags.test(27) || flags.test(28)) {
+    blank_screen_timer += dt;
+    if (blank_screen_timer > BLANK_SCREEN_TIME) {
+      if (flags.test(27)) {
+        flags.reset(27);
+        flags.set(28);
+        received_pos = 0;
+      } else {
+        flags.reset(28);
+        flags.reset(8);
+      }
+      blank_screen_timer = 0.0F;
+    }
+  }
+
   for (auto &obj : qms) {
     obj.update(dt);
   }
@@ -373,13 +396,14 @@ void Renderer3D::update_impl() {
                              (triple_single_width - actual_width) / 2.0F &&
           GetTouchY() >= GetScreenHeight() - height &&
           GetTouchY() <= GetScreenHeight()) {
-        if (choices.at(0) == '?') {
-          choices.at(0) = 'r';
-        } else if (choices.at(1) == '?') {
-          choices.at(1) = 'r';
+        // std::cout << "selected rock" << std::endl;
+        if ((flags.test(2) ? choices : opponent_choices).at(0) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(0) = 'r';
+        } else if ((flags.test(2) ? choices : opponent_choices).at(1) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(1) = 'r';
         } else {
-          choices.at(2) = 'r';
-          flags.set(8);
+          (flags.test(2) ? choices : opponent_choices).at(2) = 'r';
+          // flags.set(8);
         }
       } else if (GetTouchX() >=
                      triple_single_width +
@@ -389,13 +413,14 @@ void Renderer3D::update_impl() {
                          (triple_single_width - actual_width) / 2.0F &&
                  GetTouchY() >= GetScreenHeight() - height &&
                  GetTouchY() <= GetScreenHeight()) {
-        if (choices.at(0) == '?') {
-          choices.at(0) = 'p';
-        } else if (choices.at(1) == '?') {
-          choices.at(1) = 'p';
+        // std::cout << "selected paper" << std::endl;
+        if ((flags.test(2) ? choices : opponent_choices).at(0) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(0) = 'p';
+        } else if ((flags.test(2) ? choices : opponent_choices).at(1) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(1) = 'p';
         } else {
-          choices.at(2) = 'p';
-          flags.set(8);
+          (flags.test(2) ? choices : opponent_choices).at(2) = 'p';
+          // flags.set(8);
         }
       } else if (GetTouchX() >=
                      GetScreenWidth() - triple_single_width +
@@ -405,13 +430,14 @@ void Renderer3D::update_impl() {
                          (triple_single_width - actual_width) / 2.0F &&
                  GetTouchY() >= GetScreenHeight() - height &&
                  GetTouchY() <= GetScreenHeight()) {
-        if (choices.at(0) == '?') {
-          choices.at(0) = 's';
-        } else if (choices.at(1) == '?') {
-          choices.at(1) = 's';
+        // std::cout << "selected scissors" << std::endl;
+        if ((flags.test(2) ? choices : opponent_choices).at(0) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(0) = 's';
+        } else if ((flags.test(2) ? choices : opponent_choices).at(1) == '?') {
+          (flags.test(2) ? choices : opponent_choices).at(1) = 's';
         } else {
-          choices.at(2) = 's';
-          flags.set(8);
+          (flags.test(2) ? choices : opponent_choices).at(2) = 's';
+          // flags.set(8);
         }
       } else if (GetTouchX() >= (triple_single_width - actual_width2) / 2.0F &&
                  GetTouchX() <=
@@ -419,7 +445,7 @@ void Renderer3D::update_impl() {
                          (triple_single_width - actual_width2) / 2.0F &&
                  GetTouchY() >= GetScreenHeight() - height - height2 &&
                  GetTouchY() <= GetScreenHeight() - height) {
-        choices.at(0) = '?';
+        (flags.test(2) ? choices : opponent_choices).at(0) = '?';
       } else if (GetTouchX() >=
                      triple_single_width +
                          (triple_single_width - actual_width2) / 2.0F &&
@@ -428,7 +454,7 @@ void Renderer3D::update_impl() {
                          (triple_single_width - actual_width2) / 2.0F &&
                  GetTouchY() >= GetScreenHeight() - height - height2 &&
                  GetTouchY() <= GetScreenHeight() - height) {
-        choices.at(1) = '?';
+        (flags.test(2) ? choices : opponent_choices).at(1) = '?';
       } else if (GetTouchX() >=
                      GetScreenWidth() - triple_single_width +
                          (triple_single_width - actual_width2) / 2.0F &&
@@ -437,9 +463,31 @@ void Renderer3D::update_impl() {
                          (triple_single_width - actual_width2) / 2.0F &&
                  GetTouchY() >= GetScreenHeight() - height - height2 &&
                  GetTouchY() <= GetScreenHeight() - height) {
-        choices.at(2) = '?';
+        (flags.test(2) ? choices : opponent_choices).at(2) = '?';
       }
     }
+    if (flags.test(2) && choices.at(2) != '?') {
+      flags.reset(2);
+      flags.set(9);
+      std::cout << "End choices for player 1." << std::endl;
+    } else if (!flags.test(2) && opponent_choices.at(2) != '?') {
+      flags.set(2);
+      flags.set(11);
+      flags.set(8);
+      flags.set(10);
+      flags.set(12);
+      flags.set(13);
+      flags.set(0);
+      flags.set(19);
+      std::cout << "End choices for player 2." << std::endl;
+    }
+  } else if (IsMouseButtonPressed(1)) {
+    // std::cout << "NOP\n";
+    // std::cout << "Received pos is " << received_pos << std::endl;
+  }
+
+  if (IsWindowResized()) {
+    flags.set(19);
   }
 
   button_color_timer -= dt;
@@ -448,12 +496,12 @@ void Renderer3D::update_impl() {
   }
 
   if (flags.test(8) && flags.test(9) && flags.test(10) && !flags.test(11)) {
-    char buf[6] = {(char)choices.at(0), 0, (char)choices.at(1), 0,
-                   (char)choices.at(2), 0};
+    // char buf[6] = {(char)choices.at(0), 0, (char)choices.at(1), 0,
+    //                (char)choices.at(2), 0};
     flags.set(11);
     flags.set(0);
     if (!flags.test(14)) {
-      call_js_set_choices(&buf[0], &buf[2], &buf[4]);
+      // call_js_set_choices(&buf[0], &buf[2], &buf[4]);
     }
   }
 
@@ -481,8 +529,34 @@ void Renderer3D::update_impl() {
 
   if (flags.test(8) && flags.test(11) && flags.test(7) && anims.is_done() &&
       !flags.test(14) && !flags.test(26)) {
-    call_js_set_matchup_done();
+    // call_js_set_matchup_done();
     flags.set(26);
+
+    flags.reset(0);
+    flags.set(1);
+    flags.set(2);
+    flags.reset(7);
+    flags.reset(8);
+    flags.reset(9);
+    flags.reset(10);
+    flags.reset(11);
+    flags.reset(13);
+    flags.reset(15);
+    flags.set(19);
+    flags.reset(26);
+
+    choices.at(0) = '?';
+    choices.at(1) = '?';
+    choices.at(2) = '?';
+
+    opponent_choices.at(0) = '?';
+    opponent_choices.at(1) = '?';
+    opponent_choices.at(2) = '?';
+
+    if (received_pos <= -3 || received_pos >= 3) {
+      flags.set(27);
+      flags.set(8);
+    }
   }
 
   {
@@ -525,6 +599,14 @@ void Renderer3D::update_impl() {
     load_sounds();
   }
 
+  if (flags.test(19)) {
+    flags.reset(19);
+    if (renderTexture.has_value()) {
+      UnloadRenderTexture(renderTexture.value());
+    }
+    renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+  }
+
   if (flags.test(21)) {
     screen_shake_timer -= dt;
     if (screen_shake_timer < 0.0F) {
@@ -541,7 +623,7 @@ void Renderer3D::update_impl() {
   if (flags.test(8) && ((flags.test(2) && !flags.test(9)) ||
                         (!flags.test(2) && !flags.test(10)))) {
     if (!flags.test(14)) {
-      call_js_set_ready();
+      // call_js_set_ready();
     }
   }
 
@@ -570,33 +652,33 @@ void Renderer3D::draw_impl() {
     }
   }
 
-  if (avatar1_texture.has_value()) {
-    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
-        avatar1_texture.value();
-    DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
-                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
-                WHITE);
-  } else if (avatar_placeholder_texture.has_value()) {
-    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
-        avatar_placeholder_texture.value();
-    DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
-                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
-                WHITE);
-  }
+  // if (avatar1_texture.has_value()) {
+  //   avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+  //       avatar1_texture.value();
+  //   DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
+  //               Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+  //               WHITE);
+  // } else if (avatar_placeholder_texture.has_value()) {
+  //   avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+  //       avatar_placeholder_texture.value();
+  //   DrawModelEx(avatar_model, Vector3{camera.target.x - 1.0F, 2.0F, -1.0F},
+  //               Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+  //               WHITE);
+  // }
 
-  if (avatar2_texture.has_value()) {
-    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
-        avatar2_texture.value();
-    DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
-                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
-                WHITE);
-  } else if (avatar_placeholder_texture.has_value()) {
-    avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
-        avatar_placeholder_texture.value();
-    DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
-                Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
-                WHITE);
-  }
+  // if (avatar2_texture.has_value()) {
+  //   avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+  //       avatar2_texture.value();
+  //   DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
+  //               Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+  //               WHITE);
+  // } else if (avatar_placeholder_texture.has_value()) {
+  //   avatar_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture =
+  //       avatar_placeholder_texture.value();
+  //   DrawModelEx(avatar_model, Vector3{camera.target.x + 1.0F, 2.0F, -1.0F},
+  //               Vector3{1.0F, 0.0F, 0.0F}, 90.0F, Vector3{1.0F, 1.0F, 1.0F},
+  //               WHITE);
+  // }
   EndMode3D();
 
   if (!flags.test(3) && !flags.test(8)) {
@@ -673,8 +755,8 @@ void Renderer3D::draw_impl() {
                     GetScreenHeight() - height, actual_width, height},
                    {0.0F, 0.0F}, 0.0F, WHITE);
 
-    for (unsigned int i = 0; i < choices.size(); ++i) {
-      switch (choices[i]) {
+    for (unsigned int i = 0; i < 3; ++i) {
+      switch (flags.test(2) ? choices[i] : opponent_choices[i]) {
         case 'r':
           DrawTexturePro(
               spriteSheet,
@@ -716,6 +798,15 @@ void Renderer3D::draw_impl() {
     if (iter.second.is_activated()) {
       iter.second.draw();
     }
+  }
+
+  if (flags.test(27)) {
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                  Color{0, 0, 0, (unsigned char)(255.0F * blank_screen_timer)});
+  } else if (flags.test(28)) {
+    DrawRectangle(
+        0, 0, GetScreenWidth(), GetScreenHeight(),
+        Color{0, 0, 0, (unsigned char)(255.0F - 255.0F * blank_screen_timer)});
   }
 
   if (flags.test(20) && renderTexture.has_value()) {

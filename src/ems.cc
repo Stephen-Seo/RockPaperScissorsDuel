@@ -1,5 +1,7 @@
 #include "ems.h"
 
+#include <random>
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/fetch.h>
@@ -42,24 +44,25 @@ EM_JS(void, js_rune_init, (), {
 
 #include <iostream>
 
-void call_js_set_ready() {
-#ifdef __EMSCRIPTEN__
-  js_set_ready();
-#else
-  std::clog << "WARNING: emscripten not enabled, cannot call js_set_ready()!"
-            << std::endl;
-#endif
-}
+// void call_js_set_ready() {
+// #ifdef __EMSCRIPTEN__
+//   js_set_ready();
+// #else
+//   std::clog << "WARNING: emscripten not enabled, cannot call js_set_ready()!"
+//             << std::endl;
+// #endif
+// }
 
-void call_js_set_choices(const char *first, const char *second,
-                         const char *third) {
-#ifdef __EMSCRIPTEN__
-  js_set_choices(first, second, third);
-#else
-  std::clog << "WARNING: emscripten not enabled, cannot call js_set_choices()!"
-            << std::endl;
-#endif
-}
+// void call_js_set_choices(const char *first, const char *second,
+//                          const char *third) {
+// #ifdef __EMSCRIPTEN__
+//   js_set_choices(first, second, third);
+// #else
+//   std::clog << "WARNING: emscripten not enabled, cannot call
+//   js_set_choices()!"
+//             << std::endl;
+// #endif
+// }
 
 // void call_js_request_update() {
 // #ifdef __EMSCRIPTEN__
@@ -75,9 +78,10 @@ void call_js_set_matchup_done() {
 #ifdef __EMSCRIPTEN__
   js_set_matchup_done();
 #else
-  std::clog
-      << "WARNING: emscripten not enabled, cannot call js_set_matchup_done()!"
-      << std::endl;
+  // std::clog
+  //     << "WARNING: emscripten not enabled, cannot call
+  //     js_set_matchup_done()!"
+  //     << std::endl;
 #endif
 }
 
@@ -101,7 +105,14 @@ float call_js_get_random() {
 #ifdef __EMSCRIPTEN__
   return get_random();
 #else
-  return -1.0F;
+
+  // TODO Maybe persist random state.
+
+  std::random_device rd{};
+  std::default_random_engine re(rd());
+  std::uniform_real_distribution<float> dist(0.0F, 1.0F);
+
+  return dist(re);
 #endif
 }
 
@@ -111,54 +122,54 @@ void call_js_init_rune() {
 #endif
 }
 
-#ifdef __EMSCRIPTEN__
-void fetch_avatar1_url_success(emscripten_fetch_t *fetch) {
-  GameRenderer *game = (GameRenderer *)fetch->userData;
-  game->avatar1_loaded(fetch->numBytes, fetch->data);
-  emscripten_fetch_close(fetch);
-}
+// #ifdef __EMSCRIPTEN__
+// void fetch_avatar1_url_success(emscripten_fetch_t *fetch) {
+//   GameRenderer *game = (GameRenderer *)fetch->userData;
+//   game->avatar1_loaded(fetch->numBytes, fetch->data);
+//   emscripten_fetch_close(fetch);
+// }
+//
+// void fetch_avatar1_url_fail(emscripten_fetch_t *fetch) {
+//   GameRenderer *game = (GameRenderer *)fetch->userData;
+//   game->avatar1_loaded(0, nullptr);
+//   emscripten_fetch_close(fetch);
+// }
+//
+// void fetch_avatar2_url_success(emscripten_fetch_t *fetch) {
+//   GameRenderer *game = (GameRenderer *)fetch->userData;
+//   game->avatar2_loaded(fetch->numBytes, fetch->data);
+//   emscripten_fetch_close(fetch);
+// }
+//
+// void fetch_avatar2_url_fail(emscripten_fetch_t *fetch) {
+//   GameRenderer *game = (GameRenderer *)fetch->userData;
+//   game->avatar2_loaded(0, nullptr);
+//   emscripten_fetch_close(fetch);
+// }
+// #endif
 
-void fetch_avatar1_url_fail(emscripten_fetch_t *fetch) {
-  GameRenderer *game = (GameRenderer *)fetch->userData;
-  game->avatar1_loaded(0, nullptr);
-  emscripten_fetch_close(fetch);
-}
-
-void fetch_avatar2_url_success(emscripten_fetch_t *fetch) {
-  GameRenderer *game = (GameRenderer *)fetch->userData;
-  game->avatar2_loaded(fetch->numBytes, fetch->data);
-  emscripten_fetch_close(fetch);
-}
-
-void fetch_avatar2_url_fail(emscripten_fetch_t *fetch) {
-  GameRenderer *game = (GameRenderer *)fetch->userData;
-  game->avatar2_loaded(0, nullptr);
-  emscripten_fetch_close(fetch);
-}
-#endif
-
-void fetch_avatar1_url(const char *url, void *game_ptr) {
-#ifdef __EMSCRIPTEN__
-  emscripten_fetch_attr_t attr;
-  emscripten_fetch_attr_init(&attr);
-  std::strcpy(attr.requestMethod, "GET");
-  attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-  attr.onsuccess = fetch_avatar1_url_success;
-  attr.onerror = fetch_avatar1_url_fail;
-  attr.userData = game_ptr;
-  emscripten_fetch(&attr, url);
-#endif
-}
-
-void fetch_avatar2_url(const char *url, void *game_ptr) {
-#ifdef __EMSCRIPTEN__
-  emscripten_fetch_attr_t attr;
-  emscripten_fetch_attr_init(&attr);
-  std::strcpy(attr.requestMethod, "GET");
-  attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-  attr.onsuccess = fetch_avatar2_url_success;
-  attr.onerror = fetch_avatar2_url_fail;
-  attr.userData = game_ptr;
-  emscripten_fetch(&attr, url);
-#endif
-}
+// void fetch_avatar1_url(const char *url, void *game_ptr) {
+// #ifdef __EMSCRIPTEN__
+//   emscripten_fetch_attr_t attr;
+//   emscripten_fetch_attr_init(&attr);
+//   std::strcpy(attr.requestMethod, "GET");
+//   attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+//   attr.onsuccess = fetch_avatar1_url_success;
+//   attr.onerror = fetch_avatar1_url_fail;
+//   attr.userData = game_ptr;
+//   emscripten_fetch(&attr, url);
+// #endif
+// }
+//
+// void fetch_avatar2_url(const char *url, void *game_ptr) {
+// #ifdef __EMSCRIPTEN__
+//   emscripten_fetch_attr_t attr;
+//   emscripten_fetch_attr_init(&attr);
+//   std::strcpy(attr.requestMethod, "GET");
+//   attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+//   attr.onsuccess = fetch_avatar2_url_success;
+//   attr.onerror = fetch_avatar2_url_fail;
+//   attr.userData = game_ptr;
+//   emscripten_fetch(&attr, url);
+// #endif
+// }
